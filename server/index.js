@@ -25,6 +25,17 @@ db.connect(err => {
   console.log('Połączono z MySQL');
 });
 
+// Middleware parsujące JSON, jeśli potrzebny
+app.use(express.json());
+
+// Inne middleware i konfiguracje Twojej aplikacji
+
+// Importuj router z ofertami z zewnętrznego API
+const lockstepOffersRouter = require("./routes/lockstepOffers");
+
+// Montowanie routera – endpointy będą dostępne pod /api/lockstep-offers
+app.use("/api/lockstep-offers", lockstepOffersRouter);
+
 // Rejestracja
 app.post('/register', async (req, res) => {
   const { name, email, password, role } = req.body;

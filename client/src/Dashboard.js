@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import TabInputData from './TabInputData';
 import TabViewData from './TabViewData';
 import axios from 'axios';
+import OffersTable from './Offers';
 
 function Dashboard() {
   const user = getUser();
@@ -71,6 +72,7 @@ function Dashboard() {
             <button onClick={() => setActiveTab('input')}>➕ Wprowadzanie danych</button>
             <button onClick={() => setActiveTab('view')}>📄 Podgląd bazy</button>
             <button onClick={() => setActiveTab('password')}>🔐 Zmiana hasła</button>
+            <button onClick={() => setActiveTab('offers')}> Oferty pracy</button>
           </div>
 
           {activeTab === 'input' && (
@@ -82,6 +84,7 @@ function Dashboard() {
           )}
           {activeTab === 'view' && <TabViewData entries={entries} />}  {/* Przekazanie danych do TabViewData */}
           {activeTab === 'password' && <ChangePassword />}
+          {activeTab === 'offers' && <OffersTable />}
         </div>
   
         {user?.role === 'admin' ? <AdminPanel /> : <UserPanel />}

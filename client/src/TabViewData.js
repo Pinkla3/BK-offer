@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react';
+// TabViewData.js
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Modal from 'react-modal';
 import { toast } from 'react-toastify';
 import TabInputData from './TabInputData'; // Komponent do dodawania nowych danych
+import EditOffersModal from './EditOffersModal'; // Komponent modala z ofertami
 
 Modal.setAppElement('#root');  // Ustawienie aplikacji jako root dla modala
 
@@ -39,32 +41,6 @@ const inputStyle = {
   outlineColor: '#007bff'
 };
 
-// Funkcja formatująca datę w formacie "YYYY-MM" na czytelny napis "Miesiąc RRRR"
-const formatMonthYear = (monthYearStr) => {
-  if (!monthYearStr || monthYearStr.length !== 7 || !monthYearStr.includes('-')) return '';
-  const [year, month] = monthYearStr.split('-');
-  if (!month || !year || isNaN(month) || isNaN(year)) return '';
-  
-  const date = new Date(year, month - 1);
-  const months = [
-    'styczeń', 'luty', 'marzec', 'kwiecień', 'maj', 'czerwiec',
-    'lipiec', 'sierpień', 'wrzesień', 'październik', 'listopad', 'grudzień'
-  ];
-  return `${months[date.getMonth()]} ${date.getFullYear()}`;
-};
-
-// Funkcja konwertująca napis w formacie "Miesiąc RRRR" na "YYYY-MM"
-const convertToMonthYearFormat = (monthYearStr) => {
-  if (!monthYearStr) return '';
-  const months = {
-    'styczeń': '01', 'luty': '02', 'marzec': '03', 'kwiecień': '04', 'maj': '05', 'czerwiec': '06',
-    'lipiec': '07', 'sierpień': '08', 'wrzesień': '09', 'październik': '10', 'listopad': '11', 'grudzień': '12'
-  };
-  const [monthName, year] = monthYearStr.split(' ');
-  const month = months[monthName.toLowerCase()] || '01';
-  return `${year}-${month}`;
-};
-
 function TabViewData() {
   const [entries, setEntries] = useState([]);
   const [sortedEntries, setSortedEntries] = useState([]);
@@ -75,6 +51,10 @@ function TabViewData() {
   const [sortColumn, setSortColumn] = useState('nazwisko');
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchVisible, setIsSearchVisible] = useState(false);
+
+  // Dla modala z ofertami pracy – stan dostępności (dyspozycyjność)
+  const [availability, setAvailability] = useState("2025-05");
+  const [isOffersModalOpen, setIsOffersModalOpen] = useState(false);
 
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
@@ -96,15 +76,15 @@ function TabViewData() {
       referencje: entry.referencje,
       ostatni_kontakt: entry.ostatni_kontakt,
       notatka: entry.notatka
-    }
+    };
   };
 
-  // Filtrowanie wpisów – dodano wyszukiwanie po nazwach miesięcy
+  // Filtrowanie wpisów – wyszukiwanie w tabeli wpisów
   const filterEntries = (entries) => {
     if (!searchQuery) return entries;
     return entries.filter(entry => {
-      const dyspozycyjnoscFormatted = entry.dyspozycyjnosc ? formatMonthYear(entry.dyspozycyjnosc) : '';
-      const searchString = `${entry.imie} ${entry.nazwisko} ${entry.jezyk} ${entry.fs} ${entry.nr} ${entry.do_opieki} ${entry.dyspozycyjnosc} ${dyspozycyjnoscFormatted} ${entry.oczekiwania} ${entry.referencje} ${entry.ostatni_kontakt} ${entry.notatka}`.toLowerCase();
+      const dyspozycyjnoscFormatted = entry.dyspozycyjnosc ? entry.dyspozycyjnosc : '';
+      const searchString = `${entry.imie} ${entry.nazwisko} ${entry.jezyk} ${entry.fs} ${entry.nr} ${entry.do_opieki} ${dyspozycyjnoscFormatted} ${entry.oczekiwania} ${entry.referencje} ${entry.ostatni_kontakt} ${entry.notatka}`.toLowerCase();
       return searchString.includes(searchQuery.toLowerCase());
     });
   };
@@ -135,24 +115,17 @@ function TabViewData() {
     if (sortColumn === column) {
       newSortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
     }
-    const columnKey = column
-      .toLowerCase()
-      .replace(/\s+/g, '_')
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[ąćęłńóśżź]/g, (match) => match.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase());
+    const columnKey = column.toLowerCase().replace(/\s+/g, '_');
     const sortedData = [...entries].sort((a, b) => {
       let valueA = a[columnKey];
       let valueB = b[columnKey];
-      if (valueA === undefined || valueB === undefined) {
-        return 0;
-      }
+      if (valueA === undefined || valueB === undefined) return 0;
       if (!isNaN(valueA) && !isNaN(valueB)) {
         valueA = parseFloat(valueA);
         valueB = parseFloat(valueB);
       }
       if (typeof valueA === 'string' && typeof valueB === 'string') {
-        return newSortOrder === 'asc' 
+        return newSortOrder === 'asc'
           ? valueA.localeCompare(valueB, 'pl', { sensitivity: 'base' })
           : valueB.localeCompare(valueA, 'pl', { sensitivity: 'base' });
       }
@@ -179,18 +152,15 @@ function TabViewData() {
   // Inicjalizacja formularza edycji
   const handleEdit = (entry) => {
     setEditingEntry(entry);
+    // Ustaw availability na wartość z pola dyspozycyjność (zakładamy, że jest już w formacie "YYYY-MM")
+    setAvailability(entry.dyspozycyjnosc || "");
     setEditForm({
       ...entry,
-      dyspozycyjnosc: entry.dyspozycyjnosc
-        ? (/^\d{4}-\d{2}$/.test(entry.dyspozycyjnosc)
-            ? entry.dyspozycyjnosc
-            : convertToMonthYearFormat(entry.dyspozycyjnosc))
-        : '',
-      ostatni_kontakt: formatDate(entry.ostatni_kontakt),
-    });
-  };
+      // Jeśli wartość dyspozycyjność nie jest w oczekiwanym formacie, możesz ją przekonwertować
+      dyspozycyjnosc: entry.dyspozycyjnosc ? entry.dyspozycyjnosc : '',
+      ostatni_kontakt: formatDate(entry.ostatni_kontakt),})}
 
-  // Obsługa zmian w formularzu edycji – dla pola "dyspozycyjność" używamy input type "month"
+  // Obsługa zmian w formularzu edycji – dla pola "dyspozycyjność" używamy input typu "month"
   const handleEditChange = (field, value) => {
     setEditForm((prev) => ({ ...prev, [field]: value }));
   };
@@ -302,7 +272,7 @@ function TabViewData() {
               <td>{entry.fs}</td>
               <td>{entry.nr}</td>
               <td>{entry.do_opieki}</td>
-              <td>{entry.dyspozycyjnosc ? formatMonthYear(entry.dyspozycyjnosc) : '—'}</td>
+              <td>{entry.dyspozycyjnosc ? entry.dyspozycyjnosc : '—'}</td>
               <td>{entry.oczekiwania}</td>
               <td>{entry.referencje}</td>
               <td>{entry.ostatni_kontakt ? formatDate(entry.ostatni_kontakt) : '—'}</td>
@@ -315,6 +285,7 @@ function TabViewData() {
         </tbody>
       </table>
 
+      {/* Modal do edycji wpisu */}
       <Modal
         isOpen={!!editingEntry}
         onRequestClose={() => setEditingEntry(null)}
@@ -396,7 +367,6 @@ function TabViewData() {
               </div>
               <div style={{ flex: 1 }}>
                 <label style={labelStyle}>Dyspozycyjność</label>
-                {/* Input typu "month" – wartość w formacie "YYYY-MM" */}
                 <input
                   type="month"
                   value={editForm.dyspozycyjnosc || ''}
@@ -426,6 +396,29 @@ function TabViewData() {
             <div style={{ marginBottom: 16 }}>
               <label style={{ display: 'block', textAlign: 'center', fontWeight: 600, marginBottom: 4 }}>Notatka</label>
               <textarea value={editForm.notatka || ''} onChange={e => handleEditChange('notatka', e.target.value)} rows={3} style={inputStyle} />
+            </div>
+            {/* Dodany przycisk i modal z ofertami pracy według dyspozycyjności */}
+            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+              <button
+                type="button"
+                onClick={() => setIsOffersModalOpen(true)}
+                style={{
+                  padding: '10px 20px',
+                  backgroundColor: '#28a745',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '16px'
+                }}
+              >
+                Pokaż oferty pracy dla dyspozycyjności {availability}
+              </button>
+              <EditOffersModal
+                isOpen={isOffersModalOpen}
+                onRequestClose={() => setIsOffersModalOpen(false)}
+                availability={availability}
+              />
             </div>
             <button type="submit" style={{
               width: '100%',
