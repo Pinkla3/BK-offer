@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: bk-offer-backend
+    env: node
+    rootDir: server
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: PORT
+        value: 3001
+      - key: MONGODB_URI
+        value: your-mongodb-uri-here
+      - key: JWT_SECRET
+        value: your-jwt-secret-here
