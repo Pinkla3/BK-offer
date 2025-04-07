@@ -1,21 +1,154 @@
-import { getUser, removeToken } from './auth';
+// Dashboard.js
+import React, { useState, useEffect } from 'react';
+import styled, { createGlobalStyle } from 'styled-components';
+import axios from 'axios';
+import { removeToken } from './auth';
 import AdminPanel from './AdminPanel';
 import UserPanel from './UserPanel';
 import ChangePassword from './ChangePassword';
-import { useState, useEffect } from 'react';
 import TabInputData from './TabInputData';
 import TabViewData from './TabViewData';
-import axios from 'axios';
 import OffersTable from './Offers';
+import { FaPlus, FaDatabase, FaLock, FaBriefcase } from 'react-icons/fa';
+import TabChangePassword from './TabChangePassword';
 
-function Dashboard() {
-  const user = getUser();
+const GlobalStyle = createGlobalStyle`
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  body {
+    font-family: Arial, sans-serif;
+    color: #333;
+  }
+`;
+
+const DashboardContainer = styled.div`
+  display: flex;
+  min-height: 100vh;
+`;
+
+const Sidebar = styled.aside`
+  width: 220px;
+  padding: 30px 20px;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  background: url('/images/background.png') left/cover;
+  position: relative;
+  
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: rgba(255,255,255,0.85); // opcjonalnie dla lepszej czytelności
+    z-index: 0;
+  }
+
+  & > * {
+    position: relative;
+    z-index: 1; /* upewnij się, że elementy sidebara są na wierzchu */
+  }
+`;
+
+const SidebarButton = styled.button`
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-left: ${props => (props.$active ? '4px solid #007bff' : '4px solid transparent')};
+  color: ${props => (props.$active ? '#007bff' : '#555')};
+  transition: all 0.2s ease;
+  &:hover {
+    color: #007bff;
+    border-left: 4px solid #007bff;
+  }
+`;
+
+const MainArea = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+`;
+
+const Header = styled.header`
+  background: url('/images/background.png');
+  padding: 15px 30px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  z-index: 1;
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: rgba(255,255,255,0.85); // opcjonalnie dla lepszej czytelności
+    z-index: 0;
+  }
+
+  & > * {
+    position: relative;
+    z-index: 1;
+  }
+`;
+
+const UserInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 16px;
+`;
+
+const LogoutButton = styled.button`
+  background: #e74c3c;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 14px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  &:hover {
+    background: #c0392b;
+  }
+`;
+
+const Content = styled.main`
+  flex: 1;
+`;
+
+const Dashboard = () => {
+  const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('input');
-  const [isAdding, setIsAdding] = useState(false);  // Stan do kontrolowania widoczności formularza
-  const [editingEntry, setEditingEntry] = useState(null);  // Przechowuje dane edytowanego wpisu
-  const [entries, setEntries] = useState([]);  // Przechowuje listę wpisów
+  const [isAdding, setIsAdding] = useState(false);
+  const [editingEntry, setEditingEntry] = useState(null);
+  const [entries, setEntries] = useState([]);
 
-  // Funkcja do pobierania danych z bazy
+  // Pobieranie danych użytkownika z endpointu /userdb
+  const fetchUser = async () => {
+    try {
+      const response = await axios.get('http://localhost:3001/userdb');
+      console.log('Odpowiedź z userdb:', response.data);
+      if (response.data && response.data.users && response.data.users.length > 0) {
+        setUser(response.data.users[0]);
+      }
+    } catch (error) {
+      console.error('Błąd pobierania danych użytkownika:', error);
+    }
+  };
+
+  // Pobieranie wpisów
   const fetchEntries = async () => {
     try {
       const response = await axios.get('http://localhost:3001/entries');
@@ -25,12 +158,12 @@ function Dashboard() {
     }
   };
 
-  // Funkcja do edytowania wpisu
+  // Funkcja do edycji wpisu
   const handleEdit = (entryId) => {
     axios.get(`http://localhost:3001/entries/${entryId}`)
       .then((response) => {
-        setEditingEntry(response.data);  // Ustawienie danych edytowanego wpisu
-        setIsAdding(true);  // Otwieramy formularz edycji
+        setEditingEntry(response.data);
+        setIsAdding(true);
       })
       .catch((error) => {
         console.error('Błąd pobierania danych do edycji:', error);
@@ -38,59 +171,58 @@ function Dashboard() {
   };
 
   useEffect(() => {
-    fetchEntries();  // Pobranie danych po załadowaniu komponentu
+    fetchUser();
+    fetchEntries();
   }, []);
 
+  const handleLogout = () => {
+    removeToken();
+    window.location.href = '/login';
+  };
+
+  let content;
+  if (activeTab === 'input') {
+    content = <TabInputData setIsAdding={setIsAdding} fetchEntries={fetchEntries} editingEntry={editingEntry} />;
+  } else if (activeTab === 'view') {
+    content = <TabViewData entries={entries} />;
+  } else if (activeTab === 'password') {
+    content = <TabChangePassword />;
+  } 
+
   return (
-    <div style={{
-      minHeight: '100vh',
-      padding: 40,
-      background: '#f0f4ff',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center'
-    }}>
-      <div style={{
-        maxWidth: 600,
-        width: '100%',
-        background: '#fff',
-        borderRadius: 12,
-        padding: 30,
-        boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-      }}>
-        <button onClick={() => {
-          removeToken();
-          window.location.href = '/login';
-        }}>Wyloguj</button>
-  
-        <h2 style={{ textAlign: 'center' }}>
-          Witaj, {user?.role === 'admin' ? 'Administratorze' : 'Użytkowniku'}!
-        </h2>
-
-        <div style={{ padding: 20 }}>
-          <div style={{ marginBottom: 20 }}>
-            <button onClick={() => setActiveTab('input')}>➕ Wprowadzanie danych</button>
-            <button onClick={() => setActiveTab('view')}>📄 Podgląd bazy</button>
-            <button onClick={() => setActiveTab('password')}>🔐 Zmiana hasła</button>
-            <button onClick={() => setActiveTab('offers')}> Oferty pracy</button>
-          </div>
-
-          {activeTab === 'input' && (
-            <TabInputData
-              setIsAdding={setIsAdding}
-              fetchEntries={fetchEntries}  // Przekazanie funkcji do pobierania danych
-              editingEntry={editingEntry}
-            />
-          )}
-          {activeTab === 'view' && <TabViewData entries={entries} />}  {/* Przekazanie danych do TabViewData */}
-          {activeTab === 'password' && <ChangePassword />}
-          {activeTab === 'offers' && <OffersTable />}
-        </div>
-  
-        {user?.role === 'admin' ? <AdminPanel /> : <UserPanel />}
-      </div>
-    </div>
+    <>
+      <GlobalStyle />
+      <DashboardContainer>
+        <Sidebar>
+            {/* Logo */}
+  <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+    <img src="/images/logo.jpg" alt="Logo" style={{ width: '100px' }} />
+  </div>
+          <SidebarButton $active={activeTab === 'input'} onClick={() => setActiveTab('input')}>
+            <FaPlus size={18} /> Dodaj opiekunkę do bazy
+          </SidebarButton>
+          <SidebarButton $active={activeTab === 'view'} onClick={() => setActiveTab('view')}>
+            <FaDatabase size={18} /> Podgląd bazy opiekunek
+          </SidebarButton>
+          <SidebarButton $active={activeTab === 'password'} onClick={() => setActiveTab('password')}>
+            <FaLock size={18} /> Zmiana hasła
+          </SidebarButton>
+        </Sidebar>
+        <MainArea>
+          <Header>
+            <UserInfo>
+              <span>{user ? `Witaj, ${user.name}` : 'Użytkownik'}</span>
+              <LogoutButton onClick={handleLogout}>Wyloguj</LogoutButton>
+            </UserInfo>
+          </Header>
+          <Content>
+            {content}
+          </Content>
+          {user?.role === 'admin' ? <AdminPanel /> : <UserPanel />}
+        </MainArea>
+      </DashboardContainer>
+    </>
   );
-}
+};
 
 export default Dashboard;

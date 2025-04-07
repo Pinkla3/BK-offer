@@ -5,6 +5,7 @@ import Modal from 'react-modal';
 import { toast } from 'react-toastify';
 import TabInputData from './TabInputData'; // Komponent do dodawania nowych danych
 import EditOffersModal from './EditOffersModal'; // Komponent modala z ofertami
+import { FaPlus, FaTrash,FaSearch } from 'react-icons/fa';
 
 Modal.setAppElement('#root');  // Ustawienie aplikacji jako root dla modala
 
@@ -60,7 +61,14 @@ function TabViewData() {
     if (!dateStr) return '';
     return dateStr.slice(0, 10);
   };
-
+  const formatMonthYear = (monthYear) => {
+    if (!monthYear) return '—';
+    
+    const [year, month] = monthYear.split('-');
+    const date = new Date(year, month - 1);
+  
+    return date.toLocaleDateString('pl-PL', { year: 'numeric', month: 'long' });
+  };
   // Normalizowanie danych pobranych z backendu
   const normalizeEntryData = (entry) => {
     return {
@@ -82,9 +90,26 @@ function TabViewData() {
   // Filtrowanie wpisów – wyszukiwanie w tabeli wpisów
   const filterEntries = (entries) => {
     if (!searchQuery) return entries;
+  
     return entries.filter(entry => {
-      const dyspozycyjnoscFormatted = entry.dyspozycyjnosc ? entry.dyspozycyjnosc : '';
-      const searchString = `${entry.imie} ${entry.nazwisko} ${entry.jezyk} ${entry.fs} ${entry.nr} ${entry.do_opieki} ${dyspozycyjnoscFormatted} ${entry.oczekiwania} ${entry.referencje} ${entry.ostatni_kontakt} ${entry.notatka}`.toLowerCase();
+      const dyspozycyjnoscFormatted = entry.dyspozycyjnosc 
+        ? new Date(entry.dyspozycyjnosc).toLocaleDateString('pl-PL', { year: 'numeric', month: 'long' })
+        : '';
+  
+      const searchString = `
+        ${entry.imie} 
+        ${entry.nazwisko} 
+        ${entry.jezyk} 
+        ${entry.fs} 
+        ${entry.nr} 
+        ${entry.do_opieki} 
+        ${dyspozycyjnoscFormatted} 
+        ${entry.oczekiwania} 
+        ${entry.referencje} 
+        ${entry.ostatni_kontakt} 
+        ${entry.notatka}
+      `.toLowerCase();
+  
       return searchString.includes(searchQuery.toLowerCase());
     });
   };
@@ -109,13 +134,31 @@ function TabViewData() {
     setSearchQuery(event.target.value);
   };
 
+  // Mapowanie nagłówków na właściwe klucze danych
+  const columnMapping = {
+    'imię': 'imie',
+    'nazwisko': 'nazwisko',
+    'język': 'jezyk',
+    'fs': 'fs',
+    'nr': 'nr',
+    'do opieki': 'do_opieki',
+    'dyspozycyjność': 'dyspozycyjnosc',
+    'oczekiwania': 'oczekiwania',
+    'referencje': 'referencje',
+    'ostatni kontakt': 'ostatni_kontakt',
+    'notatka': 'notatka'
+  };
+
   // Sortowanie wpisów
   const handleSort = (column) => {
     let newSortOrder = 'asc';
     if (sortColumn === column) {
       newSortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
     }
-    const columnKey = column.toLowerCase().replace(/\s+/g, '_');
+    const headerKey = column.toLowerCase();
+    const columnKey = columnMapping[headerKey] || headerKey;
+    const collator = new Intl.Collator('pl', { sensitivity: 'base' });
+
     const sortedData = [...entries].sort((a, b) => {
       let valueA = a[columnKey];
       let valueB = b[columnKey];
@@ -126,8 +169,8 @@ function TabViewData() {
       }
       if (typeof valueA === 'string' && typeof valueB === 'string') {
         return newSortOrder === 'asc'
-          ? valueA.localeCompare(valueB, 'pl', { sensitivity: 'base' })
-          : valueB.localeCompare(valueA, 'pl', { sensitivity: 'base' });
+          ? collator.compare(valueA, valueB)
+          : collator.compare(valueB, valueA);
       }
       return newSortOrder === 'asc' ? valueA - valueB : valueB - valueA;
     });
@@ -152,17 +195,22 @@ function TabViewData() {
   // Inicjalizacja formularza edycji
   const handleEdit = (entry) => {
     setEditingEntry(entry);
-    // Ustaw availability na wartość z pola dyspozycyjność (zakładamy, że jest już w formacie "YYYY-MM")
+    // Ustaw availability na wartość z pola dyspozycyjność
     setAvailability(entry.dyspozycyjnosc || "");
     setEditForm({
       ...entry,
-      // Jeśli wartość dyspozycyjność nie jest w oczekiwanym formacie, możesz ją przekonwertować
-      dyspozycyjnosc: entry.dyspozycyjnosc ? entry.dyspozycyjnosc : '',
-      ostatni_kontakt: formatDate(entry.ostatni_kontakt),})}
+      dyspozycyjnosc: entry.dyspozycyjnosc || '',
+      ostatni_kontakt: formatDate(entry.ostatni_kontakt),
+    });
+  };
 
   // Obsługa zmian w formularzu edycji – dla pola "dyspozycyjność" używamy input typu "month"
   const handleEditChange = (field, value) => {
     setEditForm((prev) => ({ ...prev, [field]: value }));
+  
+    if (field === 'dyspozycyjnosc') {
+      setAvailability(value);
+    }
   };
 
   // Zapisywanie edytowanego wpisu
@@ -179,40 +227,51 @@ function TabViewData() {
 
   return (
     <div style={{ overflowX: 'auto', padding: 20 }}>
-      <h2 style={{ textAlign: 'center' }}>📄 Wpisy w bazie danych</h2>
+      <h2 style={{ textAlign: 'center' }}>Lista Opiekunek</h2>
       
       {/* Kontener z przyciskiem oraz polem wyszukiwania */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-        <button
-          onClick={() => setIsSearchVisible(prev => !prev)}
-          style={{
-            width: '220px',
-            padding: '10px 20px',
-            backgroundColor: '#007bff',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '16px'
-          }}
-        >
-          {isSearchVisible ? 'Ukryj wyszukiwanie' : 'Pokaż wyszukiwanie'}
-        </button>
-        {isSearchVisible && (
-          <input
-            type="text"
-            placeholder="Wyszukaj..."
-            value={searchQuery}
-            onChange={handleSearchChange}
-            style={{
-              padding: '10px',
-              borderRadius: '8px',
-              border: '1px solid #ccc',
-              outlineColor: '#007bff'
-            }}
-          />
-        )}
-      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop:'20px', marginBottom: '20px', justifyContent: 'center', padding:'10px' }}>
+      <button
+  onClick={() => {
+    setIsSearchVisible(prev => {
+      if (prev) setSearchQuery(''); // Jeśli ukrywasz, wyczyść pole wyszukiwania
+      return !prev;
+    });
+  }}
+  style={{
+    width: '220px',
+    padding: '10px 20px',
+    backgroundColor: '#007bff',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    fontSize: '16px',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '8px'
+  }}
+>
+  <FaSearch style={{ fontSize: '18px' }} />
+  {isSearchVisible ? 'Ukryj wyszukiwanie' : 'Pokaż wyszukiwanie'}
+</button>
+  
+  {isSearchVisible && (
+    <input
+      type="text"
+      placeholder="Wyszukaj..."
+      value={searchQuery}
+      onChange={handleSearchChange}
+      style={{
+        padding: '10px',
+        borderRadius: '8px',
+        border: '1px solid #ccc',
+        outlineColor: '#007bff'
+      }}
+    />
+  )}
+</div>
 
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead style={{ backgroundColor: '#007bff' }}>
@@ -230,27 +289,33 @@ function TabViewData() {
                     borderBottom: '1px solid #e0e0e0',
                     cursor: 'pointer'
                   }}
-                  onClick={() => handleSort(columnKey)}
+                  onClick={() => handleSort(col)}
                 >
                   {col}
-                  {sortColumn === columnKey && (sortOrder === 'asc' ? ' 🔼' : ' 🔽')}
+                  {sortColumn === col && (sortOrder === 'asc' ? ' 🔼' : ' 🔽')}
                 </th>
               );
             })}
-            <th style={{ padding: '10px', textAlign: 'center', cursor: 'pointer' }} onClick={() => setIsAdding(true)}>
-              <button
-                style={{
-                  padding: '5px 10px',
-                  backgroundColor: '#28a745',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '20px',
-                }}
-              >
-                +
-              </button>
+<th style={{ padding: '10px', textAlign: 'center' }}>
+  <button
+    onClick={() => setIsAdding(true)}
+    style={{
+      backgroundColor: '#28a745',
+      color: '#fff',
+      border: 'none',
+      width: '36px',
+      height: '36px',
+      cursor: 'pointer',
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontSize: '18px',
+      transition: 'background-color 0.3s',
+    }}
+    title="Dodaj nowy wpis"
+  >
+    <FaPlus />
+  </button>
             </th>
           </tr>
         </thead>
@@ -262,6 +327,7 @@ function TabViewData() {
                 borderBottom: '1px solid #eee',
                 transition: 'background-color 0.2s',
                 cursor: 'pointer',
+                padding:'10px'
               }}
               onClick={() => handleEdit(entry)}
             >
@@ -272,14 +338,32 @@ function TabViewData() {
               <td>{entry.fs}</td>
               <td>{entry.nr}</td>
               <td>{entry.do_opieki}</td>
-              <td>{entry.dyspozycyjnosc ? entry.dyspozycyjnosc : '—'}</td>
+              <td>{formatMonthYear(entry.dyspozycyjnosc)}</td>
               <td>{entry.oczekiwania}</td>
               <td>{entry.referencje}</td>
               <td>{entry.ostatni_kontakt ? formatDate(entry.ostatni_kontakt) : '—'}</td>
               <td>{entry.notatka}</td>
-              <td>
-                <button onClick={(e) => handleDelete(entry.id, e)} style={deleteBtn}>🗑️</button>
-              </td>
+              <td style={{padding:'10px', textAlign: 'center' }}>
+  <button
+    onClick={(e) => handleDelete(entry.id, e)}
+    style={{
+      backgroundColor:'red',
+      color: '#fff',
+      border: 'none',
+      width: '36px',
+      height: '36px',
+      cursor: 'pointer',
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontSize: '18px',
+      transition: 'background-color 0.3s',
+    }}
+    title="Usuń wpis"
+  >
+    <FaTrash />
+  </button>
+</td>
             </tr>
           ))}
         </tbody>
@@ -292,12 +376,30 @@ function TabViewData() {
         contentLabel="Edytuj wpis"
         style={{
           content: {
-            maxWidth: '600px',
-            margin: 'auto',
+            width: '800px',
+            maxWidth: '80%',
+            maxHeight: '90vh',
+            overflowY: 'auto',
             padding: '30px',
             borderRadius: '12px',
             boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-            background: '#fff'
+            background: '#ffffff', // biały kolor tła modala
+            inset: '0',
+            margin: 'auto',
+            position: 'relative',
+            zIndex: '1001'
+          },
+          overlay: {
+            backgroundColor: 'rgba(0, 0, 0, 0.5)', // tło całego ekranu za modalem
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'fixed',
+            top: '0',
+            left: '0',
+            right: '0',
+            bottom: '0',
+            zIndex: '1000'
           }
         }}
       >
@@ -317,7 +419,19 @@ function TabViewData() {
         >
           &times;
         </button>
-        <h2 style={{ textAlign: 'center', marginBottom: 20 }}>✏️ Edycja wpisu</h2>
+        <h2 style={{ textAlign: 'center',
+        display:'flex',
+              width: '100%',
+              padding: '12px',
+              backgroundColor: '#007bff',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              marginTop: 10,
+              justifyContent:'center',
+              alignItems:'center',
+              marginBottom:15}}>Edycja danych opiekunki</h2>
         {editingEntry && (
           <form onSubmit={(e) => { e.preventDefault(); handleSaveEdit(); }}>
             <div style={{ display: 'flex', gap: '10px', marginBottom: 16 }}>
@@ -397,28 +511,30 @@ function TabViewData() {
               <label style={{ display: 'block', textAlign: 'center', fontWeight: 600, marginBottom: 4 }}>Notatka</label>
               <textarea value={editForm.notatka || ''} onChange={e => handleEditChange('notatka', e.target.value)} rows={3} style={inputStyle} />
             </div>
-            {/* Dodany przycisk i modal z ofertami pracy według dyspozycyjności */}
+            {/* Przycisk i modal z ofertami pracy według dyspozycyjności */}
             <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-              <button
-                type="button"
-                onClick={() => setIsOffersModalOpen(true)}
-                style={{
-                  padding: '10px 20px',
-                  backgroundColor: '#28a745',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '16px'
-                }}
-              >
-                Pokaż oferty pracy dla dyspozycyjności {availability}
-              </button>
-              <EditOffersModal
-                isOpen={isOffersModalOpen}
-                onRequestClose={() => setIsOffersModalOpen(false)}
-                availability={availability}
-              />
+            <button
+  type="button"
+  onClick={() => setIsOffersModalOpen(true)}
+  style={{
+    padding: '10px 20px',
+    backgroundColor: '#28a745',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    fontSize: '16px',
+      zIndex: '2001'
+  }}
+>
+  Pokaż oferty pracy dla dyspozycyjności w {editForm.dyspozycyjnosc || availability}
+</button>
+
+<EditOffersModal
+  isOpen={isOffersModalOpen}
+  onRequestClose={() => setIsOffersModalOpen(false)}
+  availability={editForm.dyspozycyjnosc || availability}
+/>
             </div>
             <button type="submit" style={{
               width: '100%',
@@ -427,9 +543,9 @@ function TabViewData() {
               color: '#fff',
               border: 'none',
               borderRadius: '8px',
-              cursor: 'pointer'
+              cursor: 'pointer',
             }}>
-              💾 Zapisz zmiany
+           Zapisz zmiany
             </button>
           </form>
         )}
@@ -437,15 +553,33 @@ function TabViewData() {
       <Modal
         isOpen={isAdding}
         onRequestClose={() => setIsAdding(false)}
-        contentLabel="Dodaj nowy wpis"
+        contentLabel="Dodaj dane opiekunki"
         style={{
           content: {
-            maxWidth: '600px',
-            margin: 'auto',
+            width: '800px',
+            maxWidth: '80%',
+            maxHeight: '90vh',
+            overflowY: 'auto',
             padding: '30px',
             borderRadius: '12px',
             boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-            background: '#fff'
+            background: '#ffffff', // biały kolor tła modala
+            inset: '0',
+            margin: 'auto',
+            position: 'relative',
+            zIndex: '1001'
+          },
+          overlay: {
+            backgroundColor: 'rgba(0, 0, 0, 0.5)', // tło całego ekranu za modalem
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'fixed',
+            top: '0',
+            left: '0',
+            right: '0',
+            bottom: '0',
+            zIndex: '1000'
           }
         }}
       >
@@ -465,7 +599,6 @@ function TabViewData() {
         >
           &times;
         </button>
-        <h2 style={{ textAlign: 'center', marginBottom: 20 }}>+ Dodaj nowy wpis</h2>
         <TabInputData setIsAdding={setIsAdding} fetchEntries={fetchEntries} />
       </Modal>
     </div>

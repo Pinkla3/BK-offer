@@ -71,6 +71,18 @@ app.get('/check-email', (req, res) => {
   });
 });
 
+// Dodaj poniżej innych endpointów w Twoim serwerze (np. pod app.get('/entries', ...))
+app.get('/userdb', (req, res) => {
+  db.query('SELECT * FROM users', (err, results) => {
+    if (err) {
+      console.error('Błąd przy pobieraniu danych użytkownika:', err);
+      return res.status(500).json({ error: 'Błąd serwera' });
+    }
+    // Zakładamy, że chcesz zwrócić wszystkich użytkowników w obiekcie, gdzie tablica jest w polu "users"
+    res.json({ users: results });
+  });
+});
+
 // Reset hasła
 app.post('/reset-password', (req, res) => {
   const { email } = req.body;

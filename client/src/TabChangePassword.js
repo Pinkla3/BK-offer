@@ -19,7 +19,7 @@ function TabChangePassword() {
     }
 
     try {
-      const token = localStorage.getItem('token'); // zakładamy że zapisujesz token po logowaniu
+      const token = localStorage.getItem('token');
       await axios.post('/change-password', {
         oldPassword,
         newPassword
@@ -38,9 +38,55 @@ function TabChangePassword() {
     }
   };
 
+  const containerStyle = {
+    maxWidth: 400,
+    margin: '0 auto',
+    padding: 20,
+    background: '#fff',
+    borderRadius: 12,
+  };
+
+  const headerStyle = {
+    textAlign: 'center',
+    marginBottom: 20,
+    fontSize: '1.5rem',
+    fontWeight: 600
+  };
+
+  const inputStyle = {
+    width: '100%',
+    padding: '10px',
+    borderRadius: 8,
+    border: '1px solid #ccc',
+    boxSizing: 'border-box',
+    outlineColor: '#007bff',
+    fontSize: '1rem'
+  };
+
+  const labelStyle = {
+    display: 'block',
+    fontWeight: 600,
+    marginBottom: 4,
+    marginLeft: 3,
+    fontSize: '0.9rem'
+  };
+
+  const buttonStyle = {
+    width: '100%',
+    padding: '10px',
+    backgroundColor: '#007bff',
+    color: '#fff',
+    border: 'none',
+    borderRadius: 8,
+    cursor: 'pointer',
+    fontSize: '1rem',
+    marginTop: 10,
+    transition: 'background-color 0.3s'
+  };
+
   return (
-    <div style={{ maxWidth: 400, margin: '0 auto', paddingTop: 20 }}>
-      <h3 style={{ textAlign: 'center', marginBottom: 20 }}>🔐 Zmiana hasła</h3>
+    <div style={containerStyle}>
+      <h3 style={headerStyle}>Zmiana hasła</h3>
       <form onSubmit={handleSubmit}>
         {[
           { label: 'Stare hasło', value: oldPassword, set: setOldPassword, type: 'password' },
@@ -48,34 +94,16 @@ function TabChangePassword() {
           { label: 'Potwierdź nowe hasło', value: confirmPassword, set: setConfirmPassword, type: 'password' }
         ].map(({ label, value, set, type }, idx) => (
           <div key={idx} style={{ marginBottom: 14 }}>
-            <label style={{ display: 'block', fontWeight: 600, marginBottom: 4 }}>{label}</label>
+            <label style={labelStyle}>{label}</label>
             <input
               type={type}
               value={value}
               onChange={(e) => set(e.target.value)}
-              style={{
-                width: '100%',
-                padding: 10,
-                borderRadius: 8,
-                border: '1px solid #ccc',
-                boxSizing: 'border-box'
-              }}
+              style={inputStyle}
             />
           </div>
         ))}
-
-        <button
-          type="submit"
-          style={{
-            width: '100%',
-            padding: '10px',
-            backgroundColor: '#007bff',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer'
-          }}
-        >
+        <button type="submit" style={buttonStyle}>
           Zmień hasło
         </button>
       </form>

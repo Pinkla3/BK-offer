@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+// TabInputData.js
+import { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
@@ -32,7 +33,7 @@ function TabInputData({ setIsAdding, fetchEntries, editingEntry }) {
       form.ostatni_kontakt = null;  // Jeśli brak daty, ustawiamy NULL
     } else {
       const date = new Date(form.ostatni_kontakt);
-      form.ostatni_kontakt = date.toISOString().split('T')[0];  // Zmiana na format YYYY-MM-DD
+      form.ostatni_kontakt = date.toISOString().split('T')[0];  // Format YYYY-MM-DD
     }
 
     try {
@@ -61,29 +62,39 @@ function TabInputData({ setIsAdding, fetchEntries, editingEntry }) {
 
   return (
     <div style={{
-      minHeight: '100vh',
+      minHeight: '90vh',
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
-      background: '#f0f4ff',
-      padding: 20
+      position: 'relative'
     }}>
+      {/* Overlay dla lepszej czytelności */}
       <div style={{
+        padding:5,
         width: '100%',
-        maxWidth: '600px',
-        background: '#fff',
-        padding: '30px',
+        maxWidth: '800px',
+        position: 'relative',
+        zIndex: 2,
         borderRadius: '12px',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
         boxSizing: 'border-box'
       }}>
-        <h2 style={{ textAlign: 'center', marginBottom: 20 }}>
-          {editingEntry ? 'Edycja danych' : 'Wprowadzanie danych'}
-        </h2>
+<h2 style={{
+  textAlign: 'center',
+  width: '100%',
+  padding: '12px',
+  backgroundColor: '#007bff',
+  color: '#fff',
+  border: 'none',
+  borderRadius: '8px',
+  cursor: 'pointer',
+  marginTop: 0  // usunięto przerwę
+}}>
+  {editingEntry ? 'Edycja danych opiekunki:' : 'Dodaj opiekunkę:'}
+</h2>
 
         <form onSubmit={handleSubmit}>
           {/* Imię i nazwisko */}
-          <div style={{ display: 'flex', gap: '10px', marginBottom: 16 }}>
+          <div style={{ display: 'flex', gap: '10px', marginBottom: 16, marginTop: 16 }}>
             <div style={{ flex: 1 }}>
               <label style={{ display: 'block', fontWeight: 600, marginBottom: 4 }}>Imię</label>
               <input

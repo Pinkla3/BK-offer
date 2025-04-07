@@ -1,0 +1,246 @@
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+
+function TabInputData({ setIsAdding, fetchEntries, editingEntry }) {
+  // Inicjalizacja formularza z wartościami z editingEntry, jeśli istnieje
+  const [form, setForm] = useState({
+    imie: editingEntry ? editingEntry.imie : '',
+    nazwisko: editingEntry ? editingEntry.nazwisko : '',
+    jezyk: editingEntry ? editingEntry.jezyk : '',
+    fs: editingEntry ? editingEntry.fs : '',
+    nr: editingEntry ? editingEntry.nr : '',
+    do_opieki: editingEntry ? editingEntry.do_opieki : '',
+    dyspozycyjnosc: editingEntry ? editingEntry.dyspozycyjnosc : '',
+    oczekiwania: editingEntry ? editingEntry.oczekiwania : '',
+    referencje: editingEntry ? editingEntry.referencje : '',
+    ostatni_kontakt: editingEntry ? editingEntry.ostatni_kontakt : '',
+    notatka: editingEntry ? editingEntry.notatka : ''
+  });
+
+  // Funkcja do zmiany wartości formularza
+  const handleChange = (field, value) => {
+    setForm({ ...form, [field]: value });
+  };
+
+  // Funkcja do obsługi wysyłania formularza
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Konwersja daty na odpowiedni format
+    if (!form.ostatni_kontakt) {
+      form.ostatni_kontakt = null;  // Jeśli brak daty, ustawiamy NULL
+    } else {
+      const date = new Date(form.ostatni_kontakt);
+      form.ostatni_kontakt = date.toISOString().split('T')[0];  // Zmiana na format YYYY-MM-DD
+    }
+
+    try {
+      if (editingEntry) {
+        await axios.put(`http://localhost:3001/entries/${editingEntry.id}`, form);
+        toast.success('Dane zaktualizowane!');
+        fetchEntries();
+      } else {
+        await axios.post('http://localhost:3001/entries', form);
+        toast.success('Wpis dodany');
+        fetchEntries();
+      }
+      setIsAdding(false);  // Zamknięcie formularza po zapisaniu
+    } catch (err) {
+      console.error('Błąd zapisu danych:', err.response || err);
+      toast.error('Błąd zapisu danych');
+    }
+
+    // Resetowanie formularza
+    setForm({
+      imie: '', nazwisko: '', jezyk: '', fs: '', nr: '',
+      do_opieki: '', dyspozycyjnosc: '', oczekiwania: '',
+      referencje: '', ostatni_kontakt: '', notatka: ''
+    });
+  };
+
+  return (
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      background: '#f0f4ff',
+      padding: 20
+    }}>
+      <div style={{
+        width: '100%',
+        maxWidth: '600px',
+        background: '#fff',
+        padding: '30px',
+        borderRadius: '12px',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+        boxSizing: 'border-box'
+      }}>
+        <h2 style={{ textAlign: 'center', marginBottom: 20 }}>
+          {editingEntry ? 'Edycja danych' : 'Wprowadzanie danych'}
+        </h2>
+
+        <form onSubmit={handleSubmit}>
+          {/* Imię i nazwisko */}
+          <div style={{ display: 'flex', gap: '10px', marginBottom: 16 }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', fontWeight: 600, marginBottom: 4 }}>Imię</label>
+              <input
+                type="text"
+                placeholder="Wpisz imię"
+                value={form.imie}
+                onChange={e => handleChange('imie', e.target.value)}
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc', boxSizing: 'border-box' }}
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', fontWeight: 600, marginBottom: 4 }}>Nazwisko</label>
+              <input
+                type="text"
+                placeholder="Wpisz nazwisko"
+                value={form.nazwisko}
+                onChange={e => handleChange('nazwisko', e.target.value)}
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc', boxSizing: 'border-box' }}
+              />
+            </div>
+          </div>
+
+          {/* Poziom języka, FS, NR */}
+          <div style={{ display: 'flex', gap: '10px', marginBottom: 16 }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', fontWeight: 600, marginBottom: 4 }}>Poziom języka</label>
+              <select
+                value={form.jezyk}
+                onChange={e => handleChange('jezyk', e.target.value)}
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc', boxSizing: 'border-box', cursor: 'pointer' }}
+              >
+                <option value="">Wybierz</option>
+                {['A0', 'A1', 'A2', 'B1', 'B2', 'C1'].map(level => (
+                  <option key={level} value={level}>{level}</option>
+                ))}
+              </select>
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', fontWeight: 600, marginBottom: 4 }}>FS</label>
+              <select
+                value={form.fs}
+                onChange={e => handleChange('fs', e.target.value)}
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc', boxSizing: 'border-box', cursor: 'pointer' }}
+              >
+                <option value="">Wybierz</option>
+                <option value="Tak">Tak</option>
+                <option value="Nie">Nie</option>
+              </select>
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', fontWeight: 600, marginBottom: 4 }}>NR</label>
+              <select
+                value={form.nr}
+                onChange={e => handleChange('nr', e.target.value)}
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc', boxSizing: 'border-box', cursor: 'pointer' }}
+              >
+                <option value="">Wybierz</option>
+                <option value="Tak">Tak</option>
+                <option value="Nie">Nie</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Do opieki + Dyspozycyjność */}
+          <div style={{ display: 'flex', gap: '10px', marginBottom: 16 }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', fontWeight: 600, marginBottom: 4 }}>Do opieki</label>
+              <select
+                value={form.do_opieki}
+                onChange={e => handleChange('do_opieki', e.target.value)}
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc', boxSizing: 'border-box', cursor: 'pointer' }}
+              >
+                <option value="">Wybierz</option>
+                <option value="senior">Senior</option>
+                <option value="seniorka">Seniorka</option>
+                <option value="małżeństwo">Małżeństwo</option>
+              </select>
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', fontWeight: 600, marginBottom: 4 }}>Dyspozycyjność</label>
+              <input
+                type="month"
+                value={form.dyspozycyjnosc}
+                onChange={e => handleChange('dyspozycyjnosc', e.target.value)}
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc', boxSizing: 'border-box' }}
+              />
+            </div>
+          </div>
+
+          {/* Oczekiwania */}
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ display: 'block', fontWeight: 600, marginBottom: 4 }}>Oczekiwania</label>
+            <textarea
+              placeholder="własna łazienka, bez nocek, bez transferu itd"
+              value={form.oczekiwania}
+              onChange={e => handleChange('oczekiwania', e.target.value)}
+              rows={3}
+              style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc', boxSizing: 'border-box' }}
+            />
+          </div>
+
+          {/* Referencje */}
+          <div style={{ display: 'flex', gap: '10px', marginBottom: 16 }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', fontWeight: 600, marginBottom: 4 }}>Referencje</label>
+              <select
+                value={form.referencje}
+                onChange={e => handleChange('referencje', e.target.value)}
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc', boxSizing: 'border-box', cursor: 'pointer' }}
+              >
+                <option value="">Wybierz</option>
+                <option value="Tak">Tak</option>
+                <option value="Nie">Nie</option>
+              </select>
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', fontWeight: 600, marginBottom: 4 }}>Ostatni kontakt</label>
+              <input
+                type="date"
+                value={form.ostatni_kontakt}
+                onChange={e => handleChange('ostatni_kontakt', e.target.value)}
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc', boxSizing: 'border-box' }}
+              />
+            </div>
+          </div>
+
+          {/* Notatka */}
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ display: 'block', fontWeight: 600, marginBottom: 4 }}>Notatka</label>
+            <textarea
+              placeholder="Dodatkowe informacje..."
+              value={form.notatka}
+              onChange={e => handleChange('notatka', e.target.value)}
+              rows={3}
+              style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc', boxSizing: 'border-box' }}
+            />
+          </div>
+
+          <button
+            type="submit"
+            style={{
+              width: '100%',
+              padding: '12px',
+              backgroundColor: '#007bff',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              marginTop: 10
+            }}
+          >
+            {editingEntry ? 'Zapisz zmiany' : 'Dodaj wpis'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+export default TabInputData;
