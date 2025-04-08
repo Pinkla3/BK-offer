@@ -2,6 +2,9 @@ import { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
+// Ustawienie zmiennej API_BASE_URL z pliku .env (Create React App)
+const API_BASE_URL = process.env.REACT_APP_API_URL;
+
 function TabChangePassword() {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -20,14 +23,15 @@ function TabChangePassword() {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.post('/change-password', {
-        oldPassword,
-        newPassword
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`
+      await axios.post(
+        `${API_BASE_URL}/change-password`,
+        { oldPassword, newPassword },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
-      });
+      );
 
       toast.success('Hasło zostało zmienione!');
       setOldPassword('');

@@ -1,8 +1,10 @@
-
 import { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+
+// Ustawienie zmiennej API_BASE_URL z pliku .env (Create React App)
+const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -12,7 +14,7 @@ function ForgotPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:3001/reset-password', { email });
+      const res = await axios.post(`${API_BASE_URL}/reset-password`, { email });
       setNewPassword(res.data.newPassword);
       toast.success('Nowe hasło wygenerowane!');
     } catch {
@@ -21,13 +23,16 @@ function ForgotPassword() {
   };
 
   return (
-    <div style={{
+        <div style={{
+      backgroundImage: 'url("/images/background.jfif")',
+      backgroundSize: 'cover',       // skalowanie do wielkości kontenera
+      backgroundRepeat: 'no-repeat', // wyłączenie powtarzania
+      backgroundPosition: 'center',  // wyśrodkowanie obrazu     
       minHeight: '100vh',
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
       padding: '20px',
-      background: '#f0f4ff',
     }}>
       <div style={{
         width: '100%',
@@ -38,6 +43,12 @@ function ForgotPassword() {
         boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
         boxSizing: 'border-box'
       }}>
+
+          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+    <img src="/images/logo.jpg" alt="Logo" style={{ width: '100px' }} />
+    <h2 style={{ textAlign: 'center' }}>BK-offer ver.1.0 </h2>
+  </div> 
+
         <h2 style={{ textAlign: 'center' }}>Odzyskiwanie hasła</h2>
         <form onSubmit={handleSubmit}>
           <input

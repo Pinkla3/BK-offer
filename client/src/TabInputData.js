@@ -3,6 +3,9 @@ import { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
+// Ustawienie zmiennej API_BASE_URL z pliku .env (Vite)
+const API_BASE_URL = process.env.REACT_APP_API_URL;
+
 function TabInputData({ setIsAdding, fetchEntries, editingEntry }) {
   // Inicjalizacja formularza z wartościami z editingEntry, jeśli istnieje
   const [form, setForm] = useState({
@@ -38,11 +41,11 @@ function TabInputData({ setIsAdding, fetchEntries, editingEntry }) {
 
     try {
       if (editingEntry) {
-        await axios.put(`http://localhost:3001/entries/${editingEntry.id}`, form);
+        await axios.put(`${API_BASE_URL}/entries/${editingEntry.id}`, form);
         toast.success('Dane zaktualizowane!');
         fetchEntries();
       } else {
-        await axios.post('http://localhost:3001/entries', form);
+        await axios.post(`${API_BASE_URL}/entries`, form);
         toast.success('Wpis dodany');
         fetchEntries();
       }
@@ -54,43 +57,57 @@ function TabInputData({ setIsAdding, fetchEntries, editingEntry }) {
 
     // Resetowanie formularza
     setForm({
-      imie: '', nazwisko: '', jezyk: '', fs: '', nr: '',
-      do_opieki: '', dyspozycyjnosc: '', oczekiwania: '',
-      referencje: '', ostatni_kontakt: '', notatka: ''
+      imie: '',
+      nazwisko: '',
+      jezyk: '',
+      fs: '',
+      nr: '',
+      do_opieki: '',
+      dyspozycyjnosc: '',
+      oczekiwania: '',
+      referencje: '',
+      ostatni_kontakt: '',
+      notatka: ''
     });
   };
 
   return (
-    <div style={{
-      minHeight: '90vh',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      position: 'relative'
-    }}>
+    <div
+      style={{
+        minHeight: '90vh',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'relative'
+      }}
+    >
       {/* Overlay dla lepszej czytelności */}
-      <div style={{
-        padding:5,
-        width: '100%',
-        maxWidth: '800px',
-        position: 'relative',
-        zIndex: 2,
-        borderRadius: '12px',
-        boxSizing: 'border-box'
-      }}>
-<h2 style={{
-  textAlign: 'center',
-  width: '100%',
-  padding: '12px',
-  backgroundColor: '#007bff',
-  color: '#fff',
-  border: 'none',
-  borderRadius: '8px',
-  cursor: 'pointer',
-  marginTop: 0  // usunięto przerwę
-}}>
-  {editingEntry ? 'Edycja danych opiekunki:' : 'Dodaj opiekunkę:'}
-</h2>
+      <div
+        style={{
+          padding: 5,
+          width: '100%',
+          maxWidth: '800px',
+          position: 'relative',
+          zIndex: 2,
+          borderRadius: '12px',
+          boxSizing: 'border-box'
+        }}
+      >
+        <h2
+          style={{
+            textAlign: 'center',
+            width: '100%',
+            padding: '12px',
+            backgroundColor: '#007bff',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            marginTop: 0 // usunięto przerwę
+          }}
+        >
+          {editingEntry ? 'Edycja danych opiekunki:' : 'Dodaj opiekunkę:'}
+        </h2>
 
         <form onSubmit={handleSubmit}>
           {/* Imię i nazwisko */}
@@ -101,8 +118,14 @@ function TabInputData({ setIsAdding, fetchEntries, editingEntry }) {
                 type="text"
                 placeholder="Wpisz imię"
                 value={form.imie}
-                onChange={e => handleChange('imie', e.target.value)}
-                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc', boxSizing: 'border-box' }}
+                onChange={(e) => handleChange('imie', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  borderRadius: '8px',
+                  border: '1px solid #ccc',
+                  boxSizing: 'border-box'
+                }}
               />
             </div>
             <div style={{ flex: 1 }}>
@@ -111,8 +134,14 @@ function TabInputData({ setIsAdding, fetchEntries, editingEntry }) {
                 type="text"
                 placeholder="Wpisz nazwisko"
                 value={form.nazwisko}
-                onChange={e => handleChange('nazwisko', e.target.value)}
-                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc', boxSizing: 'border-box' }}
+                onChange={(e) => handleChange('nazwisko', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  borderRadius: '8px',
+                  border: '1px solid #ccc',
+                  boxSizing: 'border-box'
+                }}
               />
             </div>
           </div>
@@ -123,12 +152,21 @@ function TabInputData({ setIsAdding, fetchEntries, editingEntry }) {
               <label style={{ display: 'block', fontWeight: 600, marginBottom: 4 }}>Poziom języka</label>
               <select
                 value={form.jezyk}
-                onChange={e => handleChange('jezyk', e.target.value)}
-                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc', boxSizing: 'border-box', cursor: 'pointer' }}
+                onChange={(e) => handleChange('jezyk', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  borderRadius: '8px',
+                  border: '1px solid #ccc',
+                  boxSizing: 'border-box',
+                  cursor: 'pointer'
+                }}
               >
                 <option value="">Wybierz</option>
-                {['A0', 'A1', 'A2', 'B1', 'B2', 'C1'].map(level => (
-                  <option key={level} value={level}>{level}</option>
+                {['A0', 'A1', 'A2', 'B1', 'B2', 'C1'].map((level) => (
+                  <option key={level} value={level}>
+                    {level}
+                  </option>
                 ))}
               </select>
             </div>
@@ -136,8 +174,15 @@ function TabInputData({ setIsAdding, fetchEntries, editingEntry }) {
               <label style={{ display: 'block', fontWeight: 600, marginBottom: 4 }}>FS</label>
               <select
                 value={form.fs}
-                onChange={e => handleChange('fs', e.target.value)}
-                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc', boxSizing: 'border-box', cursor: 'pointer' }}
+                onChange={(e) => handleChange('fs', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  borderRadius: '8px',
+                  border: '1px solid #ccc',
+                  boxSizing: 'border-box',
+                  cursor: 'pointer'
+                }}
               >
                 <option value="">Wybierz</option>
                 <option value="Tak">Tak</option>
@@ -148,8 +193,15 @@ function TabInputData({ setIsAdding, fetchEntries, editingEntry }) {
               <label style={{ display: 'block', fontWeight: 600, marginBottom: 4 }}>NR</label>
               <select
                 value={form.nr}
-                onChange={e => handleChange('nr', e.target.value)}
-                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc', boxSizing: 'border-box', cursor: 'pointer' }}
+                onChange={(e) => handleChange('nr', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  borderRadius: '8px',
+                  border: '1px solid #ccc',
+                  boxSizing: 'border-box',
+                  cursor: 'pointer'
+                }}
               >
                 <option value="">Wybierz</option>
                 <option value="Tak">Tak</option>
@@ -164,8 +216,15 @@ function TabInputData({ setIsAdding, fetchEntries, editingEntry }) {
               <label style={{ display: 'block', fontWeight: 600, marginBottom: 4 }}>Do opieki</label>
               <select
                 value={form.do_opieki}
-                onChange={e => handleChange('do_opieki', e.target.value)}
-                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc', boxSizing: 'border-box', cursor: 'pointer' }}
+                onChange={(e) => handleChange('do_opieki', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  borderRadius: '8px',
+                  border: '1px solid #ccc',
+                  boxSizing: 'border-box',
+                  cursor: 'pointer'
+                }}
               >
                 <option value="">Wybierz</option>
                 <option value="senior">Senior</option>
@@ -178,8 +237,14 @@ function TabInputData({ setIsAdding, fetchEntries, editingEntry }) {
               <input
                 type="month"
                 value={form.dyspozycyjnosc}
-                onChange={e => handleChange('dyspozycyjnosc', e.target.value)}
-                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc', boxSizing: 'border-box' }}
+                onChange={(e) => handleChange('dyspozycyjnosc', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  borderRadius: '8px',
+                  border: '1px solid #ccc',
+                  boxSizing: 'border-box'
+                }}
               />
             </div>
           </div>
@@ -190,9 +255,15 @@ function TabInputData({ setIsAdding, fetchEntries, editingEntry }) {
             <textarea
               placeholder="własna łazienka, bez nocek, bez transferu itd"
               value={form.oczekiwania}
-              onChange={e => handleChange('oczekiwania', e.target.value)}
+              onChange={(e) => handleChange('oczekiwania', e.target.value)}
               rows={3}
-              style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc', boxSizing: 'border-box' }}
+              style={{
+                width: '100%',
+                padding: '10px',
+                borderRadius: '8px',
+                border: '1px solid #ccc',
+                boxSizing: 'border-box'
+              }}
             />
           </div>
 
@@ -202,8 +273,15 @@ function TabInputData({ setIsAdding, fetchEntries, editingEntry }) {
               <label style={{ display: 'block', fontWeight: 600, marginBottom: 4 }}>Referencje</label>
               <select
                 value={form.referencje}
-                onChange={e => handleChange('referencje', e.target.value)}
-                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc', boxSizing: 'border-box', cursor: 'pointer' }}
+                onChange={(e) => handleChange('referencje', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  borderRadius: '8px',
+                  border: '1px solid #ccc',
+                  boxSizing: 'border-box',
+                  cursor: 'pointer'
+                }}
               >
                 <option value="">Wybierz</option>
                 <option value="Tak">Tak</option>
@@ -215,8 +293,14 @@ function TabInputData({ setIsAdding, fetchEntries, editingEntry }) {
               <input
                 type="date"
                 value={form.ostatni_kontakt}
-                onChange={e => handleChange('ostatni_kontakt', e.target.value)}
-                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc', boxSizing: 'border-box' }}
+                onChange={(e) => handleChange('ostatni_kontakt', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  borderRadius: '8px',
+                  border: '1px solid #ccc',
+                  boxSizing: 'border-box'
+                }}
               />
             </div>
           </div>
@@ -227,9 +311,15 @@ function TabInputData({ setIsAdding, fetchEntries, editingEntry }) {
             <textarea
               placeholder="Dodatkowe informacje..."
               value={form.notatka}
-              onChange={e => handleChange('notatka', e.target.value)}
+              onChange={(e) => handleChange('notatka', e.target.value)}
               rows={3}
-              style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc', boxSizing: 'border-box' }}
+              style={{
+                width: '100%',
+                padding: '10px',
+                borderRadius: '8px',
+                border: '1px solid #ccc',
+                boxSizing: 'border-box'
+              }}
             />
           </div>
 

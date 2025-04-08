@@ -1,11 +1,10 @@
-
+require('dotenv').config();
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-require('dotenv').config();
 
 const app = express();
 const port = 3001;
@@ -58,6 +57,21 @@ app.post('/login', (req, res) => {
     if (!isMatch) return res.status(401).json({ error: 'Nieprawidłowy email lub hasło' });
     const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '2h' });
     res.json({ message: 'Zalogowano', token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
+  });
+});
+
+app.get('/check-email', (req, res) => {
+  const { email } = req.query;
+
+  // 👇 dodaj tę walidację
+  if (!email || !email.includes('@') || !email.includes('.')) {
+    return res.status(400).json({ error: 'Nieprawidłowy adres e-mail' });
+  }
+
+  const sql = 'SELECT * FROM users WHERE email = ?';
+  db.query(sql, [email], (err, results) => {
+    if (err) return res.status(500).json({ error: 'Błąd serwera przy sprawdzaniu e-maila' });
+    res.json({ exists: results.length > 0 });
   });
 });
 

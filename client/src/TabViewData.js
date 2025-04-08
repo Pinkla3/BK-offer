@@ -5,9 +5,12 @@ import Modal from 'react-modal';
 import { toast } from 'react-toastify';
 import TabInputData from './TabInputData'; // Komponent do dodawania nowych danych
 import EditOffersModal from './EditOffersModal'; // Komponent modala z ofertami
-import { FaPlus, FaTrash,FaSearch } from 'react-icons/fa';
+import { FaPlus, FaTrash, FaSearch } from 'react-icons/fa';
 
-Modal.setAppElement('#root');  // Ustawienie aplikacji jako root dla modala
+// Ustawienie zmiennej API_BASE_URL z pliku .env (Vite)
+const API_BASE_URL = process.env.REACT_APP_API_URL;
+
+Modal.setAppElement('#root'); // Ustawienie aplikacji jako root dla modala
 
 const tdStyle = {
   padding: '10px',
@@ -52,8 +55,6 @@ function TabViewData() {
   const [sortColumn, setSortColumn] = useState('nazwisko');
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchVisible, setIsSearchVisible] = useState(false);
-
-  // Dla modala z ofertami pracy – stan dostępności (dyspozycyjność)
   const [availability, setAvailability] = useState("2025-05");
   const [isOffersModalOpen, setIsOffersModalOpen] = useState(false);
 
@@ -61,14 +62,14 @@ function TabViewData() {
     if (!dateStr) return '';
     return dateStr.slice(0, 10);
   };
+
   const formatMonthYear = (monthYear) => {
     if (!monthYear) return '—';
-    
     const [year, month] = monthYear.split('-');
     const date = new Date(year, month - 1);
-  
     return date.toLocaleDateString('pl-PL', { year: 'numeric', month: 'long' });
   };
+
   // Normalizowanie danych pobranych z backendu
   const normalizeEntryData = (entry) => {
     return {
@@ -85,6 +86,7 @@ function TabViewData() {
       ostatni_kontakt: entry.ostatni_kontakt,
       notatka: entry.notatka
     };
+
   };
 
   // Filtrowanie wpisów – wyszukiwanie w tabeli wpisów
@@ -116,13 +118,14 @@ function TabViewData() {
 
   // Pobieranie danych z backendu
   const fetchEntries = () => {
-    axios.get('/entries')
-      .then(res => {
+    axios
+      .get(`${API_BASE_URL}/entries`)
+      .then((res) => {
         const normalizedData = res.data.map(normalizeEntryData);
         setEntries(normalizedData);
         setSortedEntries(normalizedData);
       })
-      .catch(error => console.error('Błąd pobierania danych:', error));
+      .catch((error) => console.error('Błąd pobierania danych:', error));
   };
 
   useEffect(() => {
@@ -184,7 +187,7 @@ function TabViewData() {
     e.stopPropagation();
     if (!window.confirm('Czy na pewno chcesz usunąć ten wpis?')) return;
     try {
-      await axios.delete(`/entries/${id}`);
+      await axios.delete(`${API_BASE_URL}/entries/${id}`);
       toast.success('Wpis usunięty');
       fetchEntries();
     } catch {
@@ -195,7 +198,6 @@ function TabViewData() {
   // Inicjalizacja formularza edycji
   const handleEdit = (entry) => {
     setEditingEntry(entry);
-    // Ustaw availability na wartość z pola dyspozycyjność
     setAvailability(entry.dyspozycyjnosc || "");
     setEditForm({
       ...entry,
@@ -207,7 +209,6 @@ function TabViewData() {
   // Obsługa zmian w formularzu edycji – dla pola "dyspozycyjność" używamy input typu "month"
   const handleEditChange = (field, value) => {
     setEditForm((prev) => ({ ...prev, [field]: value }));
-  
     if (field === 'dyspozycyjnosc') {
       setAvailability(value);
     }
@@ -216,7 +217,7 @@ function TabViewData() {
   // Zapisywanie edytowanego wpisu
   const handleSaveEdit = async () => {
     try {
-      await axios.put(`/entries/${editingEntry.id}`, editForm);
+      await axios.put(`${API_BASE_URL}/entries/${editingEntry.id}`, editForm);
       toast.success('Zaktualizowano dane');
       setEditingEntry(null);
       fetchEntries();
@@ -231,47 +232,47 @@ function TabViewData() {
       
       {/* Kontener z przyciskiem oraz polem wyszukiwania */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop:'20px', marginBottom: '20px', justifyContent: 'center', padding:'10px' }}>
-      <button
-  onClick={() => {
-    setIsSearchVisible(prev => {
-      if (prev) setSearchQuery(''); // Jeśli ukrywasz, wyczyść pole wyszukiwania
-      return !prev;
-    });
-  }}
-  style={{
-    width: '220px',
-    padding: '10px 20px',
-    backgroundColor: '#007bff',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    fontSize: '16px',
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '8px'
-  }}
->
-  <FaSearch style={{ fontSize: '18px' }} />
-  {isSearchVisible ? 'Ukryj wyszukiwanie' : 'Pokaż wyszukiwanie'}
-</button>
+        <button
+          onClick={() => {
+            setIsSearchVisible((prev) => {
+              if (prev) setSearchQuery(''); // Jeśli ukrywasz, wyczyść pole wyszukiwania
+              return !prev;
+            });
+          }}
+          style={{
+            width: '220px',
+            padding: '10px 20px',
+            backgroundColor: '#007bff',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontSize: '16px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px'
+          }}
+        >
+          <FaSearch style={{ fontSize: '18px' }} />
+          {isSearchVisible ? 'Ukryj wyszukiwanie' : 'Pokaż wyszukiwanie'}
+        </button>
   
-  {isSearchVisible && (
-    <input
-      type="text"
-      placeholder="Wyszukaj..."
-      value={searchQuery}
-      onChange={handleSearchChange}
-      style={{
-        padding: '10px',
-        borderRadius: '8px',
-        border: '1px solid #ccc',
-        outlineColor: '#007bff'
-      }}
-    />
-  )}
-</div>
+        {isSearchVisible && (
+          <input
+            type="text"
+            placeholder="Wyszukaj..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            style={{
+              padding: '10px',
+              borderRadius: '8px',
+              border: '1px solid #ccc',
+              outlineColor: '#007bff'
+            }}
+          />
+        )}
+      </div>
 
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead style={{ backgroundColor: '#007bff' }}>
@@ -296,38 +297,38 @@ function TabViewData() {
                 </th>
               );
             })}
-<th style={{ padding: '10px', textAlign: 'center' }}>
-  <button
-    onClick={() => setIsAdding(true)}
-    style={{
-      backgroundColor: '#28a745',
-      color: '#fff',
-      border: 'none',
-      width: '36px',
-      height: '36px',
-      cursor: 'pointer',
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontSize: '18px',
-      transition: 'background-color 0.3s',
-    }}
-    title="Dodaj nowy wpis"
-  >
-    <FaPlus />
-  </button>
+            <th style={{ padding: '10px', textAlign: 'center' }}>
+              <button
+                onClick={() => setIsAdding(true)}
+                style={{
+                  backgroundColor: '#28a745',
+                  color: '#fff',
+                  border: 'none',
+                  width: '36px',
+                  height: '36px',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '18px',
+                  transition: 'background-color 0.3s'
+                }}
+                title="Dodaj nowy wpis"
+              >
+                <FaPlus />
+              </button>
             </th>
           </tr>
         </thead>
         <tbody>
-          {filterEntries(sortedEntries).map((entry, index) => (
+          {sortedEntries && sortedEntries.length > 0 && filterEntries(sortedEntries).map((entry, index) => (
             <tr
               key={entry.id}
               style={{
                 borderBottom: '1px solid #eee',
                 transition: 'background-color 0.2s',
                 cursor: 'pointer',
-                padding:'10px'
+                padding: '10px'
               }}
               onClick={() => handleEdit(entry)}
             >
@@ -343,27 +344,27 @@ function TabViewData() {
               <td>{entry.referencje}</td>
               <td>{entry.ostatni_kontakt ? formatDate(entry.ostatni_kontakt) : '—'}</td>
               <td>{entry.notatka}</td>
-              <td style={{padding:'10px', textAlign: 'center' }}>
-  <button
-    onClick={(e) => handleDelete(entry.id, e)}
-    style={{
-      backgroundColor:'red',
-      color: '#fff',
-      border: 'none',
-      width: '36px',
-      height: '36px',
-      cursor: 'pointer',
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontSize: '18px',
-      transition: 'background-color 0.3s',
-    }}
-    title="Usuń wpis"
-  >
-    <FaTrash />
-  </button>
-</td>
+              <td style={{ padding: '10px', textAlign: 'center' }}>
+                <button
+                  onClick={(e) => handleDelete(entry.id, e)}
+                  style={{
+                    backgroundColor: 'red',
+                    color: '#fff',
+                    border: 'none',
+                    width: '36px',
+                    height: '36px',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '18px',
+                    transition: 'background-color 0.3s'
+                  }}
+                  title="Usuń wpis"
+                >
+                  <FaTrash />
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
@@ -383,14 +384,14 @@ function TabViewData() {
             padding: '30px',
             borderRadius: '12px',
             boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-            background: '#ffffff', // biały kolor tła modala
+            background: '#ffffff',
             inset: '0',
             margin: 'auto',
             position: 'relative',
             zIndex: '1001'
           },
           overlay: {
-            backgroundColor: 'rgba(0, 0, 0, 0.5)', // tło całego ekranu za modalem
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -419,42 +420,66 @@ function TabViewData() {
         >
           &times;
         </button>
-        <h2 style={{ textAlign: 'center',
-        display:'flex',
-              width: '100%',
-              padding: '12px',
-              backgroundColor: '#007bff',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              marginTop: 10,
-              justifyContent:'center',
-              alignItems:'center',
-              marginBottom:15}}>Edycja danych opiekunki</h2>
+        <h2
+          style={{
+            textAlign: 'center',
+            display: 'flex',
+            width: '100%',
+            padding: '12px',
+            backgroundColor: '#007bff',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            marginTop: 10,
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginBottom: 15
+          }}
+        >
+          Edycja danych opiekunki
+        </h2>
         {editingEntry && (
           <form onSubmit={(e) => { e.preventDefault(); handleSaveEdit(); }}>
             <div style={{ display: 'flex', gap: '10px', marginBottom: 16 }}>
               <div style={{ flex: 1 }}>
                 <label style={labelStyle}>Imię</label>
-                <input type="text" value={editForm.imie || ''} onChange={e => handleEditChange('imie', e.target.value)} style={inputStyle} />
+                <input
+                  type="text"
+                  value={editForm.imie || ''}
+                  onChange={e => handleEditChange('imie', e.target.value)}
+                  style={inputStyle}
+                />
               </div>
               <div style={{ flex: 1 }}>
                 <label style={labelStyle}>Nazwisko</label>
-                <input type="text" value={editForm.nazwisko || ''} onChange={e => handleEditChange('nazwisko', e.target.value)} style={inputStyle} />
+                <input
+                  type="text"
+                  value={editForm.nazwisko || ''}
+                  onChange={e => handleEditChange('nazwisko', e.target.value)}
+                  style={inputStyle}
+                />
               </div>
             </div>
             <div style={{ display: 'flex', gap: '10px', marginBottom: 16 }}>
               <div style={{ flex: 1 }}>
                 <label style={labelStyle}>Język</label>
-                <select value={editForm.jezyk || ''} onChange={e => handleEditChange('jezyk', e.target.value)} style={inputStyle}>
+                <select
+                  value={editForm.jezyk || ''}
+                  onChange={e => handleEditChange('jezyk', e.target.value)}
+                  style={inputStyle}
+                >
                   <option value="">Wybierz</option>
                   {['A0', 'A1', 'A2', 'B1', 'B2', 'C1'].map(lvl => <option key={lvl} value={lvl}>{lvl}</option>)}
                 </select>
               </div>
               <div style={{ flex: 1 }}>
                 <label style={labelStyle}>FS</label>
-                <select value={editForm.fs || ''} onChange={e => handleEditChange('fs', e.target.value)} style={inputStyle}>
+                <select
+                  value={editForm.fs || ''}
+                  onChange={e => handleEditChange('fs', e.target.value)}
+                  style={inputStyle}
+                >
                   <option value="">Wybierz</option>
                   <option value="Tak">Tak</option>
                   <option value="Nie">Nie</option>
@@ -462,7 +487,11 @@ function TabViewData() {
               </div>
               <div style={{ flex: 1 }}>
                 <label style={labelStyle}>NR</label>
-                <select value={editForm.nr || ''} onChange={e => handleEditChange('nr', e.target.value)} style={inputStyle}>
+                <select
+                  value={editForm.nr || ''}
+                  onChange={e => handleEditChange('nr', e.target.value)}
+                  style={inputStyle}
+                >
                   <option value="">Wybierz</option>
                   <option value="Tak">Tak</option>
                   <option value="Nie">Nie</option>
@@ -472,7 +501,11 @@ function TabViewData() {
             <div style={{ display: 'flex', gap: '10px', marginBottom: 16 }}>
               <div style={{ flex: 1 }}>
                 <label style={labelStyle}>Do opieki</label>
-                <select value={editForm.do_opieki || ''} onChange={e => handleEditChange('do_opieki', e.target.value)} style={inputStyle}>
+                <select
+                  value={editForm.do_opieki || ''}
+                  onChange={e => handleEditChange('do_opieki', e.target.value)}
+                  style={inputStyle}
+                >
                   <option value="">Wybierz</option>
                   <option value="senior">Senior</option>
                   <option value="seniorka">Seniorka</option>
@@ -491,12 +524,21 @@ function TabViewData() {
             </div>
             <div style={{ marginBottom: 16 }}>
               <label style={labelStyle}>Oczekiwania</label>
-              <textarea value={editForm.oczekiwania || ''} onChange={e => handleEditChange('oczekiwania', e.target.value)} rows={3} style={inputStyle} />
+              <textarea
+                value={editForm.oczekiwania || ''}
+                onChange={e => handleEditChange('oczekiwania', e.target.value)}
+                rows={3}
+                style={inputStyle}
+              />
             </div>
             <div style={{ display: 'flex', gap: '10px', marginBottom: 16 }}>
               <div style={{ flex: 1 }}>
                 <label style={labelStyle}>Referencje</label>
-                <select value={editForm.referencje || ''} onChange={e => handleEditChange('referencje', e.target.value)} style={inputStyle}>
+                <select
+                  value={editForm.referencje || ''}
+                  onChange={e => handleEditChange('referencje', e.target.value)}
+                  style={inputStyle}
+                >
                   <option value="">Wybierz</option>
                   <option value="Tak">Tak</option>
                   <option value="Nie">Nie</option>
@@ -504,48 +546,59 @@ function TabViewData() {
               </div>
               <div style={{ flex: 1 }}>
                 <label style={labelStyle}>Ostatni kontakt</label>
-                <input type="date" value={editForm.ostatni_kontakt || ''} onChange={e => handleEditChange('ostatni_kontakt', e.target.value)} style={inputStyle} />
+                <input
+                  type="date"
+                  value={editForm.ostatni_kontakt || ''}
+                  onChange={e => handleEditChange('ostatni_kontakt', e.target.value)}
+                  style={inputStyle}
+                />
               </div>
             </div>
             <div style={{ marginBottom: 16 }}>
               <label style={{ display: 'block', textAlign: 'center', fontWeight: 600, marginBottom: 4 }}>Notatka</label>
-              <textarea value={editForm.notatka || ''} onChange={e => handleEditChange('notatka', e.target.value)} rows={3} style={inputStyle} />
+              <textarea
+                value={editForm.notatka || ''}
+                onChange={e => handleEditChange('notatka', e.target.value)}
+                rows={3}
+                style={inputStyle}
+              />
             </div>
-            {/* Przycisk i modal z ofertami pracy według dyspozycyjności */}
             <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-            <button
-  type="button"
-  onClick={() => setIsOffersModalOpen(true)}
-  style={{
-    padding: '10px 20px',
-    backgroundColor: '#28a745',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    fontSize: '16px',
-      zIndex: '2001'
-  }}
->
-  Pokaż oferty pracy dla dyspozycyjności w {editForm.dyspozycyjnosc || availability}
-</button>
-
-<EditOffersModal
-  isOpen={isOffersModalOpen}
-  onRequestClose={() => setIsOffersModalOpen(false)}
-  availability={editForm.dyspozycyjnosc || availability}
-/>
+              <button
+                type="button"
+                onClick={() => setIsOffersModalOpen(true)}
+                style={{
+                  padding: '10px 20px',
+                  backgroundColor: '#28a745',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '16px',
+                  zIndex: '2001'
+                }}
+              >
+                Pokaż oferty pracy dla dyspozycyjności w {editForm.dyspozycyjnosc || availability}
+              </button>
+              <EditOffersModal
+                isOpen={isOffersModalOpen}
+                onRequestClose={() => setIsOffersModalOpen(false)}
+                availability={editForm.dyspozycyjnosc || availability}
+              />
             </div>
-            <button type="submit" style={{
-              width: '100%',
-              padding: '12px',
-              backgroundColor: '#007bff',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-            }}>
-           Zapisz zmiany
+            <button
+              type="submit"
+              style={{
+                width: '100%',
+                padding: '12px',
+                backgroundColor: '#007bff',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer'
+              }}
+            >
+              Zapisz zmiany
             </button>
           </form>
         )}
@@ -563,14 +616,14 @@ function TabViewData() {
             padding: '30px',
             borderRadius: '12px',
             boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-            background: '#ffffff', // biały kolor tła modala
+            background: '#ffffff',
             inset: '0',
             margin: 'auto',
             position: 'relative',
             zIndex: '1001'
           },
           overlay: {
-            backgroundColor: 'rgba(0, 0, 0, 0.5)', // tło całego ekranu za modalem
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -606,3 +659,4 @@ function TabViewData() {
 }
 
 export default TabViewData;
+

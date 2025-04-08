@@ -1,8 +1,10 @@
-
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+
+// Ustawienie zmiennej API_BASE_URL z pliku .env (Create React App)
+const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 function Register() {
   const [form, setForm] = useState({ name: '', email: '', password: '', role: 'user' });
@@ -22,7 +24,7 @@ function Register() {
   useEffect(() => {
     const delay = setTimeout(() => {
       if (form.email.includes('@')) {
-        axios.get(`http://localhost:3001/check-email?email=${form.email}`)
+        axios.get(`${API_BASE_URL}/check-email?email=${form.email}`)
           .then(res => {
             if (res.data.exists) {
               setErrors(prev => ({ ...prev, email: 'Email już istnieje' }));
@@ -46,7 +48,7 @@ function Register() {
     e.preventDefault();
     if (!validateForm()) return;
     try {
-      await axios.post('http://localhost:3001/register', form);
+      await axios.post(`${API_BASE_URL}/register`, form);
       toast.success('Zarejestrowano! Możesz się zalogować');
       navigate('/login');
     } catch {
@@ -55,13 +57,16 @@ function Register() {
   };
 
   return (
-    <div style={{
+       <div style={{
+      backgroundImage: 'url("/images/background.jfif")',
+      backgroundSize: 'cover',       // skalowanie do wielkości kontenera
+      backgroundRepeat: 'no-repeat', // wyłączenie powtarzania
+      backgroundPosition: 'center',  // wyśrodkowanie obrazu     
       minHeight: '100vh',
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
       padding: '20px',
-      background: '#f0f4ff',
     }}>
       <div style={{
         width: '100%',
@@ -72,6 +77,12 @@ function Register() {
         boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
         boxSizing: 'border-box'
       }}>
+
+          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+    <img src="/images/logo.jpg" alt="Logo" style={{ width: '100px' }} />
+    <h2 style={{ textAlign: 'center' }}>BK-offer ver.1.0 </h2>
+  </div> 
+
         <h2 style={{ textAlign: 'center' }}>Rejestracja</h2>
         <form onSubmit={handleSubmit}>
           <input
@@ -165,4 +176,5 @@ function Register() {
     </div>
   );
 }
+
 export default Register;

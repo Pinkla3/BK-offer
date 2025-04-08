@@ -12,6 +12,9 @@ import OffersTable from './Offers';
 import { FaPlus, FaDatabase, FaLock, FaBriefcase } from 'react-icons/fa';
 import TabChangePassword from './TabChangePassword';
 
+// Ustawienie zmiennej API_BASE_URL z pliku .env (Create React App)
+const API_BASE_URL = process.env.REACT_APP_API_URL;
+
 const GlobalStyle = createGlobalStyle`
   * {
     margin: 0;
@@ -43,13 +46,13 @@ const Sidebar = styled.aside`
     content: "";
     position: absolute;
     inset: 0;
-    background-color: rgba(255,255,255,0.85); // opcjonalnie dla lepszej czytelności
+    background-color: rgba(255,255,255,0.85);
     z-index: 0;
   }
 
   & > * {
     position: relative;
-    z-index: 1; /* upewnij się, że elementy sidebara są na wierzchu */
+    z-index: 1;
   }
 `;
 
@@ -93,7 +96,7 @@ const Header = styled.header`
     content: "";
     position: absolute;
     inset: 0;
-    background-color: rgba(255,255,255,0.85); // opcjonalnie dla lepszej czytelności
+    background-color: rgba(255,255,255,0.85);
     z-index: 0;
   }
 
@@ -138,7 +141,7 @@ const Dashboard = () => {
   // Pobieranie danych użytkownika z endpointu /userdb
   const fetchUser = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/userdb');
+      const response = await axios.get(`${API_BASE_URL}/userdb`);
       console.log('Odpowiedź z userdb:', response.data);
       if (response.data && response.data.users && response.data.users.length > 0) {
         setUser(response.data.users[0]);
@@ -151,7 +154,7 @@ const Dashboard = () => {
   // Pobieranie wpisów
   const fetchEntries = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/entries');
+      const response = await axios.get(`${API_BASE_URL}/entries`);
       setEntries(response.data);
     } catch (error) {
       console.error('Błąd pobierania danych:', error);
@@ -160,7 +163,7 @@ const Dashboard = () => {
 
   // Funkcja do edycji wpisu
   const handleEdit = (entryId) => {
-    axios.get(`http://localhost:3001/entries/${entryId}`)
+    axios.get(`${API_BASE_URL}/entries/${entryId}`)
       .then((response) => {
         setEditingEntry(response.data);
         setIsAdding(true);
@@ -194,10 +197,10 @@ const Dashboard = () => {
       <GlobalStyle />
       <DashboardContainer>
         <Sidebar>
-            {/* Logo */}
-  <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-    <img src="/images/logo.jpg" alt="Logo" style={{ width: '100px' }} />
-  </div>
+          {/* Logo */}
+          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+            <img src="/images/logo.jpg" alt="Logo" style={{ width: '100px' }} />
+          </div>
           <SidebarButton $active={activeTab === 'input'} onClick={() => setActiveTab('input')}>
             <FaPlus size={18} /> Dodaj opiekunkę do bazy
           </SidebarButton>
