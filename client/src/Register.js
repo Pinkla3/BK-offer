@@ -20,21 +20,27 @@ function Register() {
     if (field === 'password' && value.length < 6) error = 'Hasło musi mieć min. 6 znaków';
     setErrors(prev => ({ ...prev, [field]: error }));
   };
+const validateEmail = (email) => {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+};
 
-  useEffect(() => {
-    const delay = setTimeout(() => {
-      if (form.email.includes('@')) {
-        axios.get(`${API_BASE_URL}/check-email?email=${form.email}`)
-          .then(res => {
-            if (res.data.exists) {
-              setErrors(prev => ({ ...prev, email: 'Email już istnieje' }));
-            }
-          });
-      }
-    }, 500);
-    return () => clearTimeout(delay);
-  }, [form.email]);
+useEffect(() => {
+  const delay = setTimeout(() => {
+    if (!validateEmail(form.email)) return;
 
+    axios.get(`${API_BASE_URL}/check-email?email=${form.email}`)
+      .then(res => {
+        if (res.data.exists) {
+          setErrors(prev => ({ ...prev, email: 'Email już istnieje' }));
+        }
+      })
+      .catch(() => {
+        toast.error('Błąd połączenia z serwerem');
+      });
+  }, 500);
+
+  return () => clearTimeout(delay);
+}, [form.email]);
   const validateForm = () => {
     const newErrors = {};
     if (!form.name.trim()) newErrors.name = 'Imię jest wymagane';
