@@ -44,3 +44,11 @@ Thumbs.db
 # ===============================
 .nyc_output
 node_repl_history
+
+server/node_modules/
+server/build/
+server/.cache/
+server/.eslintcache
+server/.env
+server/.env.*.local
+server/package-lock.json
