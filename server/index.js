@@ -10,7 +10,12 @@ const pool = require('./db');
 const app = express();
 const port = 3001;
 
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:3000', 'https://bk-offer.pl'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(bodyParser.json());
 app.use(express.json());
 
@@ -82,8 +87,14 @@ app.post('/reset-password', async (req, res) => {
 });
 
 app.get('/entries', async (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) return res.status(401).json({ error: 'Brak tokenu' });
+
   try {
-    const [results] = await pool.query('SELECT * FROM entries ORDER BY id DESC');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.id;
+
+    const [results] = await pool.query('SELECT * FROM entries WHERE user_id = ? ORDER BY id DESC', [userId]);
     res.json(results);
   } catch (err) {
     console.error('Błąd przy pobieraniu danych:', err);
@@ -159,23 +170,42 @@ app.put('/entries/:id', async (req, res) => {
 });
 
 app.post('/entries', async (req, res) => {
-  const { imie, nazwisko, jezyk, fs, nr, do_opieki, dyspozycyjnosc, oczekiwania, referencje, ostatni_kontakt, notatka } = req.body;
-
-  const sql = `
-    INSERT INTO entries (imie, nazwisko, jezyk, fs, nr, do_opieki, dyspozycyjnosc, oczekiwania, referencje, ostatni_kontakt, notatka)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `;
-  const values = [imie, nazwisko, jezyk, fs, nr, do_opieki, dyspozycyjnosc, oczekiwania, referencje, ostatni_kontakt, notatka];
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) return res.status(401).json({ error: 'Brak tokenu' });
 
   try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.id;
+
+    const {
+      imie, nazwisko, jezyk, fs, nr, do_opieki,
+      dyspozycyjnosc, oczekiwania, referencje,
+      ostatni_kontakt, notatka
+    } = req.body;
+
+    const sql = `
+      INSERT INTO entries (
+        imie, nazwisko, jezyk, fs, nr, do_opieki,
+        dyspozycyjnosc, oczekiwania, referencje,
+        ostatni_kontakt, notatka, user_id
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const values = [
+      imie, nazwisko, jezyk, fs, nr, do_opieki,
+      dyspozycyjnosc, oczekiwania, referencje,
+      ostatni_kontakt, notatka, userId
+    ];
+
     await pool.query(sql, values);
     res.status(201).json({ message: 'Wpis dodany pomyślnie' });
   } catch (err) {
-    console.error('Błąd zapytania SQL:', err);
-    res.status(500).json({ error: 'Błąd zapisu danych', message: err.message });
+    console.error('Błąd zapisu wpisu:', err);
+    res.status(500).json({ error: 'Błąd serwera' });
   }
 });
 
 app.listen(port, () => {
   console.log(`Server działa na http://localhost:${port}`);
 });
+
