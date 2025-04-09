@@ -177,9 +177,9 @@ app.post('/change-password', async (req, res) => {
 app.put('/entries/:id', async (req, res) => {
   const id = req.params.id;
   const {
-    imie, nazwisko, jezyk, fs, nr,
+    imie, nazwisko, jezyk,telefon, fs, nr,
     do_opieki, dyspozycyjnosc, oczekiwania,
-    referencje, ostatni_kontakt, notatka
+    referencje, ostatni_kontakt, notatka, proponowane_zlecenie,
   } = req.body;
 
   const sql = `
@@ -191,9 +191,9 @@ app.put('/entries/:id', async (req, res) => {
   `;
 
   const values = [
-    imie, nazwisko, jezyk, fs, nr,
+    imie, nazwisko, jezyk, telefon, fs, nr,
     do_opieki, dyspozycyjnosc, oczekiwania,
-    referencje, ostatni_kontakt, notatka, id
+    referencje, ostatni_kontakt, notatka, proponowane_zlecenie, id
   ];
 
   try {

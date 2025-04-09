@@ -123,6 +123,7 @@ function TabViewData({ user }) {
   const fetchEntries = () => {
     const token = localStorage.getItem('token');
     console.log('Token JWT:', token); 
+    console.log('fetchEntries start');
     if (!token) {
       console.warn('Brak tokenu JWT, nie można pobrać danych.');
       return;
@@ -137,6 +138,7 @@ function TabViewData({ user }) {
         const normalizedData = res.data.map(normalizeEntryData);
         setEntries(normalizedData);
         setSortedEntries(normalizedData);
+        console.log('Otrzymane dane z /entries:', res.data);
       })
       .catch((error) => console.error('Błąd pobierania danych:', error));
   };
