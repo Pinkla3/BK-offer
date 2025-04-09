@@ -221,16 +221,16 @@ app.post('/entries', async (req, res) => {
 
     const sql = `
       INSERT INTO entries (
-        imie, nazwisko, jezyk, fs, nr, do_opieki,
+        imie, nazwisko, jezyk, telefon, fs, nr, do_opieki,
         dyspozycyjnosc, oczekiwania, referencje,
-        ostatni_kontakt, notatka, telefon, proponowane_zlecenie, user_id
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ostatni_kontakt, notatka, proponowane_zlecenie, user_id
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
-      imie, nazwisko, jezyk, fs, nr, do_opieki,
+      imie, nazwisko, jezyk, telefon, fs, nr, do_opieki,
       dyspozycyjnosc, oczekiwania, referencje,
-      ostatni_kontakt, notatka, telefon, proponowane_zlecenie, userId
+      ostatni_kontakt, notatka, proponowane_zlecenie, userId
     ];
 
     await pool.query(sql, values);
