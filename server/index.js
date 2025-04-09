@@ -186,7 +186,7 @@ app.put('/entries/:id', async (req, res) => {
     UPDATE entries SET 
       imie = ?, nazwisko = ?, jezyk = ?, fs = ?, nr = ?,
       do_opieki = ?, dyspozycyjnosc = ?, oczekiwania = ?,
-      referencje = ?, ostatni_kontakt = ?, notatka = ?
+      referencje = ?, ostatni_kontakt = ?, notatka = ?, telefon = ?, proponowane_zlecenie = ?,
     WHERE id = ?
   `;
 
@@ -214,23 +214,23 @@ app.post('/entries', async (req, res) => {
     const userId = decoded.id;
 
     const {
-      imie, nazwisko, jezyk, fs, nr, do_opieki,
+      imie, nazwisko, jezyk, telefon,  fs, nr, do_opieki,
       dyspozycyjnosc, oczekiwania, referencje,
-      ostatni_kontakt, notatka
+      ostatni_kontakt, notatka, proponowane_zlecenie
     } = req.body;
 
     const sql = `
       INSERT INTO entries (
         imie, nazwisko, jezyk, fs, nr, do_opieki,
         dyspozycyjnosc, oczekiwania, referencje,
-        ostatni_kontakt, notatka, user_id
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ostatni_kontakt, notatka, user_id, telefon, proponowane_zlecenie,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
-      imie, nazwisko, jezyk, fs, nr, do_opieki,
+      imie, nazwisko, jezyk,telefon, fs, nr, do_opieki,
       dyspozycyjnosc, oczekiwania, referencje,
-      ostatni_kontakt, notatka, userId
+      ostatni_kontakt, notatka, userId, proponowane_zlecenie,
     ];
 
     await pool.query(sql, values);
