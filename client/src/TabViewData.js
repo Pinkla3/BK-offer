@@ -45,7 +45,7 @@ const inputStyle = {
   outlineColor: '#007bff'
 };
 
-function TabViewData() {
+function TabViewData({ user }) {
   const [entries, setEntries] = useState([]);
   const [sortedEntries, setSortedEntries] = useState([]);
   const [editingEntry, setEditingEntry] = useState(null);
@@ -57,6 +57,10 @@ function TabViewData() {
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [availability, setAvailability] = useState("2025-05");
   const [isOffersModalOpen, setIsOffersModalOpen] = useState(false);
+
+  useEffect(() => {
+    fetchEntries();
+  }, []);
 
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
@@ -315,6 +319,11 @@ const handleSaveEdit = async () => {
                 </th>
               );
             })}
+             {/* 👇 Dodane tylko dla admina */}
+    {user?.role === 'admin' && (
+      <th style={{ padding: '10px', color: '#fff' }}>Użytkownik</th>
+    )}
+
             <th style={{ padding: '10px', textAlign: 'center' }}>
               <button
                 onClick={() => setIsAdding(true)}
@@ -362,6 +371,11 @@ const handleSaveEdit = async () => {
               <td>{entry.referencje}</td>
               <td>{entry.ostatni_kontakt ? formatDate(entry.ostatni_kontakt) : '—'}</td>
               <td>{entry.notatka}</td>
+              {user?.role === 'admin' && (
+      <td style={{ padding: '10px', verticalAlign: 'top', borderBottom: '1px solid #eee', fontSize: '14px' }}>
+        {entry.user_name}
+      </td>
+    )}
               <td style={{ padding: '10px', textAlign: 'center' }}>
                 <button
                   onClick={(e) => handleDelete(entry.id, e)}

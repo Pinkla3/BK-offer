@@ -148,8 +148,9 @@ const Dashboard = () => {
         }
       });
       console.log('Odpowiedź z userdb:', response.data);
-      if (response.data && response.data.users && response.data.users.length > 0) {
-        setUser(response.data.users[0]);
+      if (response.data && response.data.user) {
+        setUser(response.data.user);
+      
       }
     } catch (error) {
       console.error('Błąd pobierania danych użytkownika:', error);
@@ -163,7 +164,7 @@ const Dashboard = () => {
       return;
     }
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/entries`, {
+      const response = await axios.get(`${API_BASE_URL}/entries`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -199,7 +200,7 @@ const Dashboard = () => {
   if (activeTab === 'input') {
     content = <TabInputData setIsAdding={setIsAdding} fetchEntries={fetchEntries} editingEntry={editingEntry} />;
   } else if (activeTab === 'view') {
-    content = <TabViewData entries={entries} />;
+    content = <TabViewData entries={entries} user={user}/>;
   } else if (activeTab === 'password') {
     content = <TabChangePassword />;
   } 

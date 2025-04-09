@@ -101,11 +101,15 @@ app.get('/entries', async (req, res) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.id;
+    const userRole = decoded.role;
 
-    const [results] = await pool.query('SELECT * FROM entries WHERE user_id = ? ORDER BY id DESC', [userId]);
-  // 👇 Dodaj to:
-  console.log('Użytkownik ID:', userId);
-  console.log('Wynik:', results);
+    let results;
+    if (userRole === 'admin') {
+      [results] = await pool.query('SELECT * FROM entries ORDER BY id DESC');
+    } else {
+      [results] = await pool.query('SELECT * FROM entries WHERE user_id = ? ORDER BY id DESC', [userId]);
+    }
+
     res.json(results);
   } catch (err) {
     console.error('Błąd przy pobieraniu danych:', err);
@@ -134,7 +138,23 @@ app.post('/change-password', async (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.id;
 
-    const [results] = await pool.query('SELECT * FROM users WHERE id = ?', [userId]);
+    let results;
+
+    if (decoded.role === 'admin') {
+      // Admin widzi wszystkie wpisy + nazwę użytkownika
+      [results] = await pool.query(`
+        SELECT entries.*, users.name AS user_name 
+        FROM entries 
+        JOIN users ON entries.user_id = users.id 
+        ORDER BY entries.id DESC
+      `);
+    } else {
+      // Zwykły użytkownik widzi tylko swoje wpisy
+      [results] = await pool.query(
+        'SELECT * FROM entries WHERE user_id = ? ORDER BY id DESC',
+        [userId]
+      );
+    }
     if (results.length === 0) return res.status(404).json({ error: 'Użytkownik nie znaleziony' });
 
     const user = results[0];
