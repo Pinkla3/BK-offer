@@ -590,14 +590,14 @@ const handleSaveEdit = async () => {
                 </select>
               </div>
               <div style={{ flex: 1 }}>
-                <label style={labelStyle}>Ostatni kontakt</label>
-                <input
-                  type="date"
-                  value={editForm.ostatni_kontakt || ''}
-                  onChange={e => handleEditChange('ostatni_kontakt', e.target.value)}
-                  style={inputStyle}
-                />
-              </div>
+  <label style={labelStyle}>Ostatni kontakt</label>
+  <input
+    type="date"
+    value={editForm.ostatni_kontakt || ''}
+    onChange={e => handleEditChange('ostatni_kontakt', e.target.value)}
+    style={inputStyle}
+  />
+</div>
             </div>
             <div style={{ marginBottom: 16 }}>
               <label style={{ display: 'block', textAlign: 'center', fontWeight: 600, marginBottom: 4 }}>Notatka</label>

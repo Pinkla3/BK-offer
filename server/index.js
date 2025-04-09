@@ -177,9 +177,9 @@ app.post('/change-password', async (req, res) => {
 app.put('/entries/:id', async (req, res) => {
   const id = req.params.id;
   const {
-    imie, nazwisko, jezyk,telefon, fs, nr,
-    do_opieki, dyspozycyjnosc, oczekiwania,
-    referencje, ostatni_kontakt, notatka, proponowane_zlecenie,
+    imie, nazwisko, jezyk, fs, nr, do_opieki,
+    dyspozycyjnosc, oczekiwania, referencje,
+    ostatni_kontakt, notatka, telefon, proponowane_zlecenie
   } = req.body;
 
   const sql = `
@@ -191,9 +191,9 @@ app.put('/entries/:id', async (req, res) => {
   `;
 
   const values = [
-    imie, nazwisko, jezyk, telefon, fs, nr,
+    imie, nazwisko, jezyk, fs, nr,
     do_opieki, dyspozycyjnosc, oczekiwania,
-    referencje, ostatni_kontakt, notatka, proponowane_zlecenie, id
+    referencje, ostatni_kontakt, notatka, telefon, proponowane_zlecenie, id
   ];
 
   try {
@@ -214,7 +214,7 @@ app.post('/entries', async (req, res) => {
     const userId = decoded.id;
 
     const {
-      imie, nazwisko, jezyk, telefon,  fs, nr, do_opieki,
+      imie, nazwisko, jezyk, telefon, fs, nr, do_opieki,
       dyspozycyjnosc, oczekiwania, referencje,
       ostatni_kontakt, notatka, proponowane_zlecenie
     } = req.body;
@@ -223,14 +223,14 @@ app.post('/entries', async (req, res) => {
       INSERT INTO entries (
         imie, nazwisko, jezyk, fs, nr, do_opieki,
         dyspozycyjnosc, oczekiwania, referencje,
-        ostatni_kontakt, notatka, user_id, telefon, proponowane_zlecenie,
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ostatni_kontakt, notatka, telefon, proponowane_zlecenie, user_id
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
-      imie, nazwisko, jezyk,telefon, fs, nr, do_opieki,
+      imie, nazwisko, jezyk, fs, nr, do_opieki,
       dyspozycyjnosc, oczekiwania, referencje,
-      ostatni_kontakt, notatka, userId, proponowane_zlecenie,
+      ostatni_kontakt, notatka, telefon, proponowane_zlecenie, userId
     ];
 
     await pool.query(sql, values);
