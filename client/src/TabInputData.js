@@ -15,7 +15,7 @@ function TabInputData({ setIsAdding, fetchEntries, editingEntry }) {
     jezyk: editingEntry ? editingEntry.jezyk : '',
     fs: editingEntry ? editingEntry.fs : '',
     nr: editingEntry ? editingEntry.nr : '',
-    do_opieki: editingEntry ? editingEntry.do_opieki : '',
+    do_opieki: editingEntry ? (editingEntry.do_opieki?.split(',') || []) : [],
     dyspozycyjnosc: editingEntry ? editingEntry.dyspozycyjnosc : '',
     oczekiwania: editingEntry ? editingEntry.oczekiwania : '',
     referencje: editingEntry ? editingEntry.referencje : '',
@@ -27,6 +27,15 @@ function TabInputData({ setIsAdding, fetchEntries, editingEntry }) {
   // Funkcja do zmiany wartości formularza
   const handleChange = (field, value) => {
     setForm({ ...form, [field]: value });
+  };
+  const handleCheckboxChange = (value) => {
+    setForm(prevForm => {
+      const isChecked = prevForm.do_opieki.includes(value);
+      const updated = isChecked
+        ? prevForm.do_opieki.filter(v => v !== value)
+        : [...prevForm.do_opieki, value];
+      return { ...prevForm, do_opieki: updated };
+    });
   };
 
   // Funkcja do obsługi wysyłania formularza
@@ -40,7 +49,7 @@ function TabInputData({ setIsAdding, fetchEntries, editingEntry }) {
       const date = new Date(form.ostatni_kontakt);
       form.ostatni_kontakt = date.toISOString().split('T')[0];  // Format YYYY-MM-DD
     }
-
+    form.do_opieki = form.do_opieki.join(',');
     try {
       if (editingEntry) {
         await axios.put(`${API_BASE_URL}/entries/${editingEntry.id}`, form);
@@ -237,25 +246,23 @@ function TabInputData({ setIsAdding, fetchEntries, editingEntry }) {
 
           {/* Do opieki + Dyspozycyjność */}
           <div style={{ display: 'flex', gap: '10px', marginBottom: 16 }}>
-            <div style={{ flex: 1 }}>
-              <label style={{ display: 'block', fontWeight: 600, marginBottom: 4 }}>Do opieki</label>
-              <select
-                value={form.do_opieki}
-                onChange={(e) => handleChange('do_opieki', e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  borderRadius: '8px',
-                  border: '1px solid #ccc',
-                  boxSizing: 'border-box',
-                  cursor: 'pointer'
-                }}
-              >
-                <option value="">Wybierz</option>
-                <option value="senior">Senior</option>
-                <option value="seniorka">Seniorka</option>
-                <option value="małżeństwo">Małżeństwo</option>
-              </select>
+              <div style={{ flex: 1 }}>
+  <label style={{ display: 'block', fontWeight: 600, marginBottom: 4 }}>Do opieki</label>
+  <div style={{   display: 'grid', 
+  gridTemplateColumns: '1fr 1fr', 
+  gap: '6px 12px'  }}>
+    {['senior', 'seniorka', 'małżeństwo', 'osoba leżąca'].map(option => (
+      <label key={option} style={{ fontWeight: 400 }}>
+        <input
+          type="checkbox"
+          checked={form.do_opieki.includes(option)}
+          onChange={() => handleCheckboxChange(option)}
+          style={{ marginRight: 6 }}
+        />
+        {option}
+      </label>
+    ))}
+  </div>
             </div>
             <div style={{ flex: 1 }}>
               <label style={{ display: 'block', fontWeight: 600, marginBottom: 4 }}>Dyspozycyjność</label>

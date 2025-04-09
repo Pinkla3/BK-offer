@@ -12,11 +12,12 @@ const API_BASE_URL = process.env.REACT_APP_API_URL;
 Modal.setAppElement('#root');
 
 
-const tdStyle = {
+const tdStyle1 = {
   padding: '10px',
   verticalAlign: 'top',
   borderBottom: '1px solid #eee',
-  fontSize: '14px'
+  fontSize: '14px',
+   textAlign: 'justify'
 };
 
 const deleteBtn = {
@@ -105,7 +106,8 @@ function TabViewData({ user }) {
       const searchString = `
         ${entry.imie} 
         ${entry.nazwisko} 
-        ${entry.jezyk} 
+        ${entry.jezyk}
+        ${entry.telefon} 
         ${entry.fs} 
         ${entry.nr} 
         ${entry.do_opieki} 
@@ -114,6 +116,7 @@ function TabViewData({ user }) {
         ${entry.referencje} 
         ${entry.ostatni_kontakt} 
         ${entry.notatka}
+        ${entry.proponowane_zlecenie}
       `.toLowerCase();
   
       return searchString.includes(searchQuery.toLowerCase());
@@ -370,11 +373,11 @@ const handleSaveEdit = async () => {
               <td>{entry.nr}</td>
               <td>{entry.do_opieki}</td>
               <td>{formatMonthYear(entry.dyspozycyjnosc)}</td>
-              <td>{entry.oczekiwania}</td>
+              <td style={{maxWidth: 200, textAlign: 'justify'}}>{entry.oczekiwania}</td>
               <td>{entry.referencje}</td>
               <td>{entry.ostatni_kontakt ? formatDate(entry.ostatni_kontakt) : '—'}</td>
-              <td>{entry.notatka}</td>
-              <td>{entry.proponowane_zlecenie}</td>
+              <td style={{maxWidth: 200, textAlign: 'justify'}}>{entry.notatka}</td>
+              <td style={{maxWidth: 200, textAlign: 'justify'}}>{entry.proponowane_zlecenie}</td>
               {user?.role === 'admin' && (
       <td style={{ padding: '10px', verticalAlign: 'top', borderBottom: '1px solid #eee', fontSize: '14px' }}>
         {entry.user_name}
