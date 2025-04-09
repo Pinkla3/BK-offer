@@ -70,14 +70,14 @@ app.get('/api/userdb', async (req, res) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.id;
-
     const [results] = await pool.query('SELECT id, name, email, role FROM users WHERE id = ?', [userId]);
+
     if (results.length === 0) return res.status(404).json({ error: 'Użytkownik nie znaleziony' });
 
-    res.json({ users: results });
+    res.json({ user: results[0] });
   } catch (err) {
-    console.error('Błąd podczas autoryzacji:', err);
-    res.status(401).json({ error: 'Nieprawidłowy token' });
+    console.error('Błąd przy pobieraniu danych użytkownika:', err);
+    res.status(500).json({ error: 'Błąd serwera' });
   }
 });
 
