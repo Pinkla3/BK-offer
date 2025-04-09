@@ -45,7 +45,12 @@ function TabInputData({ setIsAdding, fetchEntries, editingEntry }) {
         toast.success('Dane zaktualizowane!');
         fetchEntries();
       } else {
-        await axios.post(`${API_BASE_URL}/entries`, form);
+        const token = localStorage.getItem('token');
+        await axios.post(`${API_BASE_URL}/entries`, form, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
         toast.success('Wpis dodany');
         fetchEntries();
       }

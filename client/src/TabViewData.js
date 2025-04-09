@@ -3,14 +3,14 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Modal from 'react-modal';
 import { toast } from 'react-toastify';
-import TabInputData from './TabInputData'; // Komponent do dodawania nowych danych
-import EditOffersModal from './EditOffersModal'; // Komponent modala z ofertami
+import TabInputData from './TabInputData';
+import EditOffersModal from './EditOffersModal';
 import { FaPlus, FaTrash, FaSearch } from 'react-icons/fa';
 
-// Ustawienie zmiennej API_BASE_URL z pliku .env (Vite)
 const API_BASE_URL = process.env.REACT_APP_API_URL;
 
-Modal.setAppElement('#root'); // Ustawienie aplikacji jako root dla modala
+Modal.setAppElement('#root');
+
 
 const tdStyle = {
   padding: '10px',
@@ -116,10 +116,19 @@ function TabViewData() {
     });
   };
 
-  // Pobieranie danych z backendu
   const fetchEntries = () => {
+    const token = localStorage.getItem('token');
+    console.log('Token JWT:', token); 
+    if (!token) {
+      console.warn('Brak tokenu JWT, nie można pobrać danych.');
+      return;
+    }
     axios
-      .get(`${API_BASE_URL}/entries`)
+      .get(`${API_BASE_URL}/entries`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
       .then((res) => {
         const normalizedData = res.data.map(normalizeEntryData);
         setEntries(normalizedData);
@@ -128,9 +137,6 @@ function TabViewData() {
       .catch((error) => console.error('Błąd pobierania danych:', error));
   };
 
-  useEffect(() => {
-    fetchEntries();
-  }, []);
 
   // Obsługa zmiany w polu wyszukiwania
   const handleSearchChange = (event) => {
@@ -182,18 +188,23 @@ function TabViewData() {
     setSortColumn(column);
   };
 
-  // Usuwanie wpisu
-  const handleDelete = async (id, e) => {
-    e.stopPropagation();
-    if (!window.confirm('Czy na pewno chcesz usunąć ten wpis?')) return;
-    try {
-      await axios.delete(`${API_BASE_URL}/entries/${id}`);
-      toast.success('Wpis usunięty');
-      fetchEntries();
-    } catch {
-      toast.error('Błąd podczas usuwania');
-    }
-  };
+  // Zmieniona funkcja handleDelete z tokenem
+const handleDelete = async (id, e) => {
+  e.stopPropagation();
+  if (!window.confirm('Czy na pewno chcesz usunąć ten wpis?')) return;
+  try {
+    const token = localStorage.getItem('token');
+    await axios.delete(`${API_BASE_URL}/entries/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    toast.success('Wpis usunięty');
+    fetchEntries();
+  } catch {
+    toast.error('Błąd podczas usuwania');
+  }
+};
 
   // Inicjalizacja formularza edycji
   const handleEdit = (entry) => {
@@ -214,17 +225,24 @@ function TabViewData() {
     }
   };
 
-  // Zapisywanie edytowanego wpisu
-  const handleSaveEdit = async () => {
-    try {
-      await axios.put(`${API_BASE_URL}/entries/${editingEntry.id}`, editForm);
-      toast.success('Zaktualizowano dane');
-      setEditingEntry(null);
-      fetchEntries();
-    } catch {
-      toast.error('Błąd edycji');
-    }
-  };
+// Zmieniona funkcja handleSaveEdit z tokenem
+const handleSaveEdit = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    console.log(payload);
+    await axios.put(`${API_BASE_URL}/entries/${editingEntry.id}`, editForm, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    toast.success('Zaktualizowano dane');
+    setEditingEntry(null);
+    fetchEntries();
+  } catch {
+    toast.error('Błąd edycji');
+  }
+};
 
   return (
     <div style={{ overflowX: 'auto', padding: 20 }}>

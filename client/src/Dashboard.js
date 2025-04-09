@@ -12,7 +12,6 @@ import OffersTable from './Offers';
 import { FaPlus, FaDatabase, FaLock, FaBriefcase } from 'react-icons/fa';
 import TabChangePassword from './TabChangePassword';
 
-// Ustawienie zmiennej API_BASE_URL z pliku .env (Create React App)
 const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 const GlobalStyle = createGlobalStyle`
@@ -138,7 +137,6 @@ const Dashboard = () => {
   const [editingEntry, setEditingEntry] = useState(null);
   const [entries, setEntries] = useState([]);
 
-  // Pobieranie danych użytkownika z endpointu /userdb
   const fetchUser = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/userdb`);
@@ -151,17 +149,24 @@ const Dashboard = () => {
     }
   };
 
-  // Pobieranie wpisów
   const fetchEntries = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.warn('Brak tokenu JWT – użytkownik niezalogowany');
+      return;
+    }
     try {
-      const response = await axios.get(`${API_BASE_URL}/entries`);
+      const response = await axios.get(`${API_BASE_URL}/entries`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       setEntries(response.data);
     } catch (error) {
       console.error('Błąd pobierania danych:', error);
     }
   };
 
-  // Funkcja do edycji wpisu
   const handleEdit = (entryId) => {
     axios.get(`${API_BASE_URL}/entries/${entryId}`)
       .then((response) => {
@@ -197,7 +202,6 @@ const Dashboard = () => {
       <GlobalStyle />
       <DashboardContainer>
         <Sidebar>
-          {/* Logo */}
           <div style={{ textAlign: 'center', marginBottom: '20px' }}>
             <img src="/images/logo.jpg" alt="Logo" style={{ width: '100px' }} />
           </div>
@@ -229,3 +233,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
