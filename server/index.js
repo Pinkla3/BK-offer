@@ -101,11 +101,16 @@ app.get('/entries', async (req, res) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.id;
-    const userRole = decoded.role;
+    const isAdmin = decoded.role === 'admin';
 
     let results;
-    if (userRole === 'admin') {
-      [results] = await pool.query('SELECT * FROM entries ORDER BY id DESC');
+    if (isAdmin) {
+      [results] = await pool.query(`
+        SELECT entries.*, users.name AS user_name 
+        FROM entries 
+        JOIN users ON entries.user_id = users.id 
+        ORDER BY entries.id DESC
+      `);
     } else {
       [results] = await pool.query('SELECT * FROM entries WHERE user_id = ? ORDER BY id DESC', [userId]);
     }
