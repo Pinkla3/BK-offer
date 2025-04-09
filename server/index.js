@@ -186,7 +186,7 @@ app.put('/entries/:id', async (req, res) => {
     UPDATE entries SET 
       imie = ?, nazwisko = ?, jezyk = ?, fs = ?, nr = ?,
       do_opieki = ?, dyspozycyjnosc = ?, oczekiwania = ?,
-      referencje = ?, ostatni_kontakt = ?, notatka = ?, telefon = ?, proponowane_zlecenie = ?,
+      referencje = ?, ostatni_kontakt = ?, notatka = ?, telefon = ?, proponowane_zlecenie = ?
     WHERE id = ?
   `;
 
