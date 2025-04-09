@@ -46,7 +46,7 @@ function Login() {
 
   return (
         <div style={{
-      backgroundImage: 'url("/images/background.png")',
+      backgroundImage: 'url("/images/background.jflf")',
       backgroundSize: 'cover',       // skalowanie do wielkości kontenera
       backgroundRepeat: 'no-repeat', // wyłączenie powtarzania
       backgroundPosition: 'center',  // wyśrodkowanie obrazu     
