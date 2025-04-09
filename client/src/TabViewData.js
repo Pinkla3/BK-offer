@@ -299,7 +299,7 @@ const handleSaveEdit = async () => {
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead style={{ backgroundColor: '#007bff' }}>
           <tr>
-            {['#', 'Imię', 'Nazwisko', 'Język', 'FS', 'NR', 'Do opieki', 'Dyspozycyjność', 'Oczekiwania', 'Referencje', 'Ostatni kontakt', 'Notatka'].map((col, i) => {
+            {['#', 'Imię', 'Nazwisko','Numer telefonu', 'Język', 'FS', 'NR', 'Do opieki', 'Dyspozycyjność', 'Oczekiwania', 'Referencje', 'Ostatni kontakt', 'Notatka', 'Proponowane zlecenie'].map((col, i) => {
               const columnKey = col.toLowerCase().replace(' ', '_');
               return (
                 <th
@@ -362,6 +362,7 @@ const handleSaveEdit = async () => {
               <td>{index + 1}</td>
               <td>{entry.imie}</td>
               <td>{entry.nazwisko}</td>
+              <td>{entry.telefon || '---'}</td>
               <td>{entry.jezyk}</td>
               <td>{entry.fs}</td>
               <td>{entry.nr}</td>
@@ -371,6 +372,7 @@ const handleSaveEdit = async () => {
               <td>{entry.referencje}</td>
               <td>{entry.ostatni_kontakt ? formatDate(entry.ostatni_kontakt) : '—'}</td>
               <td>{entry.notatka}</td>
+              <td>{entry.proponowane_zlecenie}</td>
               {user?.role === 'admin' && (
       <td style={{ padding: '10px', verticalAlign: 'top', borderBottom: '1px solid #eee', fontSize: '14px' }}>
         {entry.user_name}
@@ -494,6 +496,15 @@ const handleSaveEdit = async () => {
               </div>
             </div>
             <div style={{ display: 'flex', gap: '10px', marginBottom: 16 }}>
+            <div style={{ flex: 1 }}>
+                <label style={labelStyle}>Telefon</label>
+                <input
+                  type="text"
+                  value={editForm.telefon || ''}
+                  onChange={e => handleEditChange('telefon', e.target.value)}
+                  style={inputStyle}
+                />
+              </div>
               <div style={{ flex: 1 }}>
                 <label style={labelStyle}>Język</label>
                 <select
@@ -595,6 +606,15 @@ const handleSaveEdit = async () => {
                 style={inputStyle}
               />
             </div>
+            <div style={{ flex: 1 }}>
+                <label style={labelStyle}>Proponowane zlecenie</label>
+                <input
+                  type="text"
+                  value={editForm.proponowane_zlecenie || ''}
+                  onChange={e => handleEditChange('proponowane_zlecenie', e.target.value)}
+                  style={inputStyle}
+                />
+              </div>
             <div style={{ textAlign: 'center', marginBottom: '20px' }}>
               <button
                 type="button"

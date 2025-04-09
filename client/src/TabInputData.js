@@ -11,6 +11,7 @@ function TabInputData({ setIsAdding, fetchEntries, editingEntry }) {
   const [form, setForm] = useState({
     imie: editingEntry ? editingEntry.imie : '',
     nazwisko: editingEntry ? editingEntry.nazwisko : '',
+    telefon: editingEntry ? editingEntry.telefon : '',
     jezyk: editingEntry ? editingEntry.jezyk : '',
     fs: editingEntry ? editingEntry.fs : '',
     nr: editingEntry ? editingEntry.nr : '',
@@ -19,7 +20,8 @@ function TabInputData({ setIsAdding, fetchEntries, editingEntry }) {
     oczekiwania: editingEntry ? editingEntry.oczekiwania : '',
     referencje: editingEntry ? editingEntry.referencje : '',
     ostatni_kontakt: editingEntry ? editingEntry.ostatni_kontakt : '',
-    notatka: editingEntry ? editingEntry.notatka : ''
+    notatka: editingEntry ? editingEntry.notatka : '',
+    proponowane_zlecenie: editingEntry ? editingEntry.proponowane_zlecenie: '',
   });
 
   // Funkcja do zmiany wartości formularza
@@ -64,6 +66,7 @@ function TabInputData({ setIsAdding, fetchEntries, editingEntry }) {
     setForm({
       imie: '',
       nazwisko: '',
+      telefon: '',
       jezyk: '',
       fs: '',
       nr: '',
@@ -72,7 +75,8 @@ function TabInputData({ setIsAdding, fetchEntries, editingEntry }) {
       oczekiwania: '',
       referencje: '',
       ostatni_kontakt: '',
-      notatka: ''
+      notatka: '',
+      proponowane_zlecenie: ''
     });
   };
 
@@ -153,6 +157,22 @@ function TabInputData({ setIsAdding, fetchEntries, editingEntry }) {
 
           {/* Poziom języka, FS, NR */}
           <div style={{ display: 'flex', gap: '10px', marginBottom: 16 }}>
+          <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', fontWeight: 600, marginBottom: 4 }}>Telefon</label>
+              <input
+                type="text"
+                placeholder="Wpisz numer telefonu"
+                value={form.telefon}
+                onChange={(e) => handleChange('telefon', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  borderRadius: '8px',
+                  border: '1px solid #ccc',
+                  boxSizing: 'border-box'
+                }}
+              />
+              </div> 
             <div style={{ flex: 1 }}>
               <label style={{ display: 'block', fontWeight: 600, marginBottom: 4 }}>Poziom języka</label>
               <select
@@ -327,6 +347,22 @@ function TabInputData({ setIsAdding, fetchEntries, editingEntry }) {
               }}
             />
           </div>
+          <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', fontWeight: 600, marginBottom: 4 }}>Proponowane zlecenie</label>
+              <input
+                type="text"
+                placeholder="Wpisz infromacje o proponowanym zleceniu lub numer zlecenia stałego"
+                value={form.proponowane_zlecenie}
+                onChange={(e) => handleChange('proponowane_zlecenie', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  borderRadius: '8px',
+                  border: '1px solid #ccc',
+                  boxSizing: 'border-box'
+                }}
+              />
+            </div>
 
           <button
             type="submit"
