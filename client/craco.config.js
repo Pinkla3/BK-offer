@@ -2,7 +2,7 @@ module.exports = {
   // Prosta konfiguracja devServer (poziom CRACO)
   devServer: {
     allowedHosts: 'all',
-    port: 3000
+    port: 3008
   },
 
   webpack: {

@@ -8,7 +8,7 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const app = express();
-const port = 3001;
+const port = 3009;
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -180,6 +180,6 @@ app.post('/entries', (req, res) => {
   });
 });
 
-app.listen(3001, () => {
-  console.log("Server działa na http://localhost:3001");
+app.listen(3009, () => {
+  console.log("Server działa na http://localhost:3009");
 });

@@ -23,7 +23,6 @@ function TabInputData({ setIsAdding, fetchEntries, editingEntry }) {
     notatka: editingEntry ? editingEntry.notatka : '',
     proponowane_zlecenie: editingEntry ? editingEntry.proponowane_zlecenie: '',
   });
-
   // Funkcja do zmiany wartości formularza
   const handleChange = (field, value) => {
     setForm({ ...form, [field]: value });

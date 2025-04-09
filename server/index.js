@@ -8,10 +8,10 @@ const jwt = require('jsonwebtoken');
 const pool = require('./db');
 
 const app = express();
-const port = 3001;
+const port = 3009;
 
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://bk-offer.pl'],
+  origin: ['http://localhost:3008', 'https://bk-offer.pl'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -81,7 +81,7 @@ app.get('/api/userdb', async (req, res) => {
   }
 });
 
-app.post('/reset-password', async (req, res) => {
+app.post('/api/reset-password', async (req, res) => {
   const { email } = req.body;
   const newPassword = Math.random().toString(36).slice(2, 10);
   const hashedPassword = bcrypt.hashSync(newPassword, 10);
@@ -182,6 +182,10 @@ app.put('/entries/:id', async (req, res) => {
     ostatni_kontakt, notatka, telefon, proponowane_zlecenie
   } = req.body;
 
+  // Przekształcenie pustych stringów w NULL (jeśli dotyczy)
+  const dyspozycyjnoscValue = dyspozycyjnosc === '' ? null : dyspozycyjnosc;
+  const ostatniKontaktValue = ostatni_kontakt === '' ? null : ostatni_kontakt;
+
   const sql = `
     UPDATE entries SET 
       imie = ?, nazwisko = ?, jezyk = ?, fs = ?, nr = ?,
@@ -192,8 +196,8 @@ app.put('/entries/:id', async (req, res) => {
 
   const values = [
     imie, nazwisko, jezyk, fs, nr,
-    do_opieki, dyspozycyjnosc, oczekiwania,
-    referencje, ostatni_kontakt, notatka, telefon, proponowane_zlecenie, id
+    do_opieki, dyspozycyjnoscValue, oczekiwania,
+    referencje, ostatniKontaktValue, notatka, telefon, proponowane_zlecenie, id
   ];
 
   try {
@@ -204,7 +208,6 @@ app.put('/entries/:id', async (req, res) => {
     res.status(500).json({ error: 'Błąd podczas edycji' });
   }
 });
-
 app.post('/entries', async (req, res) => {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) return res.status(401).json({ error: 'Brak tokenu' });

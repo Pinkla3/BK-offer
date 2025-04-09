@@ -45,7 +45,6 @@ const inputStyle = {
   boxSizing: 'border-box',
   outlineColor: '#007bff'
 };
-
 function TabViewData({ user }) {
   const [entries, setEntries] = useState([]);
   const [sortedEntries, setSortedEntries] = useState([]);
@@ -373,11 +372,11 @@ const handleSaveEdit = async () => {
               <td>{entry.nr}</td>
               <td>{entry.do_opieki}</td>
               <td>{formatMonthYear(entry.dyspozycyjnosc)}</td>
-              <td style={{maxWidth: 200, textAlign: 'justify'}}>{entry.oczekiwania}</td>
+              <td style={{ textAlign: 'justify'}}>{entry.oczekiwania}</td>
               <td>{entry.referencje}</td>
               <td>{entry.ostatni_kontakt ? formatDate(entry.ostatni_kontakt) : '—'}</td>
-              <td style={{maxWidth: 200, textAlign: 'justify'}}>{entry.notatka}</td>
-              <td style={{maxWidth: 200, textAlign: 'justify'}}>{entry.proponowane_zlecenie}</td>
+              <td style={{ textAlign: 'justify'}}>{entry.notatka}</td>
+              <td style={{ textAlign: 'justify'}}>{entry.proponowane_zlecenie}</td>
               {user?.role === 'admin' && (
       <td style={{ padding: '10px', verticalAlign: 'top', borderBottom: '1px solid #eee', fontSize: '14px' }}>
         {entry.user_name}
@@ -548,17 +547,28 @@ const handleSaveEdit = async () => {
             </div>
             <div style={{ display: 'flex', gap: '10px', marginBottom: 16 }}>
               <div style={{ flex: 1 }}>
-                <label style={labelStyle}>Do opieki</label>
-                <select
-                  value={editForm.do_opieki || ''}
-                  onChange={e => handleEditChange('do_opieki', e.target.value)}
-                  style={inputStyle}
-                >
-                  <option value="">Wybierz</option>
-                  <option value="senior">Senior</option>
-                  <option value="seniorka">Seniorka</option>
-                  <option value="małżeństwo">Małżeństwo</option>
-                </select>
+              <label style={{ display: 'block', fontWeight: 600, marginBottom: 4 }}>Do opieki</label>
+  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 12px' }}>
+    {['senior', 'seniorka', 'małżeństwo', 'osoba leżąca'].map(option => (
+      <label key={option} style={{ fontWeight: 400 }}>
+        <input
+          type="checkbox"
+          checked={editForm.do_opieki?.split(',').includes(option) || false}
+          onChange={() => {
+            const updatedList = editForm.do_opieki
+              ? editForm.do_opieki.split(',').filter(Boolean)
+              : [];
+            const newList = updatedList.includes(option)
+              ? updatedList.filter(item => item !== option)
+              : [...updatedList, option];
+            setEditForm(prev => ({ ...prev, do_opieki: newList.join(',') }));
+          }}
+          style={{ marginRight: 6 }}
+        />
+        {option}
+      </label>
+    ))}
+  </div>
               </div>
               <div style={{ flex: 1 }}>
                 <label style={labelStyle}>Dyspozycyjność</label>

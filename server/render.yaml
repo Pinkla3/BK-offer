@@ -7,7 +7,7 @@ services:
     startCommand: node server.js
     envVars:
       - key: PORT
-        value: 3001
+        value: 3009
       - key: MONGODB_URI
         value: your-mongodb-uri-here
       - key: JWT_SECRET

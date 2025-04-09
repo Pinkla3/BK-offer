@@ -80,7 +80,7 @@ services:
     startCommand: node server.js
     envVars:
       - key: PORT
-        value: 3001
+        value: 3009
       - key: MONGODB_URI
         value: <TWOJE_URI>
       - key: JWT_SECRET

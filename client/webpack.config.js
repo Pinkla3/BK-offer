@@ -26,7 +26,7 @@ module.exports = {
   },
   devServer: {
     // Port, na którym nasłuchuje devServer
-    port: 3000,
+    port: 3008,
 
     // Host 0.0.0.0 pozwala na dostęp z zewnątrz (jeśli puścisz to na VPS)
     host: '0.0.0.0',
