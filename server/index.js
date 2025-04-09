@@ -95,6 +95,9 @@ app.get('/entries', async (req, res) => {
     const userId = decoded.id;
 
     const [results] = await pool.query('SELECT * FROM entries WHERE user_id = ? ORDER BY id DESC', [userId]);
+  // 👇 Dodaj to:
+  console.log('Użytkownik ID:', userId);
+  console.log('Wynik:', results);
     res.json(results);
   } catch (err) {
     console.error('Błąd przy pobieraniu danych:', err);

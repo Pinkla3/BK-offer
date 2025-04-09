@@ -139,7 +139,7 @@ const Dashboard = () => {
 
   const fetchUser = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/userdb`);
+      const response = await axios.get(`${API_BASE_URL}/api/userdb`);
       console.log('Odpowiedź z userdb:', response.data);
       if (response.data && response.data.users && response.data.users.length > 0) {
         setUser(response.data.users[0]);
