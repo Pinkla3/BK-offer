@@ -63,13 +63,21 @@ app.get('/check-email', async (req, res) => {
   }
 });
 
-app.get('/userdb', async (req, res) => {
+app.get('/api/userdb', async (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) return res.status(401).json({ error: 'Brak tokenu' });
+
   try {
-    const [results] = await pool.query('SELECT * FROM users');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.id;
+
+    const [results] = await pool.query('SELECT id, name, email, role FROM users WHERE id = ?', [userId]);
+    if (results.length === 0) return res.status(404).json({ error: 'Użytkownik nie znaleziony' });
+
     res.json({ users: results });
   } catch (err) {
-    console.error('Błąd przy pobieraniu danych użytkownika:', err);
-    res.status(500).json({ error: 'Błąd serwera' });
+    console.error('Błąd podczas autoryzacji:', err);
+    res.status(401).json({ error: 'Nieprawidłowy token' });
   }
 });
 

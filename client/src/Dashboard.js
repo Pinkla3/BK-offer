@@ -138,8 +138,15 @@ const Dashboard = () => {
   const [entries, setEntries] = useState([]);
 
   const fetchUser = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return console.warn('Brak tokenu');
+  
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/userdb`);
+      const response = await axios.get(`${API_BASE_URL}/api/userdb`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       console.log('Odpowiedź z userdb:', response.data);
       if (response.data && response.data.users && response.data.users.length > 0) {
         setUser(response.data.users[0]);
@@ -156,7 +163,7 @@ const Dashboard = () => {
       return;
     }
     try {
-      const response = await axios.get(`${API_BASE_URL}/entries`, {
+      const response = await axios.get(`${API_BASE_URL}/api/entries`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
