@@ -164,7 +164,7 @@ const Dashboard = () => {
       return;
     }
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/entries`, {
+      const response = await axios.get(`${API_BASE_URL}/entries`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
