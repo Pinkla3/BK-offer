@@ -115,4 +115,40 @@ cd ../client && npm install && npm run dev
 ---
 
 > Masz pytania lub coś nie działa? Zajrzyj do logów w Render lub Vercel – lub skontaktuj się ze mną 💬
+>
+> DYREKTYWY NGINX
+> location / {
+	proxy_pass http://127.0.0.1:3008;
+	proxy_http_version 1.1;
+	proxy_set_header Host $host;
+	proxy_set_header X-Real-IP $remote_addr;
+}
+
+location /login {
+	proxy_pass http://127.0.0.1:3009;
+	proxy_http_version 1.1;
+	proxy_set_header Host $host;
+	proxy_set_header X-Real-IP $remote_addr;
+}
+
+location /register {
+	proxy_pass http://127.0.0.1:3009;
+	proxy_http_version 1.1;
+	proxy_set_header Host $host;
+	proxy_set_header X-Real-IP $remote_addr;
+}
+
+location /api/ {
+	proxy_pass http://127.0.0.1:3009;
+	proxy_http_version 1.1;
+	proxy_set_header Host $host;
+	proxy_set_header X-Real-IP $remote_addr;
+}
+
+location /entries {
+	proxy_pass http://127.0.0.1:3009;
+	proxy_http_version 1.1;
+	proxy_set_header Host $host;
+	proxy_set_header X-Real-IP $remote_addr;
+}
 
