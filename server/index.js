@@ -4,18 +4,19 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-
+const https = require('https');
 const pool = require('./db');
 
 const app = express();
 const port = 3009;
 
 app.use(cors({
-  origin: ['http://localhost:3008', 'https://bk-offer.pl'],
+  origin: 'https://desk.berlin-opiekunki.pl',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+app.options('*', cors());
 app.use(bodyParser.json());
 app.use(express.json());
 
@@ -245,6 +246,6 @@ app.post('/entries', async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server działa na http://localhost:${port}`);
+  console.log(`Server działa na https://localhost:${port}`);
 });
 
