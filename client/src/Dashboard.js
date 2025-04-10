@@ -164,7 +164,7 @@ const Dashboard = () => {
       return;
     }
     try {
-      const response = await axios.get(`${API_BASE_URL}/entries`, {
+      const response = await axios.get(`${API_BASE_URL}/api/entries`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -173,17 +173,6 @@ const Dashboard = () => {
     } catch (error) {
       console.error('Błąd pobierania danych:', error);
     }
-  };
-
-  const handleEdit = (entryId) => {
-    axios.get(`${API_BASE_URL}/entries/${entryId}`)
-      .then((response) => {
-        setEditingEntry(response.data);
-        setIsAdding(true);
-      })
-      .catch((error) => {
-        console.error('Błąd pobierania danych do edycji:', error);
-      });
   };
 
   useEffect(() => {
