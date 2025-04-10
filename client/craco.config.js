@@ -1,8 +1,9 @@
 module.exports = {
   devServer: {
+    host: '0.0.0.0',               // 👈 to dodaj
     allowedHosts: 'all',
     port: 3008,
-    historyApiFallback: true, // 👈 DODANE – to naprawia GET /login
+    historyApiFallback: true,
     proxy: {
       '/login': 'http://localhost:3009',
       '/register': 'http://localhost:3009',
@@ -28,4 +29,3 @@ module.exports = {
     }
   }
 };
-
