@@ -142,7 +142,7 @@ const Dashboard = () => {
     if (!token) return console.warn('Brak tokenu');
   
     try {
-      const response = await axios.get(`${API_BASE_URL}/userdb`, {
+      const response = await axios.get(`${API_BASE_URL}/api/userdb`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -164,7 +164,7 @@ const Dashboard = () => {
       return;
     }
     try {
-      const response = await axios.get(`${API_BASE_URL}/entries`, {
+      const response = await axios.get(`${API_BASE_URL}/api/entries`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -176,7 +176,7 @@ const Dashboard = () => {
   };
 
   const handleEdit = (entryId) => {
-    axios.get(`${API_BASE_URL}/entries/${entryId}`)
+    axios.get(`${API_BASE_URL}/api/entries/${entryId}`)
       .then((response) => {
         setEditingEntry(response.data);
         setIsAdding(true);
