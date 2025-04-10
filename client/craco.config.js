@@ -1,8 +1,17 @@
 module.exports = {
-  // Prosta konfiguracja devServer (poziom CRACO)
   devServer: {
     allowedHosts: 'all',
-    port: 3008
+    port: 3008,
+    historyApiFallback: true, // 👈 DODANE – to naprawia GET /login
+    proxy: {
+      '/login': 'http://localhost:3009',
+      '/register': 'http://localhost:3009',
+      '/check-email': 'http://localhost:3009',
+      '/change-password': 'http://localhost:3009',
+      '/reset-password': 'http://localhost:3009',
+      '/entries': 'http://localhost:3009',
+      '/api': 'http://localhost:3009'
+    }
   },
 
   webpack: {
@@ -11,7 +20,6 @@ module.exports = {
         webpackConfig.devServer = {
           ...webpackConfig.devServer,
           client: {
-            // Adres WebSocket
             webSocketURL: 'wss://bk-offer.pl/ws'
           }
         };
@@ -20,3 +28,4 @@ module.exports = {
     }
   }
 };
+
