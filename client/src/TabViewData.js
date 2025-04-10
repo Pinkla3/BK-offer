@@ -239,7 +239,7 @@ const handleSaveEdit = async () => {
     const token = localStorage.getItem('token');
     const payload = JSON.parse(atob(token.split('.')[1]));
     console.log(payload);
-    await axios.put(`${API_BASE_URL}/api/entries/${editingEntry.id}`, editForm, {
+    await axios.put(`${API_BASE_URL}/entries/${editingEntry.id}`, editForm, {
       headers: {
         Authorization: `Bearer ${token}`
       }
