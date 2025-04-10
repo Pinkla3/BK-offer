@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { setToken } from './auth';
 
 // Ustawienie zmiennej API_BASE_URL z pliku .env (Create React App)
-const API_BASE_URL = process.env.REACT_APP_API_URL;
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://desk.berlin-opiekunki.pl';
 
 function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
