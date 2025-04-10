@@ -20,7 +20,7 @@ function ChangePassword() {
 
     try {
       await axios.post(
-        'https://localhost:3009/change-password',
+        '/change-password',
         form,
         { headers: { Authorization: `Bearer ${getToken()}` } }
       );

@@ -52,7 +52,7 @@ function TabViewData({ user }) {
   const [editForm, setEditForm] = useState({});
   const [isAdding, setIsAdding] = useState(false);
   const [sortOrder, setSortOrder] = useState('asc');
-  const [sortColumn, setSortColumn] = useState('nazwisko');
+  const [sortColumn, setSortColumn] = useState('dyspozycyjnosc');
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [availability, setAvailability] = useState("2025-05");
@@ -131,7 +131,7 @@ function TabViewData({ user }) {
       return;
     }
     axios
-      .get(`${API_BASE_URL}/entries`, {
+      .get(`/entries`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -202,7 +202,7 @@ const handleDelete = async (id, e) => {
   if (!window.confirm('Czy na pewno chcesz usunąć ten wpis?')) return;
   try {
     const token = localStorage.getItem('token');
-    await axios.delete(`${API_BASE_URL}/entries/${id}`, {
+    await axios.delete(`/entries/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -239,7 +239,7 @@ const handleSaveEdit = async () => {
     const token = localStorage.getItem('token');
     const payload = JSON.parse(atob(token.split('.')[1]));
     console.log(payload);
-    await axios.put(`${API_BASE_URL}/entries/${editingEntry.id}`, editForm, {
+    await axios.put(`/entries/${editingEntry.id}`, editForm, {
       headers: {
         Authorization: `Bearer ${token}`
       }
