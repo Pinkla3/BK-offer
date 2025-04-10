@@ -12,7 +12,7 @@ import OffersTable from './Offers';
 import { FaPlus, FaDatabase, FaLock, FaBriefcase } from 'react-icons/fa';
 import TabChangePassword from './TabChangePassword';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL;
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://desk.berlin-opiekunki.pl';
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -142,7 +142,7 @@ const Dashboard = () => {
     if (!token) return console.warn('Brak tokenu');
   
     try {
-      const response = await axios.get(`/userdb`, {
+      const response = await axios.get(`${API_BASE_URL}/userdb`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -164,7 +164,7 @@ const Dashboard = () => {
       return;
     }
     try {
-      const response = await axios.get(`/entries`, {
+      const response = await axios.get(`${API_BASE_URL}/entries`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -176,7 +176,7 @@ const Dashboard = () => {
   };
 
   const handleEdit = (entryId) => {
-    axios.get(`/entries/${entryId}`)
+    axios.get(`${API_BASE_URL}/entries/${entryId}`)
       .then((response) => {
         setEditingEntry(response.data);
         setIsAdding(true);

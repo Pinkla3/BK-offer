@@ -14,7 +14,7 @@ function ForgotPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`/reset-password`, { email });
+      const res = await axios.post(`${API_BASE_URL}/reset-password`, { email });
       setNewPassword(res.data.newPassword);
       toast.success('Nowe hasło wygenerowane!');
     } catch {
