@@ -24,7 +24,7 @@ function TabChangePassword() {
     try {
       const token = localStorage.getItem('token');
       await axios.post(
-        `${API_BASE_URL}/change-password`,
+        `${API_BASE_URL}/api/change-password`,
         { oldPassword, newPassword },
         {
           headers: {

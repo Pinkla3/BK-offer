@@ -26,7 +26,7 @@ function Login() {
     if (errors.email || errors.password) return;
   
     try {
-      const res = await axios.post(`${API_BASE_URL}/login`, form);
+      const res = await axios.post(`${API_BASE_URL}/api/login`, form);
       console.log('ODPOWIEDŹ Z BACKENDU:', res.data); // 👈 LOG
   
       if (res.data.token) {

@@ -22,7 +22,7 @@ app.use(express.json());
 const lockstepOffersRouter = require("./routes/lockstepOffers");
 app.use("/api/lockstep-offers", lockstepOffersRouter);
 
-app.post('/register', async (req, res) => {
+app.post('/api/register', async (req, res) => {
   const { name, email, password, role } = req.body;
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -34,7 +34,7 @@ app.post('/register', async (req, res) => {
   }
 });
 
-app.post('/login', async (req, res) => {
+app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
   const sql = 'SELECT * FROM users WHERE email = ?';
   try {
@@ -50,7 +50,7 @@ app.post('/login', async (req, res) => {
   }
 });
 
-app.get('/check-email', async (req, res) => {
+app.get('/api/check-email', async (req, res) => {
   const { email } = req.query;
   if (!email || !email.includes('@') || !email.includes('.')) {
     return res.status(400).json({ error: 'Nieprawidłowy adres e-mail' });
@@ -94,7 +94,7 @@ app.post('/api/reset-password', async (req, res) => {
   }
 });
 
-app.get('/entries', async (req, res) => {
+app.get('/api/entries', async (req, res) => {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) return res.status(401).json({ error: 'Brak tokenu' });
 
@@ -122,7 +122,7 @@ app.get('/entries', async (req, res) => {
   }
 });
 
-app.delete('/entries/:id', async (req, res) => {
+app.delete('/api/entries/:id', async (req, res) => {
   const entryId = req.params.id;
   try {
     await pool.query('DELETE FROM entries WHERE id = ?', [entryId]);
@@ -133,7 +133,7 @@ app.delete('/entries/:id', async (req, res) => {
   }
 });
 
-app.post('/change-password', async (req, res) => {
+app.post('/api/change-password', async (req, res) => {
   const { oldPassword, newPassword } = req.body;
   const token = req.headers.authorization?.split(' ')[1];
 
@@ -174,7 +174,7 @@ app.post('/change-password', async (req, res) => {
   }
 });
 
-app.put('/entries/:id', async (req, res) => {
+app.put('/api/entries/:id', async (req, res) => {
   const id = req.params.id;
   const {
     imie, nazwisko, jezyk, fs, nr, do_opieki,
@@ -208,7 +208,7 @@ app.put('/entries/:id', async (req, res) => {
     res.status(500).json({ error: 'Błąd podczas edycji' });
   }
 });
-app.post('/entries', async (req, res) => {
+app.post('/api/entries', async (req, res) => {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) return res.status(401).json({ error: 'Brak tokenu' });
 
