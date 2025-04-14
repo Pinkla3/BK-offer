@@ -380,15 +380,15 @@ function TabViewData({ user }) {
               }}
               onClick={() => handleEdit(entry)}
             >
-              <td style={{ textAlign: 'justify', maxWidth: '20px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{(currentPage - 1) * entriesPerPage + index + 1}</td>
-              <td>{entry.imie}</td>
-              <td>{entry.nazwisko}</td>
-              <td>{entry.telefon || '---'}</td>
-              <td>{entry.jezyk}</td>
+              <td style={{ textAlign: 'justify', maxWidth: '5px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{(currentPage - 1) * entriesPerPage + index + 1}</td>
+              <td style={{ textAlign: 'justify', maxWidth: '50px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{entry.imie}</td>
+              <td style={{ textAlign: 'justify', maxWidth: '50px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{entry.nazwisko}</td>
+              <td style={{ textAlign: 'justify', maxWidth: '50px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{entry.telefon || '---'}</td>
+              <td style={{ textAlign: 'justify', maxWidth: '50px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{entry.jezyk}</td>
               <td style={{ textAlign: 'justify', maxWidth: '5px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{entry.fs}</td>
-              <td style={{ textAlign: 'justify', maxWidth: '50px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{entry.nr}</td>
-              <td>{entry.do_opieki}</td>
-              <td>{formatMonthYear(entry.dyspozycyjnosc)}</td>
+              <td style={{ textAlign: 'justify', maxWidth: '5px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{entry.nr}</td>
+              <td style={{ textAlign: 'justify', maxWidth: '50px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{entry.do_opieki}</td>
+              <td style={{ textAlign: 'justify', maxWidth: '50px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{formatMonthYear(entry.dyspozycyjnosc)}</td>
               <td style={{ textAlign: 'justify', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
   {entry.oczekiwania}
 </td>
