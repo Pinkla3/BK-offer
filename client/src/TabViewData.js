@@ -386,7 +386,9 @@ function TabViewData({ user }) {
               <td style={{ textAlign: 'center', maxWidth: '40px',  textOverflow: 'ellipsis',  whiteSpace: 'normal' , padding: '5px'}}>{entry.jezyk}</td>
               <td style={{ textAlign: 'justify', maxWidth: '40px',  textOverflow: 'ellipsis',  whiteSpace: 'normal' , padding: '5px'}}>{entry.fs}</td>
               <td style={{ textAlign: 'justify', maxWidth: '40px',  textOverflow: 'ellipsis',  whiteSpace: 'normal', padding: '5px' }}>{entry.nr}</td>
-              <td style={{ textAlign: 'justify', maxWidth: '250px', textOverflow: 'ellipsis',  whiteSpace: 'normal', padding: '5px' }}>{entry.do_opieki}</td>
+              <td style={{ textAlign: 'justify', maxWidth: '250px', textOverflow: 'ellipsis',  whiteSpace: 'normal', padding: '5px' }}>  {entry.do_opieki.split(',').map((item, index) => (
+    <div key={index}>{item.trim()}</div>
+  ))}</td>
               <td style={{ textAlign: 'justify', textOverflow: 'ellipsis', whiteSpace: 'nowrap', padding: '5px' }}>{formatMonthYear(entry.dyspozycyjnosc)}</td>
               <td style={{ textAlign: 'justify', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', padding: '5px' }}>
   {entry.oczekiwania}
