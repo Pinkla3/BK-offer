@@ -93,7 +93,7 @@ function Register() {
 
         <div style={{ textAlign: 'center', marginBottom: '20px' }}>
           <img src="/images/logo.jpg" alt="Logo" style={{ width: '100px' }} />
-          <h2 style={{ textAlign: 'center' }}>BK-offer ver.1.0</h2>
+          <h2 style={{ textAlign: 'center' }}>Desk - twoje wirtualne biurko rekrutacyjne</h2>
         </div> 
 
         <h2 style={{ textAlign: 'center' }}>Rejestracja</h2>
