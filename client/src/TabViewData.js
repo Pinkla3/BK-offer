@@ -385,7 +385,7 @@ function TabViewData({ user }) {
               <td>{entry.nazwisko}</td>
               <td>{entry.telefon || '---'}</td>
               <td>{entry.jezyk}</td>
-              <td style={{ textAlign: 'justify', maxWidth: '10px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{entry.fs}</td>
+              <td style={{ textAlign: 'justify', maxWidth: '5px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{entry.fs}</td>
               <td style={{ textAlign: 'justify', maxWidth: '50px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{entry.nr}</td>
               <td>{entry.do_opieki}</td>
               <td>{formatMonthYear(entry.dyspozycyjnosc)}</td>
