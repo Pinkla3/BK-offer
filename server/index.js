@@ -4,8 +4,10 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
 
-const pool = require('./db');
+const pool = require('./db'); // import puli połączeń mysql2 z pliku db.js
 
 const app = express();
 const port = 3009;
@@ -19,6 +21,9 @@ app.use(cors({
 app.use(bodyParser.json());
 app.use(express.json());
 
+// ---------------------- INNE ENDPOINTY -------------------------
+
+// Przykładowy router dla lockstepOffers
 const lockstepOffersRouter = require("./routes/lockstepOffers");
 app.use("/api/lockstep-offers", lockstepOffersRouter);
 
@@ -48,7 +53,7 @@ app.post('/api/login', async (req, res) => {
       return res.status(401).json({ error: 'Nieprawidłowy email lub hasło' });
     }
     
-    // Dodaj logowanie sekretu przed generowaniem tokena:
+    // Debug: wyświetlenie JWT_SECRET (usuń w produkcji)
     console.log('JWT_SECRET (generowanie):', process.env.JWT_SECRET);
     
     const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '2h' });
@@ -89,22 +94,36 @@ app.get('/api/userdb', async (req, res) => {
   }
 });
 
-app.post('/api/reset-password', async (req, res) => {
-  const { email } = req.body;
-  const newPassword = Math.random().toString(36).slice(2, 10);
-  const hashedPassword = bcrypt.hashSync(newPassword, 10);
+// Endpoint do zmiany hasła (podając stare hasło)
+app.post('/api/change-password', async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ error: 'Brak tokenu' });
+  
+  const token = authHeader.split(' ')[1];
+  if (!token) return res.status(401).json({ error: 'Token nieprawidłowy' });
+  
   try {
-    const [result] = await pool.query('UPDATE users SET password = ? WHERE email = ?', [hashedPassword, email]);
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'Użytkownik nie istnieje' });
-    }
-    res.json({ message: 'Hasło zresetowane', newPassword });
-  } catch (err) {
-    console.error('Błąd resetowania hasła:', err);
-    res.status(500).json({ error: 'Błąd resetowania hasła', details: err.message });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.id;
+    
+    const [results] = await pool.query('SELECT * FROM users WHERE id = ?', [userId]);
+    if (results.length === 0) return res.status(404).json({ error: 'Użytkownik nie znaleziony' });
+    
+    const user = results[0];
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) return res.status(401).json({ error: 'Stare hasło nieprawidłowe' });
+    
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await pool.query('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, userId]);
+    res.json({ message: 'Hasło zostało zmienione' });
+  } catch (error) {
+    console.error('Błąd przy zmianie hasła:', error);
+    res.status(500).json({ error: 'Błąd przy zmianie hasła', details: error.message });
   }
 });
 
+// Endpointy związane z wpisami (pobieranie, dodawanie, edycja, usuwanie)
 app.get('/api/entries', async (req, res) => {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) return res.status(401).json({ error: 'Brak tokenu' });
@@ -133,82 +152,6 @@ app.get('/api/entries', async (req, res) => {
   }
 });
 
-app.delete('/api/entries/:id', async (req, res) => {
-  const entryId = req.params.id;
-  try {
-    await pool.query('DELETE FROM entries WHERE id = ?', [entryId]);
-    res.json({ message: 'Wpis usunięty' });
-  } catch (err) {
-    console.error('Błąd przy usuwaniu:', err);
-    res.status(500).json({ error: 'Błąd serwera przy usuwaniu wpisu' });
-  }
-});
-
-app.post('/api/change-password', async (req, res) => {
-  const { oldPassword, newPassword } = req.body;
-  const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json({ error: 'Brak tokenu' });
-  
-  const token = authHeader.split(' ')[1];
-  if (!token) return res.status(401).json({ error: 'Token nieprawidłowy' });
-  
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id;
-    
-    // Pobierz użytkownika z tabeli 'users', aby mieć poprawny hash hasła
-    const [results] = await pool.query('SELECT * FROM users WHERE id = ?', [userId]);
-    if (results.length === 0) return res.status(404).json({ error: 'Użytkownik nie znaleziony' });
-    
-    const user = results[0];
-    // Porównanie starego hasła
-    const isMatch = await bcrypt.compare(oldPassword, user.password);
-    if (!isMatch) return res.status(401).json({ error: 'Stare hasło nieprawidłowe' });
-    
-    // Hashowanie nowego hasła i aktualizacja
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    await pool.query('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, userId]);
-    res.json({ message: 'Hasło zostało zmienione' });
-  } catch (error) {
-    console.error('Błąd przy zmianie hasła:', error);
-    res.status(500).json({ error: 'Błąd przy zmianie hasła', details: error.message });
-  }
-});
-
-app.put('/api/entries/:id', async (req, res) => {
-  const id = req.params.id;
-  const {
-    imie, nazwisko, jezyk, fs, nr, do_opieki,
-    dyspozycyjnosc, oczekiwania, referencje,
-    ostatni_kontakt, notatka, telefon, proponowane_zlecenie
-  } = req.body;
-
-  // Przekształcenie pustych stringów w NULL (jeśli dotyczy)
-  const dyspozycyjnoscValue = dyspozycyjnosc === '' ? null : dyspozycyjnosc;
-  const ostatniKontaktValue = ostatni_kontakt === '' ? null : ostatni_kontakt;
-
-  const sql = `
-    UPDATE entries SET 
-      imie = ?, nazwisko = ?, jezyk = ?, fs = ?, nr = ?,
-      do_opieki = ?, dyspozycyjnosc = ?, oczekiwania = ?,
-      referencje = ?, ostatni_kontakt = ?, notatka = ?, telefon = ?, proponowane_zlecenie = ?
-    WHERE id = ?
-  `;
-
-  const values = [
-    imie, nazwisko, jezyk, fs, nr,
-    do_opieki, dyspozycyjnoscValue, oczekiwania,
-    referencje, ostatniKontaktValue, notatka, telefon, proponowane_zlecenie, id
-  ];
-
-  try {
-    await pool.query(sql, values);
-    res.json({ message: 'Dane zaktualizowane' });
-  } catch (err) {
-    console.error('Błąd edycji:', err);
-    res.status(500).json({ error: 'Błąd podczas edycji' });
-  }
-});
 app.post('/api/entries', async (req, res) => {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) return res.status(401).json({ error: 'Brak tokenu' });
@@ -245,7 +188,129 @@ app.post('/api/entries', async (req, res) => {
   }
 });
 
+app.put('/api/entries/:id', async (req, res) => {
+  const id = req.params.id;
+  const {
+    imie, nazwisko, jezyk, fs, nr, do_opieki,
+    dyspozycyjnosc, oczekiwania, referencje,
+    ostatni_kontakt, notatka, telefon, proponowane_zlecenie
+  } = req.body;
+
+  const dyspozycyjnoscValue = dyspozycyjnosc === '' ? null : dyspozycyjnosc;
+  const ostatniKontaktValue = ostatni_kontakt === '' ? null : ostatni_kontakt;
+
+  const sql = `
+    UPDATE entries SET 
+      imie = ?, nazwisko = ?, jezyk = ?, fs = ?, nr = ?,
+      do_opieki = ?, dyspozycyjnosc = ?, oczekiwania = ?,
+      referencje = ?, ostatni_kontakt = ?, notatka = ?, telefon = ?, proponowane_zlecenie = ?
+    WHERE id = ?
+  `;
+
+  const values = [
+    imie, nazwisko, jezyk, fs, nr,
+    do_opieki, dyspozycyjnoscValue, oczekiwania,
+    referencje, ostatniKontaktValue, notatka, telefon, proponowane_zlecenie, id
+  ];
+
+  try {
+    await pool.query(sql, values);
+    res.json({ message: 'Dane zaktualizowane' });
+  } catch (err) {
+    console.error('Błąd edycji:', err);
+    res.status(500).json({ error: 'Błąd podczas edycji' });
+  }
+});
+
+// ----------------------- ENDPOINTY RESETU HASŁA -----------------------
+
+// Konfiguracja Nodemailer (przykład dla Gmaila)
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER, // np. twojemail@gmail.com
+    pass: process.env.EMAIL_PASS  // hasło lub hasło aplikacji
+  }
+});
+
+// Endpoint wysyłki linka resetującego
+app.post('/api/reset-password', async (req, res) => {
+  const { email } = req.body;
+  
+  try {
+    // Sprawdzamy, czy użytkownik o podanym e-mailu istnieje
+    const [users] = await pool.execute('SELECT id FROM users WHERE email = ?', [email]);
+    if (users.length === 0) {
+      return res.status(404).json({ message: 'Nie znaleziono użytkownika' });
+    }
+    
+    // Generujemy token
+    const token = crypto.randomBytes(20).toString('hex');
+    
+    // Zapisujemy token wraz z datą utworzenia w tabeli "password_resets"
+    await pool.execute(
+      'INSERT INTO password_resets (email, token, created_at) VALUES (?, ?, NOW())',
+      [email, token]
+    );
+    
+    // Budujemy link resetujący – FRONTEND_URL ustawiony w .env
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+    
+    // Konfiguracja wiadomości e-mail
+    const mailOptions = {
+      to: email,
+      from: process.env.EMAIL_USER,
+      subject: 'Resetowanie hasła',
+      text: `Kliknij na poniższy link, aby zresetować hasło:\n\n${resetLink}\n\nLink jest ważny przez 1 godzinę.`
+    };
+    
+    // Wysyłamy e-mail
+    await transporter.sendMail(mailOptions);
+    res.json({ message: 'Link resetujący został wysłany na Twój adres e-mail' });
+    
+  } catch (error) {
+    console.error('Błąd podczas resetu hasła:', error);
+    res.status(500).json({ message: 'Błąd serwera' });
+  }
+});
+
+// Endpoint aktualizacji hasła po kliknięciu w link
+app.post('/api/update-password', async (req, res) => {
+  const { token, newPassword } = req.body;
+  
+  try {
+    // Pobieramy rekord odpowiadający tokenowi
+    const [records] = await pool.execute('SELECT email, created_at FROM password_resets WHERE token = ?', [token]);
+    
+    if (records.length === 0) {
+      return res.status(400).json({ message: 'Token jest nieprawidłowy lub wygasł.' });
+    }
+    
+    const record = records[0];
+    const tokenAge = (Date.now() - new Date(record.created_at).getTime()) / 1000;
+    if (tokenAge > 3600) { // 3600 sekund = 1 godzina
+      return res.status(400).json({ message: 'Token wygasł, spróbuj ponownie' });
+    }
+    
+    // Haszujemy nowe hasło
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    
+    // Aktualizujemy hasło w tabeli "users"
+    await pool.execute('UPDATE users SET password = ? WHERE email = ?', [hashedPassword, record.email]);
+    
+    // Usuwamy rekord z tokenem
+    await pool.execute('DELETE FROM password_resets WHERE token = ?', [token]);
+    
+    res.json({ message: 'Hasło zostało zaktualizowane.' });
+    
+  } catch (error) {
+    console.error('Błąd przy aktualizacji hasła:', error);
+    res.status(500).json({ message: 'Błąd serwera' });
+  }
+});
+
+// --------------------------------------------------
+
 app.listen(port, () => {
   console.log(`Server działa na http://localhost:${port}`);
 });
-
