@@ -7,6 +7,7 @@ import TabInputData from './TabInputData';
 import EditOffersModal from './EditOffersModal';
 import { FaPlus, FaTrash, FaSearch } from 'react-icons/fa';
 
+
 const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 Modal.setAppElement('#root');
@@ -57,6 +58,8 @@ function TabViewData({ user }) {
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [availability, setAvailability] = useState("2025-05");
   const [isOffersModalOpen, setIsOffersModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const entriesPerPage = 10;
 
   useEffect(() => {
     fetchEntries();
@@ -88,9 +91,9 @@ function TabViewData({ user }) {
       oczekiwania: entry.oczekiwania,
       referencje: entry.referencje,
       ostatni_kontakt: entry.ostatni_kontakt,
-      notatka: entry.notatka
+      notatka: entry.notatka,
+      proponowane_zlecenie: entry.proponowane_zlecenie
     };
-
   };
 
   // Filtrowanie wpisów – wyszukiwanie w tabeli wpisów
@@ -149,6 +152,7 @@ function TabViewData({ user }) {
   // Obsługa zmiany w polu wyszukiwania
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
+    setCurrentPage(1);
   };
 
   // Mapowanie nagłówków na właściwe klucze danych
@@ -156,6 +160,7 @@ function TabViewData({ user }) {
     'imię': 'imie',
     'nazwisko': 'nazwisko',
     'język': 'jezyk',
+    'telefon':'telefon',
     'fs': 'fs',
     'nr': 'nr',
     'do opieki': 'do_opieki',
@@ -163,7 +168,8 @@ function TabViewData({ user }) {
     'oczekiwania': 'oczekiwania',
     'referencje': 'referencje',
     'ostatni kontakt': 'ostatni_kontakt',
-    'notatka': 'notatka'
+    'notatka': 'notatka',
+    'porponowane zlecenie': 'proponowane_zlecenie'
   };
 
   // Sortowanie wpisów
@@ -251,6 +257,18 @@ const handleSaveEdit = async () => {
     toast.error('Błąd edycji');
   }
 };
+
+  // Paginacja - obliczanie wpisów do wyświetlenia
+  const filtered = filterEntries(sortedEntries);
+  const totalPages = Math.ceil(filtered.length / entriesPerPage);
+  const currentEntries = filtered.slice(
+    (currentPage - 1) * entriesPerPage,
+    currentPage * entriesPerPage
+  );
+  
+  const goToPage = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   return (
     <div style={{ overflowX: 'auto', padding: 20 }}>
@@ -363,7 +381,7 @@ const handleSaveEdit = async () => {
               }}
               onClick={() => handleEdit(entry)}
             >
-              <td>{index + 1}</td>
+               <td>{(currentPage - 1) * entriesPerPage + index + 1}</td>
               <td>{entry.imie}</td>
               <td>{entry.nazwisko}</td>
               <td>{entry.telefon || '---'}</td>
@@ -407,6 +425,27 @@ const handleSaveEdit = async () => {
           ))}
         </tbody>
       </table>
+
+            {/* Paginação */}
+            <div style={{ marginTop: '20px', textAlign: 'center' }}>
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+          <button
+            key={page}
+            onClick={() => goToPage(page)}
+            style={{
+              margin: '0 5px',
+              padding: '8px 12px',
+              borderRadius: '4px',
+              border: page === currentPage ? '2px solid #007bff' : '1px solid #ccc',
+              backgroundColor: page === currentPage ? '#007bff' : '#fff',
+              color: page === currentPage ? '#fff' : '#000',
+              cursor: 'pointer'
+            }}
+          >
+            {page}
+          </button>
+        ))}
+      </div>
 
       {/* Modal do edycji wpisu */}
       <Modal
