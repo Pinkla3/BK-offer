@@ -380,13 +380,13 @@ function TabViewData({ user }) {
               }}
               onClick={() => handleEdit(entry)}
             >
-              <td>{(currentPage - 1) * entriesPerPage + index + 1}</td>
+              <td style={{ textAlign: 'justify', maxWidth: '20px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{(currentPage - 1) * entriesPerPage + index + 1}</td>
               <td>{entry.imie}</td>
               <td>{entry.nazwisko}</td>
               <td>{entry.telefon || '---'}</td>
               <td>{entry.jezyk}</td>
-              <td>{entry.fs}</td>
-              <td>{entry.nr}</td>
+              <td style={{ textAlign: 'justify', maxWidth: '50px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{entry.fs}</td>
+              <td style={{ textAlign: 'justify', maxWidth: '50px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{entry.nr}</td>
               <td>{entry.do_opieki}</td>
               <td>{formatMonthYear(entry.dyspozycyjnosc)}</td>
               <td style={{ textAlign: 'justify', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
