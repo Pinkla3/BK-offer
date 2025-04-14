@@ -5,11 +5,9 @@ import axios from 'axios';
 import { removeToken } from './auth';
 import AdminPanel from './AdminPanel';
 import UserPanel from './UserPanel';
-import ChangePassword from './ChangePassword';
 import TabInputData from './TabInputData';
 import TabViewData from './TabViewData';
-import OffersTable from './Offers';
-import { FaPlus, FaDatabase, FaLock, FaBriefcase } from 'react-icons/fa';
+import { FaPlus, FaDatabase, FaLock } from 'react-icons/fa';
 import TabChangePassword from './TabChangePassword';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL;
