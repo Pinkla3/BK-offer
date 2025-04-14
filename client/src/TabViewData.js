@@ -7,18 +7,16 @@ import TabInputData from './TabInputData';
 import EditOffersModal from './EditOffersModal';
 import { FaPlus, FaTrash, FaSearch } from 'react-icons/fa';
 
-
 const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 Modal.setAppElement('#root');
-
 
 const tdStyle1 = {
   padding: '10px',
   verticalAlign: 'top',
   borderBottom: '1px solid #eee',
   fontSize: '14px',
-   textAlign: 'justify'
+  textAlign: 'justify'
 };
 
 const deleteBtn = {
@@ -46,6 +44,7 @@ const inputStyle = {
   boxSizing: 'border-box',
   outlineColor: '#007bff'
 };
+
 function TabViewData({ user }) {
   const [entries, setEntries] = useState([]);
   const [sortedEntries, setSortedEntries] = useState([]);
@@ -58,6 +57,7 @@ function TabViewData({ user }) {
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [availability, setAvailability] = useState("2025-05");
   const [isOffersModalOpen, setIsOffersModalOpen] = useState(false);
+  // Paginacja
   const [currentPage, setCurrentPage] = useState(1);
   const entriesPerPage = 10;
 
@@ -143,11 +143,11 @@ function TabViewData({ user }) {
         const normalizedData = res.data.map(normalizeEntryData);
         setEntries(normalizedData);
         setSortedEntries(normalizedData);
+        setCurrentPage(1); // Reset paginacji przy pobraniu nowych danych
         console.log('Otrzymane dane z /entries:', res.data);
       })
       .catch((error) => console.error('Błąd pobierania danych:', error));
   };
-
 
   // Obsługa zmiany w polu wyszukiwania
   const handleSearchChange = (event) => {
@@ -160,7 +160,7 @@ function TabViewData({ user }) {
     'imię': 'imie',
     'nazwisko': 'nazwisko',
     'język': 'jezyk',
-    'telefon':'telefon',
+    'telefon': 'telefon',
     'fs': 'fs',
     'nr': 'nr',
     'do opieki': 'do_opieki',
@@ -200,25 +200,26 @@ function TabViewData({ user }) {
     setSortedEntries(sortedData);
     setSortOrder(newSortOrder);
     setSortColumn(column);
+    setCurrentPage(1);
   };
 
   // Zmieniona funkcja handleDelete z tokenem
-const handleDelete = async (id, e) => {
-  e.stopPropagation();
-  if (!window.confirm('Czy na pewno chcesz usunąć ten wpis?')) return;
-  try {
-    const token = localStorage.getItem('token');
-    await axios.delete(`${API_BASE_URL}/api/entries/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-    toast.success('Wpis usunięty');
-    fetchEntries();
-  } catch {
-    toast.error('Błąd podczas usuwania');
-  }
-};
+  const handleDelete = async (id, e) => {
+    e.stopPropagation();
+    if (!window.confirm('Czy na pewno chcesz usunąć ten wpis?')) return;
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`${API_BASE_URL}/api/entries/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      toast.success('Wpis usunięty');
+      fetchEntries();
+    } catch {
+      toast.error('Błąd podczas usuwania');
+    }
+  };
 
   // Inicjalizacja formularza edycji
   const handleEdit = (entry) => {
@@ -231,7 +232,7 @@ const handleDelete = async (id, e) => {
     });
   };
 
-  // Obsługa zmian w formularzu edycji – dla pola "dyspozycyjność" używamy input typu "month"
+  // Obsługa zmian w formularzu edycji
   const handleEditChange = (field, value) => {
     setEditForm((prev) => ({ ...prev, [field]: value }));
     if (field === 'dyspozycyjnosc') {
@@ -239,33 +240,31 @@ const handleDelete = async (id, e) => {
     }
   };
 
-// Zmieniona funkcja handleSaveEdit z tokenem
-const handleSaveEdit = async () => {
-  try {
-    const token = localStorage.getItem('token');
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    console.log(payload);
-    await axios.put(`${API_BASE_URL}/api/entries/${editingEntry.id}`, editForm, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-    toast.success('Zaktualizowano dane');
-    setEditingEntry(null);
-    fetchEntries();
-  } catch {
-    toast.error('Błąd edycji');
-  }
-};
+  // Funkcja zapisu edytowanego wpisu
+  const handleSaveEdit = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(`${API_BASE_URL}/api/entries/${editingEntry.id}`, editForm, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      toast.success('Zaktualizowano dane');
+      setEditingEntry(null);
+      fetchEntries();
+    } catch {
+      toast.error('Błąd edycji');
+    }
+  };
 
-  // Paginacja - obliczanie wpisów do wyświetlenia
+  // Paginacja – obliczanie wpisów do wyświetlenia
   const filtered = filterEntries(sortedEntries);
   const totalPages = Math.ceil(filtered.length / entriesPerPage);
   const currentEntries = filtered.slice(
     (currentPage - 1) * entriesPerPage,
     currentPage * entriesPerPage
   );
-  
+
   const goToPage = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
@@ -279,7 +278,7 @@ const handleSaveEdit = async () => {
         <button
           onClick={() => {
             setIsSearchVisible((prev) => {
-              if (prev) setSearchQuery(''); // Jeśli ukrywasz, wyczyść pole wyszukiwania
+              if (prev) setSearchQuery('');
               return !prev;
             });
           }}
@@ -332,7 +331,8 @@ const handleSaveEdit = async () => {
                     fontWeight: '600',
                     textAlign: 'left',
                     borderBottom: '1px solid #e0e0e0',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    minWidth: '100px'
                   }}
                   onClick={() => handleSort(col)}
                 >
@@ -341,12 +341,11 @@ const handleSaveEdit = async () => {
                 </th>
               );
             })}
-             {/* 👇 Dodane tylko dla admina */}
-    {user?.role === 'admin' && (
-      <th style={{ padding: '10px', color: '#fff' }}>Użytkownik</th>
-    )}
+            {user?.role === 'admin' && (
+              <th style={{ padding: '10px', color: '#fff', minWidth: '100px' }}>Użytkownik</th>
+            )}
 
-            <th style={{ padding: '10px', textAlign: 'center' }}>
+            <th style={{ padding: '10px', textAlign: 'center', minWidth: '50px' }}>
               <button
                 onClick={() => setIsAdding(true)}
                 style={{
@@ -370,7 +369,7 @@ const handleSaveEdit = async () => {
           </tr>
         </thead>
         <tbody>
-          {sortedEntries && sortedEntries.length > 0 && filterEntries(sortedEntries).map((entry, index) => (
+          {currentEntries && currentEntries.length > 0 && currentEntries.map((entry, index) => (
             <tr
               key={entry.id}
               style={{
@@ -381,7 +380,7 @@ const handleSaveEdit = async () => {
               }}
               onClick={() => handleEdit(entry)}
             >
-               <td>{(currentPage - 1) * entriesPerPage + index + 1}</td>
+              <td>{(currentPage - 1) * entriesPerPage + index + 1}</td>
               <td>{entry.imie}</td>
               <td>{entry.nazwisko}</td>
               <td>{entry.telefon || '---'}</td>
@@ -390,16 +389,16 @@ const handleSaveEdit = async () => {
               <td>{entry.nr}</td>
               <td>{entry.do_opieki}</td>
               <td>{formatMonthYear(entry.dyspozycyjnosc)}</td>
-              <td style={{ textAlign: 'justify'}}>{entry.oczekiwania}</td>
+              <td style={{ textAlign: 'justify' }}>{entry.oczekiwania}</td>
               <td>{entry.referencje}</td>
               <td>{entry.ostatni_kontakt ? formatDate(entry.ostatni_kontakt) : '—'}</td>
-              <td style={{ textAlign: 'justify'}}>{entry.notatka}</td>
-              <td style={{ textAlign: 'justify'}}>{entry.proponowane_zlecenie}</td>
+              <td style={{ textAlign: 'justify' }}>{entry.notatka}</td>
+              <td style={{ textAlign: 'justify' }}>{entry.proponowane_zlecenie}</td>
               {user?.role === 'admin' && (
-      <td style={{ padding: '10px', verticalAlign: 'top', borderBottom: '1px solid #eee', fontSize: '14px' }}>
-        {entry.user_name}
-      </td>
-    )}
+                <td style={{ padding: '10px', verticalAlign: 'top', borderBottom: '1px solid #eee', fontSize: '14px' }}>
+                  {entry.user_name}
+                </td>
+              )}
               <td style={{ padding: '10px', textAlign: 'center' }}>
                 <button
                   onClick={(e) => handleDelete(entry.id, e)}
@@ -426,8 +425,8 @@ const handleSaveEdit = async () => {
         </tbody>
       </table>
 
-            {/* Paginação */}
-            <div style={{ marginTop: '20px', textAlign: 'center' }}>
+      {/* Paginação */}
+      <div style={{ marginTop: '20px', textAlign: 'center' }}>
         {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
           <button
             key={page}
@@ -765,4 +764,3 @@ const handleSaveEdit = async () => {
 }
 
 export default TabViewData;
-
