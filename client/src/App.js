@@ -7,7 +7,7 @@ import Dashboard from './Dashboard';
 import { getUser } from './auth';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useState, useEffect } from 'react';
+import ResetPassword from './ResetPassword';
 function App() {
 
   const user = getUser();
@@ -18,6 +18,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/" element={user ? <Dashboard /> : <Navigate to="/login" />} />
       </Routes>
       <ToastContainer position="top-right" autoClose={3000} />
