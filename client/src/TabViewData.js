@@ -389,11 +389,17 @@ function TabViewData({ user }) {
               <td>{entry.nr}</td>
               <td>{entry.do_opieki}</td>
               <td>{formatMonthYear(entry.dyspozycyjnosc)}</td>
-              <td style={{ textAlign: 'justify' }}>{entry.oczekiwania}</td>
+              <td style={{ textAlign: 'justify', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+  {entry.oczekiwania}
+</td>
               <td>{entry.referencje}</td>
               <td>{entry.ostatni_kontakt ? formatDate(entry.ostatni_kontakt) : '—'}</td>
-              <td style={{ textAlign: 'justify' }}>{entry.notatka}</td>
-              <td style={{ textAlign: 'justify' }}>{entry.proponowane_zlecenie}</td>
+   <td style={{ textAlign: 'justify', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+  {entry.notatka}
+</td>
+<td style={{ textAlign: 'justify', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+  {entry.proponowane_zlecenie}
+</td>
               {user?.role === 'admin' && (
                 <td style={{ padding: '10px', verticalAlign: 'top', borderBottom: '1px solid #eee', fontSize: '14px' }}>
                   {entry.user_name}
@@ -764,4 +770,3 @@ function TabViewData({ user }) {
 }
 
 export default TabViewData;
-
