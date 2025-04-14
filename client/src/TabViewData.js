@@ -52,7 +52,7 @@ function TabViewData({ user }) {
   const [editForm, setEditForm] = useState({});
   const [isAdding, setIsAdding] = useState(false);
   const [sortOrder, setSortOrder] = useState('asc');
-  const [sortColumn, setSortColumn] = useState('dyspozycyjnosc');
+  const [sortColumn, setSortColumn] = useState('Dyspozycyjność');
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [availability, setAvailability] = useState("2025-05");
