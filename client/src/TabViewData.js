@@ -202,24 +202,23 @@ function TabViewData({ user }) {
     setSortColumn(column);
     setCurrentPage(1);
   };
-
   // Zmieniona funkcja handleDelete z tokenem
-  const handleDelete = async (id, e) => {
-    e.stopPropagation();
-    if (!window.confirm('Czy na pewno chcesz usunąć ten wpis?')) return;
-    try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`${API_BASE_URL}/api/entries/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      toast.success('Wpis usunięty');
-      fetchEntries();
-    } catch {
-      toast.error('Błąd podczas usuwania');
-    }
-  };
+const handleDelete = async (id, e) => {
+  e.stopPropagation();
+  if (!window.confirm('Czy na pewno chcesz usunąć ten wpis?')) return;
+  try {
+    const token = localStorage.getItem('token');
+    await axios.delete(`${API_BASE_URL}/api/entries/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    toast.success('Wpis usunięty');
+    fetchEntries();
+  } catch {
+    toast.error('Błąd podczas usuwania');
+  }
+};
 
   // Inicjalizacja formularza edycji
   const handleEdit = (entry) => {
