@@ -181,10 +181,27 @@ function TabViewData({ user }) {
     const headerKey = column.toLowerCase();
     const columnKey = columnMapping[headerKey] || headerKey;
     const collator = new Intl.Collator('pl', { sensitivity: 'base' });
-
     const sortedData = [...entries].sort((a, b) => {
       let valueA = a[columnKey];
       let valueB = b[columnKey];
+  
+      // Specjalna obsługa sortowania dla numeru telefonu
+      if (columnKey === 'telefon') {
+        // Usuwamy wszystkie znaki inne niż cyfry
+        const numA = String(valueA || '').replace(/\D/g, '');
+        const numB = String(valueB || '').replace(/\D/g, '');
+        // Jeśli oba są liczbami, porównujemy numerycznie
+        if (numA && numB && !isNaN(numA) && !isNaN(numB)) {
+          valueA = parseInt(numA, 10);
+          valueB = parseInt(numB, 10);
+        } else {
+          // W przeciwnym razie porównujemy jako ciągi znaków
+          return newSortOrder === 'asc'
+            ? collator.compare(numA, numB)
+            : collator.compare(numB, numA);
+        }
+      }
+  
       if (valueA === undefined || valueB === undefined) return 0;
       if (!isNaN(valueA) && !isNaN(valueB)) {
         valueA = parseFloat(valueA);
