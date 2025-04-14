@@ -383,7 +383,7 @@ function TabViewData({ user }) {
               <td style={{ textAlign: 'justify', maxWidth: '200px',  textOverflow: 'ellipsis',  whiteSpace: 'normal' }}>{entry.imie}</td>
               <td style={{ textAlign: 'justify', maxWidth: '200px',  textOverflow: 'ellipsis',  whiteSpace: 'normal' }}>{entry.nazwisko}</td>
               <td style={{ textAlign: 'justify', maxWidth: '100px', textOverflow: 'ellipsis',  whiteSpace: 'normal' }}>{entry.telefon || '---'}</td>
-              <td style={{ textAlign: 'justify', maxWidth: '40px',  textOverflow: 'ellipsis',  whiteSpace: 'normal' }}>{entry.jezyk}</td>
+              <td style={{ textAlign: 'center', maxWidth: '40px',  textOverflow: 'ellipsis',  whiteSpace: 'normal' }}>{entry.jezyk}</td>
               <td style={{ textAlign: 'justify', maxWidth: '40px',  textOverflow: 'ellipsis',  whiteSpace: 'normal' }}>{entry.fs}</td>
               <td style={{ textAlign: 'justify', maxWidth: '40px',  textOverflow: 'ellipsis',  whiteSpace: 'normal' }}>{entry.nr}</td>
               <td style={{ textAlign: 'justify', maxWidth: '200px', textOverflow: 'ellipsis',  whiteSpace: 'normal' }}>{entry.do_opieki}</td>
