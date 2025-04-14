@@ -93,6 +93,16 @@ app.get('/api/userdb', async (req, res) => {
     res.status(500).json({ error: 'Błąd serwera' });
   }
 });
+app.delete('/api/entries/:id', async (req, res) => {
+  const entryId = req.params.id;
+  try {
+    await pool.query('DELETE FROM entries WHERE id = ?', [entryId]);
+    res.json({ message: 'Wpis usunięty' });
+  } catch (err) {
+    console.error('Błąd przy usuwaniu:', err);
+    res.status(500).json({ error: 'Błąd serwera przy usuwaniu wpisu' });
+  }
+});
 
 // Endpoint do zmiany hasła (podając stare hasło)
 app.post('/api/change-password', async (req, res) => {
