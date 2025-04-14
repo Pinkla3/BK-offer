@@ -332,7 +332,6 @@ function TabViewData({ user }) {
                     textAlign: 'left',
                     borderBottom: '1px solid #e0e0e0',
                     cursor: 'pointer',
-                    minWidth: '40px'
                   }}
                   onClick={() => handleSort(col)}
                 >
@@ -380,15 +379,15 @@ function TabViewData({ user }) {
               }}
               onClick={() => handleEdit(entry)}
             >
-              <td style={{ textAlign: 'justify', maxWidth: '5px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{(currentPage - 1) * entriesPerPage + index + 1}</td>
+              <td style={{ textAlign: 'justify', maxWidth: '40px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{(currentPage - 1) * entriesPerPage + index + 1}</td>
               <td style={{ textAlign: 'justify', maxWidth: '200px',  textOverflow: 'ellipsis',  whiteSpace: 'normal' }}>{entry.imie}</td>
               <td style={{ textAlign: 'justify', maxWidth: '200px',  textOverflow: 'ellipsis',  whiteSpace: 'normal' }}>{entry.nazwisko}</td>
               <td style={{ textAlign: 'justify', maxWidth: '100px', textOverflow: 'ellipsis',  whiteSpace: 'normal' }}>{entry.telefon || '---'}</td>
-              <td style={{ textAlign: 'justify', maxWidth: '5px',  textOverflow: 'ellipsis',  whiteSpace: 'normal' }}>{entry.jezyk}</td>
-              <td style={{ textAlign: 'justify', maxWidth: '5px',  textOverflow: 'ellipsis',  whiteSpace: 'normal' }}>{entry.fs}</td>
-              <td style={{ textAlign: 'justify', maxWidth: '5px',  textOverflow: 'ellipsis',  whiteSpace: 'normal' }}>{entry.nr}</td>
-              <td style={{ textAlign: 'justify', maxWidth: '50px', textOverflow: 'ellipsis',  whiteSpace: 'normal' }}>{entry.do_opieki}</td>
-              <td style={{ textAlign: 'justify', maxWidth: '50px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{formatMonthYear(entry.dyspozycyjnosc)}</td>
+              <td style={{ textAlign: 'justify', maxWidth: '40px',  textOverflow: 'ellipsis',  whiteSpace: 'normal' }}>{entry.jezyk}</td>
+              <td style={{ textAlign: 'justify', maxWidth: '40px',  textOverflow: 'ellipsis',  whiteSpace: 'normal' }}>{entry.fs}</td>
+              <td style={{ textAlign: 'justify', maxWidth: '40px',  textOverflow: 'ellipsis',  whiteSpace: 'normal' }}>{entry.nr}</td>
+              <td style={{ textAlign: 'justify', maxWidth: '200px', textOverflow: 'ellipsis',  whiteSpace: 'normal' }}>{entry.do_opieki}</td>
+              <td style={{ textAlign: 'justify', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{formatMonthYear(entry.dyspozycyjnosc)}</td>
               <td style={{ textAlign: 'justify', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
   {entry.oczekiwania}
 </td>
