@@ -395,10 +395,10 @@ function TabViewData({ user }) {
 </td>
 <td style={{ textAlign: 'justify', maxWidth: '40px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', padding: '5px' }}>{entry.referencje}</td>
               <td style={{ textAlign: 'justify', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', padding: '5px' }}>{entry.ostatni_kontakt ? formatDate(entry.ostatni_kontakt) : '—'}</td>
-   <td style={{ textAlign: 'justify', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',  padding: '5px' }}>
+   <td style={{ textAlign: 'justify', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',  padding: '5px' }}>
   {entry.notatka}
 </td>
-<td style={{ textAlign: 'justify', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',  padding: '5px' }}>
+<td style={{ textAlign: 'justify', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',  padding: '5px' }}>
   {entry.proponowane_zlecenie}
 </td>
               {user?.role === 'admin' && (
