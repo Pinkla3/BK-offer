@@ -332,7 +332,7 @@ function TabViewData({ user }) {
                     textAlign: 'left',
                     borderBottom: '1px solid #e0e0e0',
                     cursor: 'pointer',
-                    minWidth: '20px'
+                    minWidth: '40px'
                   }}
                   onClick={() => handleSort(col)}
                 >
