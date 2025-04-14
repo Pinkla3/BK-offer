@@ -390,7 +390,7 @@ function TabViewData({ user }) {
     <div key={index}>{item.trim()}</div>
   ))}</td>
               <td style={{ textAlign: 'justify', textOverflow: 'ellipsis', whiteSpace: 'nowrap', padding: '5px' }}>{formatMonthYear(entry.dyspozycyjnosc)}</td>
-              <td style={{ textAlign: 'justify', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', padding: '5px' }}>
+              <td style={{ textAlign: 'justify', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', padding: '5px' }}>
   {entry.oczekiwania}
 </td>
 <td style={{ textAlign: 'justify', maxWidth: '40px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', padding: '5px' }}>{entry.referencje}</td>
