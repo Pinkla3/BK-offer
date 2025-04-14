@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 function Register() {
-  const [form, setForm] = useState({ name: '', email: '', password: '', role: 'user' });
+  const [form, setForm] = useState({ name: '', email: '', password: '', role: 'user', adminCode: '' });
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
@@ -18,34 +18,41 @@ function Register() {
     if (field === 'name' && !value.trim()) error = 'Imię jest wymagane';
     if (field === 'email' && !value.includes('@')) error = 'Nieprawidłowy email';
     if (field === 'password' && value.length < 6) error = 'Hasło musi mieć min. 6 znaków';
+    if (field === 'adminCode' && form.role === 'admin' && !value.trim()) error = 'Kod admina jest wymagany';
     setErrors(prev => ({ ...prev, [field]: error }));
   };
-const validateEmail = (email) => {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-};
 
-useEffect(() => {
-  const delay = setTimeout(() => {
-    if (!validateEmail(form.email)) return;
+  const validateEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
 
-    axios.get(`${API_BASE_URL}/api/check-email?email=${form.email}`)
-      .then(res => {
-        if (res.data.exists) {
-          setErrors(prev => ({ ...prev, email: 'Email już istnieje' }));
-        }
-      })
-      .catch(() => {
-        toast.error('Błąd połączenia z serwerem');
-      });
-  }, 500);
+  useEffect(() => {
+    const delay = setTimeout(() => {
+      if (!validateEmail(form.email)) return;
 
-  return () => clearTimeout(delay);
-}, [form.email]);
+      axios.get(`${API_BASE_URL}/api/check-email?email=${form.email}`)
+        .then(res => {
+          if (res.data.exists) {
+            setErrors(prev => ({ ...prev, email: 'Email już istnieje' }));
+          }
+        })
+        .catch(() => {
+          toast.error('Błąd połączenia z serwerem');
+        });
+    }, 500);
+
+    return () => clearTimeout(delay);
+  }, [form.email]);
+
   const validateForm = () => {
     const newErrors = {};
     if (!form.name.trim()) newErrors.name = 'Imię jest wymagane';
     if (!form.email.includes('@')) newErrors.email = 'Nieprawidłowy email';
     if (form.password.length < 6) newErrors.password = 'Hasło musi mieć min. 6 znaków';
+    // Jeśli wybrano rejestrację jako admin, kod admina jest wymagany
+    if (form.role === 'admin' && !form.adminCode.trim()) {
+      newErrors.adminCode = 'Kod admina jest wymagany';
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -63,7 +70,7 @@ useEffect(() => {
   };
 
   return (
-       <div style={{
+    <div style={{
       backgroundImage: 'url("/images/background.jfif")',
       backgroundSize: 'cover',       // skalowanie do wielkości kontenera
       backgroundRepeat: 'no-repeat', // wyłączenie powtarzania
@@ -84,10 +91,10 @@ useEffect(() => {
         boxSizing: 'border-box'
       }}>
 
-          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-    <img src="/images/logo.jpg" alt="Logo" style={{ width: '100px' }} />
-    <h2 style={{ textAlign: 'center' }}>BK-offer ver.1.0 </h2>
-  </div> 
+        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+          <img src="/images/logo.jpg" alt="Logo" style={{ width: '100px' }} />
+          <h2 style={{ textAlign: 'center' }}>BK-offer ver.1.0</h2>
+        </div> 
 
         <h2 style={{ textAlign: 'center' }}>Rejestracja</h2>
         <form onSubmit={handleSubmit}>
@@ -139,7 +146,7 @@ useEffect(() => {
   
           <select
             value={form.role}
-            onChange={e => setForm({ ...form, role: e.target.value })}
+            onChange={e => setForm({ ...form, role: e.target.value, adminCode: '' })}
             style={{
               width: '100%',
               padding: '10px',
@@ -151,6 +158,26 @@ useEffect(() => {
             <option value="user">Użytkownik</option>
             <option value="admin">Administrator</option>
           </select>
+  
+          {/* Pole na kod admina – wyświetlane tylko jeśli wybrano rejestrację jako admin */}
+          {form.role === 'admin' && (
+            <>
+              <input
+                placeholder="Kod admina"
+                value={form.adminCode}
+                onChange={e => handleChange('adminCode', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  margin: '8px 0',
+                  borderRadius: '8px',
+                  border: errors.adminCode ? '1px solid red' : '1px solid #ccc',
+                  boxSizing: 'border-box'
+                }}
+              />
+              {errors.adminCode && <div style={{ color: 'red', fontSize: 12 }}>{errors.adminCode}</div>}
+            </>
+          )}
   
           <button
             type="submit"

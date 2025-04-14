@@ -28,11 +28,27 @@ const lockstepOffersRouter = require("./routes/lockstepOffers");
 app.use("/api/lockstep-offers", lockstepOffersRouter);
 
 app.post('/api/register', async (req, res) => {
-  const { name, email, password, role } = req.body;
+  const { name, email, password, role, adminCode } = req.body;
+  // Domyślnie rejestrujemy jako "user"
+  let userRole = 'user';
+  
+  // Jeżeli użytkownik chce się zarejestrować jako admin (role === 'admin'),
+  // sprawdzamy, czy podany kod admina jest poprawny.
+  if (role === 'admin') {
+    // Oczekiwany kod admina pobierany z pliku .env
+    const expectedAdminCode = process.env.ADMIN_CODE;
+    
+    if (adminCode !== expectedAdminCode) {
+      return res.status(403).json({ error: 'Nieprawidłowy kod admina' });
+    }
+    // Jeśli kod się zgadza – ustalamy rolę admina
+    userRole = 'admin';
+  }
+
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     const sql = 'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)';
-    await pool.query(sql, [name, email, hashedPassword, role || 'user']);
+    await pool.query(sql, [name, email, hashedPassword, userRole]);
     res.status(201).json({ message: 'Zarejestrowano pomyślnie' });
   } catch (err) {
     res.status(500).json({ error: 'Email już istnieje lub błąd serwera' });
