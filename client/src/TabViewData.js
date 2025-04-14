@@ -369,60 +369,64 @@ function TabViewData({ user }) {
           </tr>
         </thead>
         <tbody>
-          {currentEntries && currentEntries.length > 0 && currentEntries.map((entry, index) => (
-            <tr
-              key={entry.id}
-              style={{
-                borderBottom: '1px solid #eee',
-                transition: 'background-color 0.2s',
-                cursor: 'pointer',
-                padding: '10px'
-              }}
-              onClick={() => handleEdit(entry)}
-            >
-              <td>{(currentPage - 1) * entriesPerPage + index + 1}</td>
-              <td>{entry.imie}</td>
-              <td>{entry.nazwisko}</td>
-              <td>{entry.telefon || '---'}</td>
-              <td>{entry.jezyk}</td>
-              <td>{entry.fs}</td>
-              <td>{entry.nr}</td>
-              <td>{entry.do_opieki}</td>
-              <td>{formatMonthYear(entry.dyspozycyjnosc)}</td>
-              <td style={{ textAlign: 'justify' }}>{entry.oczekiwania}</td>
-              <td>{entry.referencje}</td>
-              <td>{entry.ostatni_kontakt ? formatDate(entry.ostatni_kontakt) : '—'}</td>
-              <td style={{ textAlign: 'justify' }}>{entry.notatka}</td>
-              <td style={{ textAlign: 'justify' }}>{entry.proponowane_zlecenie}</td>
-              {user?.role === 'admin' && (
-                <td style={{ padding: '10px', verticalAlign: 'top', borderBottom: '1px solid #eee', fontSize: '14px' }}>
-                  {entry.user_name}
-                </td>
-              )}
-              <td style={{ padding: '10px', textAlign: 'center' }}>
-                <button
-                  onClick={(e) => handleDelete(entry.id, e)}
-                  style={{
-                    backgroundColor: 'red',
-                    color: '#fff',
-                    border: 'none',
-                    width: '36px',
-                    height: '36px',
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '18px',
-                    transition: 'background-color 0.3s'
-                  }}
-                  title="Usuń wpis"
-                >
-                  <FaTrash />
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
+  {currentEntries && currentEntries.length > 0 && currentEntries.map((entry, index) => (
+    <tr
+      key={entry.id}
+      style={{
+        borderBottom: '1px solid #eee',
+        transition: 'background-color 0.2s',
+        cursor: 'pointer',
+        padding: '10px'
+      }}
+      onClick={() => handleEdit(entry)}
+    >
+      <td>{(currentPage - 1) * entriesPerPage + index + 1}</td>
+      <td>{entry.imie}</td>
+      <td>{entry.nazwisko}</td>
+      <td>{entry.telefon || '---'}</td>
+      <td>{entry.jezyk}</td>
+      <td>{entry.fs}</td>
+      <td>{entry.nr}</td>
+      <td>{entry.do_opieki}</td>
+      <td>{formatMonthYear(entry.dyspozycyjnosc)}</td>
+      <td style={{ textAlign: 'justify' }}>{entry.oczekiwania}</td>
+      <td style={{ textAlign: 'justify' }}>{entry.notatka}</td>
+      <td style={{ textAlign: 'justify' }}>{entry.proponowane_zlecenie}</td>
+      <td>{entry.ostatni_kontakt ? formatDate(entry.ostatni_kontakt) : '—'}</td>
+      {user?.role === 'admin' && (
+        <td style={{
+          padding: '10px',
+          verticalAlign: 'top',
+          borderBottom: '1px solid #eee',
+          fontSize: '14px'
+        }}>
+          {entry.user_name}
+        </td>
+      )}
+      <td style={{ padding: '10px', textAlign: 'center' }}>
+        <button
+          onClick={(e) => handleDelete(entry.id, e)}
+          style={{
+            backgroundColor: 'red',
+            color: '#fff',
+            border: 'none',
+            width: '36px',
+            height: '36px',
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '18px',
+            transition: 'background-color 0.3s'
+          }}
+          title="Usuń wpis"
+        >
+          <FaTrash />
+        </button>
+      </td>
+    </tr>
+  ))}
+</tbody>
       </table>
 
       {/* Paginação */}
