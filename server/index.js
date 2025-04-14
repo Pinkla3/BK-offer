@@ -143,7 +143,8 @@ app.delete('/api/entries/:id', async (req, res) => {
     res.status(500).json({ error: 'Błąd serwera przy usuwaniu wpisu' });
   }
 });
-pp.post('/api/change-password', async (req, res) => {
+
+app.post('/api/change-password', async (req, res) => {
   const { oldPassword, newPassword } = req.body;
   const authHeader = req.headers.authorization;
   if (!authHeader) return res.status(401).json({ error: 'Brak tokenu' });
@@ -173,7 +174,6 @@ pp.post('/api/change-password', async (req, res) => {
     res.status(500).json({ error: 'Błąd przy zmianie hasła', details: error.message });
   }
 });
-
 
 app.put('/api/entries/:id', async (req, res) => {
   const id = req.params.id;
