@@ -87,10 +87,13 @@ app.post('/api/reset-password', async (req, res) => {
   const hashedPassword = bcrypt.hashSync(newPassword, 10);
   try {
     const [result] = await pool.query('UPDATE users SET password = ? WHERE email = ?', [hashedPassword, email]);
-    if (result.affectedRows === 0) return res.status(404).json({ error: 'Użytkownik nie istnieje' });
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Użytkownik nie istnieje' });
+    }
     res.json({ message: 'Hasło zresetowane', newPassword });
   } catch (err) {
-    res.status(500).json({ error: 'Błąd resetowania hasła' });
+    console.error('Błąd resetowania hasła:', err);
+    res.status(500).json({ error: 'Błąd resetowania hasła', details: err.message });
   }
 });
 
