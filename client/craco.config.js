@@ -12,7 +12,7 @@ module.exports = {
           ...webpackConfig.devServer,
           client: {
             // Adres WebSocket
-            webSocketURL: 'wss://bk-offer.pl/ws'
+            webSocketURL: 'wss://desk.berlin-opiekunki.pl/ws'
           }
         };
       }
