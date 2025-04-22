@@ -203,7 +203,7 @@ const Dashboard = () => {
       <GlobalStyle />
       <DashboardContainer>
         <Sidebar>
-          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '15px' }}>
             <img src="/images/logo.jpg" alt="Logo" style={{ width: '100px' }} />
           </div>
           <SidebarButton
