@@ -410,13 +410,13 @@ app.delete('/api/sprawy-biezace/:id', authenticate, async (req, res) => {
 
 // ---------------------- RESET HASŁA ----------------------
 
-
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: process.env.EMAIL_USER, // np. twojemail@gmail.com
-    pass: process.env.EMAIL_PASS  // hasło lub hasło aplikacji
-  }
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  },
+  tls: { rejectUnauthorized: false }
 });
 
 app.post('/api/reset-password', async (req, res) => {
