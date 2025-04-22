@@ -70,12 +70,17 @@ function TabViewData({ user }) {
     return dateStr.slice(0, 10);
   };
 
-  const formatMonthYear = (monthYear) => {
-    if (!monthYear) return '—';
-    const [year, month] = monthYear.split('-');
-    const date = new Date(year, month - 1);
-    return date.toLocaleDateString('pl-PL', { year: 'numeric', month: 'long' });
+  const formatMonthYearDate  = (dateStr) => {
+    if (!dateStr) return '—';
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('pl-PL', {
+      day:   '2-digit',
+      month: 'long',
+      year:  'numeric'
+    });
   };
+
+
 
   // Normalizowanie danych pobranych z backendu
   const normalizeEntryData = (entry) => {
@@ -95,6 +100,25 @@ function TabViewData({ user }) {
       proponowane_zlecenie: entry.proponowane_zlecenie
     };
   };
+
+  const headers = [
+    '#',
+    'Imię',
+    'Nazwisko',
+    'Numer telefonu',
+    'Język',
+    'FS',
+    'NR',
+    'Do opieki',
+    'Dyspozycyjność',
+    'Oczekiwania',
+    'Referencje',
+    'Ostatni kontakt',
+    'Notatka',
+    'Proponowane zlecenie',
+    ...(user?.role === 'admin' ? ['Użytkownik'] : [])
+  ];
+
 
   // Filtrowanie wpisów – wyszukiwanie w tabeli wpisów
   const filterEntries = (entries) => {
@@ -155,70 +179,55 @@ function TabViewData({ user }) {
     setCurrentPage(1);
   };
 
-  // Mapowanie nagłówków na właściwe klucze danych
   const columnMapping = {
-    'imię': 'imie',
-    'nazwisko': 'nazwisko',
-    'język': 'jezyk',
-    'telefon': 'telefon',
-    'fs': 'fs',
-    'nr': 'nr',
-    'do opieki': 'do_opieki',
-    'dyspozycyjność': 'dyspozycyjnosc',
-    'oczekiwania': 'oczekiwania',
-    'referencje': 'referencje',
-    'ostatni kontakt': 'ostatni_kontakt',
-    'notatka': 'notatka',
-    'porponowane zlecenie': 'proponowane_zlecenie'
+    '#': null,
+    'Imię': 'imie',
+    'Nazwisko': 'nazwisko',
+    'Numer telefonu': 'telefon',
+    'Język': 'jezyk',
+    'FS': 'fs',
+    'NR': 'nr',
+    'Do opieki': 'do_opieki',
+    'Dyspozycyjność': 'dyspozycyjnosc',
+    'Oczekiwania': 'oczekiwania',
+    'Referencje': 'referencje',
+    'Ostatni kontakt': 'ostatni_kontakt',
+    'Notatka': 'notatka',
+    'Proponowane zlecenie': 'proponowane_zlecenie',
+    'Użytkownik': 'user_name'
   };
 
-  // Sortowanie wpisów
-  const handleSort = (column) => {
-    let newSortOrder = 'asc';
-    if (sortColumn === column) {
-      newSortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
-    }
-    const headerKey = column.toLowerCase();
-    const columnKey = columnMapping[headerKey] || headerKey;
+  const handleSort = (header) => {
+    const key = columnMapping[header];
+    if (!key) return; // np. '#' lub brak mappingu
+
+    const nextOrder = (sortColumn === header && sortOrder === 'asc') ? 'desc' : 'asc';
     const collator = new Intl.Collator('pl', { sensitivity: 'base' });
-    const sortedData = [...entries].sort((a, b) => {
-      let valueA = a[columnKey];
-      let valueB = b[columnKey];
-  
-      // Specjalna obsługa sortowania dla numeru telefonu
-      if (columnKey === 'telefon') {
-        // Usuwamy wszystkie znaki inne niż cyfry
-        const numA = String(valueA || '').replace(/\D/g, '');
-        const numB = String(valueB || '').replace(/\D/g, '');
-        // Jeśli oba są liczbami, porównujemy numerycznie
-        if (numA && numB && !isNaN(numA) && !isNaN(numB)) {
-          valueA = parseInt(numA, 10);
-          valueB = parseInt(numB, 10);
-        } else {
-          // W przeciwnym razie porównujemy jako ciągi znaków
-          return newSortOrder === 'asc'
-            ? collator.compare(numA, numB)
-            : collator.compare(numB, numA);
-        }
+
+    const sorted = [...sortedEntries].sort((a, b) => {
+      let va = a[key] ?? '';
+      let vb = b[key] ?? '';
+
+      // numerycznie, jeśli obie wartości są liczbami
+      if (!isNaN(va) && !isNaN(vb)) {
+        va = parseFloat(va);
+        vb = parseFloat(vb);
       }
-  
-      if (valueA === undefined || valueB === undefined) return 0;
-      if (!isNaN(valueA) && !isNaN(valueB)) {
-        valueA = parseFloat(valueA);
-        valueB = parseFloat(valueB);
+
+      if (typeof va === 'string' && typeof vb === 'string') {
+        return nextOrder === 'asc'
+          ? collator.compare(va, vb)
+          : collator.compare(vb, va);
       }
-      if (typeof valueA === 'string' && typeof valueB === 'string') {
-        return newSortOrder === 'asc'
-          ? collator.compare(valueA, valueB)
-          : collator.compare(valueB, valueA);
-      }
-      return newSortOrder === 'asc' ? valueA - valueB : valueB - valueA;
+      return nextOrder === 'asc' ? va - vb : vb - va;
     });
-    setSortedEntries(sortedData);
-    setSortOrder(newSortOrder);
-    setSortColumn(column);
-    setCurrentPage(1);
+
+    setSortedEntries(sorted);
+    setSortColumn(header);
+    setSortOrder(nextOrder);
   };
+
+
   // Zmieniona funkcja handleDelete z tokenem
 const handleDelete = async (id, e) => {
   e.stopPropagation();
@@ -332,34 +341,24 @@ const handleDelete = async (id, e) => {
           />
         )}
       </div>
-
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead style={{ backgroundColor: '#007bff' }}>
+        <thead style={{ backgroundColor: '#007bff', color: '#fff' }}>
           <tr>
-            {['#', 'Imię', 'Nazwisko','Numer telefonu', 'Język', 'FS', 'NR', 'Do opieki', 'Dyspozycyjność', 'Oczekiwania', 'Referencje', 'Ostatni kontakt', 'Notatka', 'Proponowane zlecenie'].map((col, i) => {
-              const columnKey = col.toLowerCase().replace(' ', '_');
-              return (
-                <th
-                  key={i}
-                  style={{
-                    padding: '10px',
-                    color: '#fff',
-                    fontWeight: '600',
-                    textAlign: 'left',
-                    borderBottom: '1px solid #e0e0e0',
-                    cursor: 'pointer',
-                  }}
-                  onClick={() => handleSort(col)}
-                >
-                  {col}
-                  {sortColumn === col && (sortOrder === 'asc' ? ' 🔼' : ' 🔽')}
-                </th>
-              );
-            })}
-            {user?.role === 'admin' && (
-              <th style={{ padding: '10px', color: '#fff', minWidth: '100px' }}>Użytkownik</th>
-            )}
-
+            {headers.map((col, i) => (
+              <th
+                key={i}
+                style={{
+                  padding: 10,
+                  fontWeight: 600,
+                  borderBottom: '1px solid rgba(255,255,255,0.4)',
+                  cursor: columnMapping[col] ? 'pointer' : 'default'
+                }}
+                onClick={() => handleSort(col)}
+              >
+                {col}
+                {sortColumn === col && (sortOrder === 'asc' ? ' 🔼' : ' 🔽')}
+              </th>
+            ))}
             <th style={{ padding: '10px', textAlign: 'center', minWidth: '50px' }}>
               <button
                 onClick={() => setIsAdding(true)}
@@ -405,7 +404,7 @@ const handleDelete = async (id, e) => {
               <td style={{ textAlign: 'justify', maxWidth: '250px', textOverflow: 'ellipsis',  whiteSpace: 'normal', padding: '10px' }}>  {entry.do_opieki.split(',').map((item, index) => (
     <div key={index}>{item.trim()}</div>
   ))}</td>
-              <td style={{ textAlign: 'justify', textOverflow: 'ellipsis', whiteSpace: 'nowrap', padding: '5px' }}>{formatMonthYear(entry.dyspozycyjnosc)}</td>
+              <td style={{ textAlign: 'justify', textOverflow: 'ellipsis', whiteSpace: 'nowrap', padding: '5px' }}>{formatMonthYearDate(entry.dyspozycyjnosc)}</td>
               <td style={{ textAlign: 'justify', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', padding: '5px' }}>
   {entry.oczekiwania}
 </td>
@@ -634,7 +633,7 @@ const handleDelete = async (id, e) => {
               <div style={{ flex: 1 }}>
                 <label style={labelStyle}>Dyspozycyjność</label>
                 <input
-                  type="month"
+                  type="date"
                   value={editForm.dyspozycyjnosc || ''}
                   onChange={e => handleEditChange('dyspozycyjnosc', e.target.value)}
                   style={inputStyle}

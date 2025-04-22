@@ -5,54 +5,41 @@ import axios from "axios";
 
 Modal.setAppElement("#root");
 
-const filterOffersByMonth = (offer, availability) => {
-  if (!offer.startDate) return false;
-
-  const [year, month] = availability.split("-");
-  if (!year || !month) return false;
-
-  const lowerBound = new Date(`${year}-${month}-01T00:00:00Z`);
-  const nextMonth = (parseInt(month, 10) % 12) + 1;
-  const nextYear = parseInt(month, 10) === 12 ? parseInt(year, 10) + 1 : year;
-  const nextMonthStr = nextMonth < 10 ? "0" + nextMonth : nextMonth;
-  const upperBound = new Date(`${nextYear}-${nextMonthStr}-01T00:00:00Z`);
-
+const filterOffersAfterDate = (offer, availability) => {
+  if (!offer.startDate || !availability) return false;
   const offerDate = new Date(offer.startDate);
-  return offerDate >= lowerBound && offerDate < upperBound;
+  const availDate = new Date(availability);
+  // uwzględniamy oferty od tej daty wzwyż
+  return offerDate >= availDate;
 };
 
 const formatStartDate = (startDate) => {
   if (!startDate) return 'Brak daty';
   const date = new Date(startDate);
-  const day = date.getDate().toString().padStart(2, '0');
+  const day   = date.getDate().toString().padStart(2, '0');
   const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const year = date.getFullYear();
+  const year  = date.getFullYear();
   return `${day}-${month}-${year}`;
 };
 
 const EditOffersModal = ({ isOpen, onRequestClose, availability }) => {
-  const [offers, setOffers] = useState([]);
+  const [offers, setOffers]   = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError]     = useState(null);
 
   useEffect(() => {
     const fetchOffers = async () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.get("https://api-lockstep.berlin-opiekunki.pl/v1/offer/all", {
-          params: { page: 1, pageSize: 100 }
-        });
-
-        const { meta, offers: fetchedOffers } = response.data;
-        const totalOffersCount = meta.all;
-        const allOffers = fetchedOffers.slice(0, totalOffersCount);
-
-        const filteredOffers = allOffers.filter((offer) =>
-          filterOffersByMonth(offer, availability)
+        const resp = await axios.get(
+          "https://api-lockstep.berlin-opiekunki.pl/v1/offer/all",
+          { params: { page: 1, pageSize: 100 } }
         );
-
-        setOffers(filteredOffers);
+        const { meta, offers: fetched } = resp.data;
+        const all = fetched.slice(0, meta.all);
+        // teraz filtrujemy po dacie >= availability
+        setOffers(all.filter(o => filterOffersAfterDate(o, availability)));
       } catch (err) {
         console.error(err);
         setError("Błąd pobierania ofert");
@@ -61,71 +48,65 @@ const EditOffersModal = ({ isOpen, onRequestClose, availability }) => {
       }
     };
 
-    if (isOpen && availability) {
-      fetchOffers();
-    }
+    if (isOpen && availability) fetchOffers();
   }, [isOpen, availability]);
 
   return (
     <Modal
-    isOpen={isOpen}
-    onRequestClose={onRequestClose}
-    contentLabel="Oferty według dyspozycyjności w"
-    style={{
-      content: {
-        maxWidth: "900px",
-        margin: "auto",
-        padding: "20px",
-        borderRadius: "12px",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-        background: "#fff",
-        zIndex: 10001,
-        position: "relative" // ważne!
-      },
-      overlay: {
-        backgroundColor: "rgba(0, 0, 0, 0.5)",
-        zIndex: 10000,
-        position: "fixed", // konieczne do przykrycia całego viewportu
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center"
-      }
-    }}
-  >
+      isOpen={isOpen}
+      onRequestClose={onRequestClose}
+      contentLabel="Oferty według dyspozycyjności"
+      style={{
+        content: {
+          maxWidth: "900px",
+          margin: "auto",
+          padding: "20px",
+          borderRadius: "12px",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+          background: "#fff",
+          zIndex: 10001,
+          position: "relative"
+        },
+        overlay: {
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          zIndex: 10000,
+          position: "fixed",
+          top: 0, left: 0, right: 0, bottom: 0,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center"
+        }
+      }}
+    >
       <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
-        Oferty pracy - dostępność w : {availability}
+        Oferty pracy od: {formatStartDate(availability)}
       </h2>
 
       {loading && <div>Ładowanie ofert...</div>}
-      {error && <div>{error}</div>}
+      {error   && <div>{error}</div>}
       {!loading && !error && offers.length === 0 && (
-        <div>Brak ofert pracy dla wybranej dyspozycyjności.</div>
+        <div>Brak ofert pracy od wybranej daty.</div>
       )}
+
       {!loading && !error && offers.length > 0 && (
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ backgroundColor: "#f4f4f4" }}>
-            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Numer oferty</th>
-              <th style={{ border: "1px solid #ddd", padding: "8px" }}>Data rozpoczęcia</th>
-              <th style={{ border: "1px solid #ddd", padding: "8px" }}>Miasto</th>
-              <th style={{ border: "1px solid #ddd", padding: "8px" }}>Kod języka</th>
-              <th style={{ border: "1px solid #ddd", padding: "8px" }}>Płeć</th>
+              <th style={thStyle}>Numer oferty</th>
+              <th style={thStyle}>Data rozpoczęcia</th>
+              <th style={thStyle}>Miasto</th>
+              <th style={thStyle}>Kod języka</th>
+              <th style={thStyle}>Płeć</th>
             </tr>
           </thead>
           <tbody>
-            {offers.map((offer, index) => (
-              <tr key={offer.uid || index}>
-                <td style={{ border: "1px solid #ddd", padding: "8px" }}>{offer.name}</td>
-             <td style={{ border: "1px solid #ddd", padding: "8px" }}>
-  {offer.startDate ? formatStartDate(offer.startDate) : "Brak daty"}
-</td>
-                <td style={{ border: "1px solid #ddd", padding: "8px" }}>{offer.city}</td>
-                <td style={{ border: "1px solid #ddd", padding: "8px" }}>{offer.code}</td>
-                <td style={{ border: "1px solid #ddd", padding: "8px" }}>{offer.sex}</td>
+            {offers.map((offer, i) => (
+              <tr key={offer.uid || i}>
+                <td style={tdStyle}>{offer.name}</td>
+                <td style={tdStyle}>{formatStartDate(offer.startDate)}</td>
+                <td style={tdStyle}>{offer.city}</td>
+                <td style={tdStyle}>{offer.code}</td>
+                <td style={tdStyle}>{offer.sex}</td>
               </tr>
             ))}
           </tbody>
@@ -150,5 +131,8 @@ const EditOffersModal = ({ isOpen, onRequestClose, availability }) => {
     </Modal>
   );
 };
+
+const thStyle = { border: "1px solid #ddd", padding: "8px" };
+const tdStyle = { border: "1px solid #ddd", padding: "8px" };
 
 export default EditOffersModal;

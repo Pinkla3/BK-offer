@@ -266,7 +266,7 @@ function TabInputData({ setIsAdding, fetchEntries, editingEntry }) {
             <div style={{ flex: 1 }}>
               <label style={{ display: 'block', fontWeight: 600, marginBottom: 4 }}>Dyspozycyjność</label>
               <input
-                type="month"
+                type="date"
                 value={form.dyspozycyjnosc}
                 onChange={(e) => handleChange('dyspozycyjnosc', e.target.value)}
                 style={{
