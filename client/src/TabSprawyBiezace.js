@@ -8,7 +8,13 @@ import TabInputSprawyBiezace from './TabInputSprawyBiezace';
 import { FaPlus, FaTrash, FaSearch } from 'react-icons/fa';
 
 Modal.setAppElement('#root');
-const API = process.env.REACT_APP_API_URL;
+
+// Utwórz instancję Axios z baseURL i obsługą ciasteczek (jeśli potrzebne)
+const API_URL = process.env.REACT_APP_API_URL || '';
+const api = axios.create({
+  baseURL: API_URL,
+  withCredentials: true,
+});
 
 const headerStyle = {
   padding: 10,
@@ -22,10 +28,10 @@ const headerStyle = {
 };
 
 const actionColStyle = {
-    ...headerStyle,
- width: '30px',
- textAlign: 'center'
-  };
+  ...headerStyle,
+  width: '30px',
+  textAlign: 'center'
+};
 
 const rowStyle = { borderBottom: '1px solid #eee' };
 const cellStyle = { padding: 10, verticalAlign: 'top', fontSize: 14 };
@@ -37,17 +43,17 @@ const noteStyle = {
   overflow: 'hidden'
 };
 const addBtnStyle = {
-    backgroundColor: '#28a745',
-    color: '#fff',
-    border: 'none',
-    width: '36px',
-    height: '36px',
-    cursor: 'pointer',
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '18px',
-    transition: 'background-color 0.3s'
+  backgroundColor: '#28a745',
+  color: '#fff',
+  border: 'none',
+  width: '36px',
+  height: '36px',
+  cursor: 'pointer',
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontSize: '18px',
+  transition: 'background-color 0.3s'
 };
 const searchToggleBtnStyle = {
   padding: '10px 20px',
@@ -68,17 +74,17 @@ const searchInputStyle = {
   width: '250px'
 };
 const deleteBtnStyle = {
-    backgroundColor: 'red',
-    color: '#fff',
-    border: 'none',
-    width: '36px',
-    height: '36px',
-    cursor: 'pointer',
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '18px',
-    transition: 'background-color 0.3s'
+  backgroundColor: 'red',
+  color: '#fff',
+  border: 'none',
+  width: '36px',
+  height: '36px',
+  cursor: 'pointer',
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontSize: '18px',
+  transition: 'background-color 0.3s'
 };
 
 export default function TabSprawyBiezace() {
@@ -102,16 +108,16 @@ export default function TabSprawyBiezace() {
 
   const fetchUser = () => {
     const token = localStorage.getItem('token');
-    axios
-      .get(`${API}/api/userdb`, { headers: { Authorization: `Bearer ${token}` } })
+    api
+      .get('/api/userdb', { headers: { Authorization: `Bearer ${token}` } })
       .then(res => setUser(res.data.user))
       .catch(() => toast.error('Nie udało się pobrać danych użytkownika'));
   };
 
   const fetchCases = () => {
     const token = localStorage.getItem('token');
-    axios
-      .get(`${API}/api/sprawy-biezace`, { headers: { Authorization: `Bearer ${token}` } })
+    api
+      .get('/api/sprawy-biezace', { headers: { Authorization: `Bearer ${token}` } })
       .then(res => setCases(res.data))
       .catch(err => {
         console.error('Błąd pobierania spraw bieżących:', err);
@@ -139,7 +145,7 @@ export default function TabSprawyBiezace() {
     if (!window.confirm('Czy na pewno chcesz usunąć ten wpis?')) return;
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`${API}/api/sprawy-biezace/${id}`, {
+      await api.delete(`/api/sprawy-biezace/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Wpis usunięty');
@@ -161,15 +167,11 @@ export default function TabSprawyBiezace() {
   const sorted = [...cases].sort((a, b) => {
     if (!sortColumn) return 0;
     let A = a[sortColumn], B = b[sortColumn];
-    // dla dat
     if (sortColumn === 'data_wplyniecia') {
       A = A ? new Date(A) : new Date(0);
       B = B ? new Date(B) : new Date(0);
-      return sortOrder === 'asc'
-        ? A - B
-        : B - A;
+      return sortOrder === 'asc' ? A - B : B - A;
     }
-    // stringi
     A = A?.toString().toLowerCase() || '';
     B = B?.toString().toLowerCase() || '';
     if (A < B) return sortOrder === 'asc' ? -1 : 1;
@@ -250,7 +252,6 @@ export default function TabSprawyBiezace() {
               </button>
             </th>
           </tr>
-          
         </thead>
         <tbody>
           {visible.length === 0 ? (
@@ -282,7 +283,7 @@ export default function TabSprawyBiezace() {
                 {user?.role === 'admin' && (
                   <td style={cellStyle}>{item.user_name}</td>
                 )}
-                 <td style={{ ...cellStyle, width: '30px', textAlign: 'center' }}>
+                <td style={{ ...cellStyle, width: '30px', textAlign: 'center' }}>
                   <button
                     onClick={e => handleDelete(item.id, e)}
                     style={deleteBtnStyle}
@@ -290,9 +291,7 @@ export default function TabSprawyBiezace() {
                   >
                     <FaTrash />
                   </button>
-                  
                 </td>
-                
               </tr>
             ))
           )}
