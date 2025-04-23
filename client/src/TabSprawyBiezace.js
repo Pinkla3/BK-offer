@@ -10,11 +10,7 @@ import { FaPlus, FaTrash, FaSearch } from 'react-icons/fa';
 Modal.setAppElement('#root');
 
 // Utwórz instancję Axios z baseURL i obsługą ciasteczek (jeśli potrzebne)
-const API_URL = process.env.REACT_APP_API_URL || '';
-const api = axios.create({
-  baseURL: API_URL,
-  withCredentials: true,
-});
+const API_BASE_URL = process.env.REACT_APP_API_URL || '';
 
 const headerStyle = {
   padding: 10,
@@ -108,16 +104,16 @@ export default function TabSprawyBiezace() {
 
   const fetchUser = () => {
     const token = localStorage.getItem('token');
-    api
-      .get('/api/userdb', { headers: { Authorization: `Bearer ${token}` } })
+    axios
+    .get(`${API_BASE_URL}/api/userdb`, { headers: { Authorization: `Bearer ${token}` } })
       .then(res => setUser(res.data.user))
       .catch(() => toast.error('Nie udało się pobrać danych użytkownika'));
   };
 
   const fetchCases = () => {
     const token = localStorage.getItem('token');
-    api
-      .get('/api/sprawy-biezace', { headers: { Authorization: `Bearer ${token}` } })
+    axios
+      .get(`${API_BASE_URL}/api/sprawy-biezace`, { headers: { Authorization: `Bearer ${token}` } })
       .then(res => setCases(res.data))
       .catch(err => {
         console.error('Błąd pobierania spraw bieżących:', err);
@@ -145,7 +141,7 @@ export default function TabSprawyBiezace() {
     if (!window.confirm('Czy na pewno chcesz usunąć ten wpis?')) return;
     try {
       const token = localStorage.getItem('token');
-      await api.delete(`/api/sprawy-biezace/${id}`, {
+      await axios.delete(`${API_BASE_URL}/api/sprawy-biezace/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Wpis usunięty');
