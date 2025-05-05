@@ -865,37 +865,49 @@ app.get('/api/public-feedback/:token', async (req, res) => {
     res.status(500).json({ error: 'Błąd serwera przy pobieraniu formularza.' });
   }
 });
-
 app.patch('/api/public-feedback/:token', async (req, res) => {
-  const { token } = req.params;
+  const token = req.params.token;
   const updates = req.body;
 
   try {
-    const [[entry]] = await pool.query(
-      'SELECT id FROM tab_responses WHERE public_token = ?',
-      [token]
+    const [[entry]] = await pool.query('SELECT * FROM tab_responses WHERE public_token = ?', [token]);
+    if (!entry) return res.status(404).json({ error: 'Nie znaleziono formularza' });
+
+    // 🕒 Dodaj wpis do historii edycji
+    const now = new Date();
+    const historyEntry = `Edytowano przez Opiekunkę dnia ${now.toLocaleDateString('pl-PL')}, ${now.toLocaleTimeString('pl-PL')}`;
+
+    let updatedHistory = [];
+    if (entry.edit_history) {
+      try {
+        updatedHistory = JSON.parse(entry.edit_history);
+        if (!Array.isArray(updatedHistory)) updatedHistory = [];
+      } catch {
+        updatedHistory = [];
+      }
+    }
+
+    updatedHistory.push(historyEntry);
+
+    const fields = Object.keys(updates);
+    const values = Object.values(updates);
+
+    // Dołączamy `edit_history` do aktualizacji
+    fields.push('edit_history');
+    values.push(JSON.stringify(updatedHistory));
+
+    const setClause = fields.map(f => `${f} = ?`).join(', ');
+    await pool.query(
+      `UPDATE tab_responses SET ${setClause} WHERE public_token = ?`,
+      [...values, token]
     );
 
-    if (!entry) return res.status(404).json({ error: 'Formularz nie istnieje' });
-
-    await pool.query(`
-      UPDATE tab_responses SET
-        q1 = ?, q2 = ?, q3 = ?, q4 = ?, q5 = ?,
-        q6 = ?, q7 = ?, q8 = ?, q9 = ?, q10 = ?, notes = ?
-      WHERE public_token = ?
-    `, [
-      updates.q1, updates.q2, updates.q3, updates.q4, updates.q5,
-      updates.q6, updates.q7, updates.q8, updates.q9, updates.q10,
-      updates.notes, token
-    ]);
-
-    res.json({ message: 'Formularz został zapisany' });
+    res.json({ message: 'Zapisano dane' });
   } catch (err) {
-    console.error('❌ Błąd PATCH public-feedback:', err);
-    res.status(500).json({ error: 'Błąd serwera przy zapisie' });
+    console.error('❌ Błąd zapisu przez public feedback:', err);
+    res.status(500).json({ error: 'Błąd serwera przy zapisie publicznego formularza' });
   }
 });
-
 // ---------------------- START SERVER ----------------------
 app.listen(port, () => {
   console.log(`Server działa na http://localhost:${port}`);
