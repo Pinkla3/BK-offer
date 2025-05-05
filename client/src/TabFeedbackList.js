@@ -1,5 +1,5 @@
 import { FaSearch, FaTrash, FaPlus } from 'react-icons/fa';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import Modal from 'react-modal';
