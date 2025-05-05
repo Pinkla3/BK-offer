@@ -295,19 +295,13 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
   };
 
   useEffect(() => {
-    let interval;
-  
     if (selected?.id) {
       fetchDetails(selected.id);
-      interval = setInterval(() => {
-        fetchDetails(selected.id);
-      }, 10000);
     }
-  
-    return () => clearInterval(interval);
   }, [selected?.id]);
 
   if (!entry) return <p style={{ padding: '2rem' }}>Ładowanie szczegółów...</p>;
+
 
   useEffect(() => {
 
@@ -512,6 +506,9 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
     <SmallButton onClick={handleBack}>
       <FaArrowLeft /> Wstecz
     </SmallButton>
+    <button onClick={() => fetchDetails(selected.id)} style={{ padding: '8px 12px', background: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+          Odśwież
+        </button>
   </LeftButtons>
 
   <Title>Szczegóły odpowiedzi</Title>
