@@ -279,6 +279,7 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
   const [editedPatientFirstName, setEditedPatientFirstName] = useState('');
   const [editedPatientLastName, setEditedPatientLastName] = useState('');
   const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [entry, setEntry] = useState(null);
 
   const fetchDetails = async (id) => {
     try {
