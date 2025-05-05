@@ -866,6 +866,36 @@ app.get('/api/public-feedback/:token', async (req, res) => {
   }
 });
 
+app.patch('/api/public-feedback/:token', async (req, res) => {
+  const { token } = req.params;
+  const updates = req.body;
+
+  try {
+    const [[entry]] = await pool.query(
+      'SELECT id FROM tab_responses WHERE public_token = ?',
+      [token]
+    );
+
+    if (!entry) return res.status(404).json({ error: 'Formularz nie istnieje' });
+
+    await pool.query(`
+      UPDATE tab_responses SET
+        q1 = ?, q2 = ?, q3 = ?, q4 = ?, q5 = ?,
+        q6 = ?, q7 = ?, q8 = ?, q9 = ?, q10 = ?, notes = ?
+      WHERE public_token = ?
+    `, [
+      updates.q1, updates.q2, updates.q3, updates.q4, updates.q5,
+      updates.q6, updates.q7, updates.q8, updates.q9, updates.q10,
+      updates.notes, token
+    ]);
+
+    res.json({ message: 'Formularz został zapisany' });
+  } catch (err) {
+    console.error('❌ Błąd PATCH public-feedback:', err);
+    res.status(500).json({ error: 'Błąd serwera przy zapisie' });
+  }
+});
+
 // ---------------------- START SERVER ----------------------
 app.listen(port, () => {
   console.log(`Server działa na http://localhost:${port}`);

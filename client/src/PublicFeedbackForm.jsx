@@ -1,109 +1,92 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import { toast } from 'react-toastify';
 
 const PublicFeedbackForm = () => {
   const { token } = useParams();
-  const [formData, setFormData] = useState(null);
+  const [data, setData] = useState(null);
+  const [form, setForm] = useState({});
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchFeedback = async () => {
       try {
         const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/public-feedback/${token}`);
-        setFormData(res.data);
+        setData(res.data);
+        setForm({
+          q1: res.data.q1 || '',
+          q2: res.data.q2 || '',
+          q3: res.data.q3 || '',
+          q4: res.data.q4 || '',
+          q5: res.data.q5 || '',
+          q6: res.data.q6 || '',
+          q7: res.data.q7 || '',
+          q8: res.data.q8 || '',
+          q9: res.data.q9 || '',
+          q10: res.data.q10 || '',
+          notes: res.data.notes || '',
+        });
       } catch (err) {
-        toast.error('Nie udało się pobrać formularza');
+        setError('Nie znaleziono formularza lub wystąpił błąd.');
       } finally {
         setLoading(false);
       }
     };
-
-    fetchData();
+    fetchFeedback();
   }, [token]);
 
   const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSaving(true);
     try {
-      await axios.patch(`${process.env.REACT_APP_API_URL}/api/public-feedback/${token}`, formData);
-      toast.success('Formularz został zapisany!');
+      await axios.patch(`${process.env.REACT_APP_API_URL}/api/public-feedback/${token}`, form);
+      setSuccess(true);
     } catch (err) {
       console.error(err);
-      toast.error('Błąd podczas zapisu');
-    } finally {
-      setSaving(false);
+      setError('Wystąpił błąd podczas zapisu.');
     }
   };
 
-  if (loading) return <p>Ładowanie formularza...</p>;
-  if (!formData) return <p>Nie znaleziono formularza.</p>;
+  if (loading) return <p className="p-4">Ładowanie...</p>;
+  if (error) return <p className="p-4 text-red-600">{error}</p>;
+  if (success) return <p className="p-4 text-green-600">✅ Formularz został zapisany. Dziękujemy!</p>;
 
   return (
-    <div className="max-w-2xl mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Formularz Feedback</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="text"
-          name="caregiver_first_name"
-          value={formData.caregiver_first_name || ''}
-          onChange={handleChange}
-          placeholder="Imię opiekunki"
-          className="w-full p-2 border rounded"
-        />
-        <input
-          type="text"
-          name="caregiver_last_name"
-          value={formData.caregiver_last_name || ''}
-          onChange={handleChange}
-          placeholder="Nazwisko opiekunki"
-          className="w-full p-2 border rounded"
-        />
-        <input
-          type="text"
-          name="caregiver_phone"
-          value={formData.caregiver_phone || ''}
-          onChange={handleChange}
-          placeholder="Telefon"
-          className="w-full p-2 border rounded"
-        />
+    <div className="p-4 max-w-xl mx-auto">
+      <h2 className="text-xl font-semibold mb-4">Formularz oceny opiekunki</h2>
 
+      <form onSubmit={handleSubmit} className="space-y-4">
         {[...Array(10)].map((_, i) => (
-          <textarea
-            key={i}
-            name={`q${i + 1}`}
-            value={formData[`q${i + 1}`] || ''}
-            onChange={handleChange}
-            placeholder={`Pytanie ${i + 1}`}
-            className="w-full p-2 border rounded"
-            rows={3}
-          />
+          <div key={`q${i + 1}`}>
+            <label className="block font-medium mb-1">Pytanie {i + 1}</label>
+            <input
+              type="text"
+              name={`q${i + 1}`}
+              value={form[`q${i + 1}`]}
+              onChange={handleChange}
+              className="w-full border rounded px-3 py-2"
+              required
+            />
+          </div>
         ))}
 
-        <textarea
-          name="notes"
-          value={formData.notes || ''}
-          onChange={handleChange}
-          placeholder="Uwagi / komentarz"
-          className="w-full p-2 border rounded"
-          rows={4}
-        />
+        <div>
+          <label className="block font-medium mb-1">Uwagi (opcjonalnie)</label>
+          <textarea
+            name="notes"
+            value={form.notes}
+            onChange={handleChange}
+            className="w-full border rounded px-3 py-2"
+          />
+        </div>
 
-        <button
-          type="submit"
-          disabled={saving}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >
-          {saving ? 'Zapisywanie...' : 'Zapisz'}
+        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+          Wyślij
         </button>
       </form>
     </div>
