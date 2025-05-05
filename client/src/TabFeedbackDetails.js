@@ -280,7 +280,15 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
   const [editedPatientLastName, setEditedPatientLastName] = useState('');
   const [showHistoryModal, setShowHistoryModal] = useState(false);
 
+  useEffect(() => {
+    fetchDetails();
+    const interval = setInterval(() => {
+      fetchDetails();
+    }, 10000);
 
+    return () => clearInterval(interval);
+  }, [selected]);
+  
   useEffect(() => {
 
     const handleFeedbackBack = () => {
