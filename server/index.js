@@ -15,7 +15,7 @@ const port = 3009;
 
 // CORS + JSON
 app.use(cors({
-  origin: ['http://localhost:3008', 'https://desk.berlin-opiekunki.pl'],
+  origin: ['http://localhost:3008', 'https://desk.berlin-opiekunki.pl', 'https://bk-offer.pl'],
   credentials: true,
   methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
   allowedHeaders: ['Content-Type','Authorization']
@@ -861,8 +861,8 @@ app.get('/api/public-feedback/:token', async (req, res) => {
 
     res.json(feedback);
   } catch (err) {
-    console.error('Błąd przy pobieraniu formularza publicznego:', err);
-    res.status(500).json({ error: 'Błąd serwera' });
+    console.error('❌ Błąd przy pobieraniu formularza publicznego:', err);
+    res.status(500).json({ error: 'Błąd serwera przy pobieraniu formularza.' });
   }
 });
 
