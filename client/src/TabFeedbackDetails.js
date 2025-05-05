@@ -295,12 +295,15 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
   };
 
   useEffect(() => {
-    if (!selected?.id) return;
-    fetchDetails(selected.id);
-    const interval = setInterval(() => {
+    let interval;
+  
+    if (selected?.id) {
       fetchDetails(selected.id);
-    }, 10000);
-
+      interval = setInterval(() => {
+        fetchDetails(selected.id);
+      }, 10000);
+    }
+  
     return () => clearInterval(interval);
   }, [selected?.id]);
 
