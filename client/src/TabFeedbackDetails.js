@@ -476,6 +476,26 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
         : (selected.notes || '')
       );
 
+      const fetchDetails = async (id) => {
+        try {
+          const token = localStorage.getItem('token');
+          const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/tabResponses`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          const match = res.data.find(r => r.id === id);
+          if (match) setEntry(match);
+        } catch (err) {
+          console.error('Błąd pobierania szczegółów feedbacku:', err);
+        }
+      };
+    
+      useEffect(() => {
+        if (selected?.id) {
+          fetchDetails(selected.id);
+        }
+      }, [selected?.id]);
+
+
   return (
     <Wrapper>
      <TitleRow>
@@ -486,7 +506,19 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
   </LeftButtons>
 
   <Title>Szczegóły odpowiedzi</Title>
-
+            <button
+              onClick={() => fetchDetails(selected.id)}
+              style={{
+                padding: '8px 12px',
+                background: '#007bff',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              Odśwież
+            </button>
   <RightButtons>
     {editing ? (
       <SmallButton onClick={handleSave} disabled={translating}>
