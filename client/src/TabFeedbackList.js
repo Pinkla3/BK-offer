@@ -98,6 +98,23 @@ const TabFeedbackList = ({ responses: initialResponses, onSelect, onAdd }) => {
   const [sortOrder, setSortOrder] = useState('asc');
   const [isAdding, setIsAdding] = useState(false);
 
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/tabResponses`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setResponses(res.data);
+        console.log('🔁 Odświeżono dane feedbacków');
+      } catch (err) {
+        console.warn('Błąd odświeżania feedbacków:', err);
+      }
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   const handleSort = (key) => {
     if (sortColumn === key) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
