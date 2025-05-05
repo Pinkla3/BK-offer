@@ -1,17 +1,44 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { setToken } from './auth';
 
-// Ustawienie zmiennej API_BASE_URL z pliku .env (Create React App)
 const API_BASE_URL = process.env.REACT_APP_API_URL;
+
+function decodeToken(token) {
+  try {
+    const payload = token.split('.')[1];
+    const decodedPayload = atob(payload);
+    return JSON.parse(decodedPayload);
+  } catch (e) {
+    console.error('Błąd dekodowania tokena', e);
+    return null;
+  }
+}
 
 function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  console.log("navigate funkcja:", navigate);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decoded = decodeToken(token);
+      if (decoded && decoded.exp) {
+        const expTime = decoded.exp * 1000;
+        const currentTime = Date.now();
+        if (expTime < currentTime) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user_name');
+          toast.info('Sesja wygasła, zaloguj się ponownie');
+          navigate('/login');
+        }
+      }
+    }
+  }, [navigate]);
 
   const handleChange = (field, value) => {
     setForm({ ...form, [field]: value });
@@ -24,32 +51,42 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (errors.email || errors.password) return;
-  
+
+    setLoading(true);
     try {
       const res = await axios.post(`${API_BASE_URL}/api/login`, form);
-      console.log('ODPOWIEDŹ Z BACKENDU:', res.data); // 👈 LOG
-  
       if (res.data.token) {
-        console.log('TOKEN JEST, PRZECHODZĘ NA DASHBOARD'); // 👈 LOG
         setToken(res.data.token);
+
+        const decoded = decodeToken(res.data.token);
+        console.log('Dekodowany token:', decoded);
+
+        if (decoded && (decoded.name || decoded.email)) {
+          const userName = decoded.name || decoded.email;
+          localStorage.setItem('user_name', userName);
+        }
+
         toast.success('Zalogowano');
-        window.location.href = '/';
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 500);
       } else {
-        console.log('BRAK tokenu – nie przechodzę'); // 👈 LOG
         toast.error('Brak tokenu');
       }
     } catch (err) {
       console.error('Błąd logowania:', err);
       toast.error('Błędne dane logowania');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-        <div style={{
-          backgroundImage: 'url("/images/background.jfif")',
-      backgroundSize: 'cover',       // skalowanie do wielkości kontenera
-      backgroundRepeat: 'no-repeat', // wyłączenie powtarzania
-      backgroundPosition: 'center',  // wyśrodkowanie obrazu     
+    <div style={{
+      backgroundImage: 'url("/images/background.jfif")',
+      backgroundSize: 'cover',
+      backgroundRepeat: 'no-repeat',
+      backgroundPosition: 'center',
       minHeight: '100vh',
       display: 'flex',
       justifyContent: 'center',
@@ -63,13 +100,12 @@ function Login() {
         padding: '30px',
         borderRadius: '12px',
         boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-        boxSizing: 'border-box'
+        boxSizing: 'border-box',
       }}>
-
-          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-    <img src="/images/logo.jpg" alt="Logo" style={{ width: '100px' }} />
-    <h2 style={{ textAlign: 'center' }}>Desk - twoje wirtualne biurko rekrutacyjne</h2>
-  </div> 
+        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+          <img src="/images/logo.jpg" alt="Logo" style={{ width: '100px' }} />
+          <h2>Desk - twoje wirtualne biurko rekrutacyjne</h2>
+        </div>
 
         <h2 style={{ textAlign: 'center' }}>Logowanie</h2>
         <form onSubmit={handleSubmit} style={{ width: '100%' }}>
@@ -83,11 +119,11 @@ function Login() {
               margin: '8px 0',
               borderRadius: '8px',
               border: errors.email ? '1px solid red' : '1px solid #ccc',
-              boxSizing: 'border-box'
+              boxSizing: 'border-box',
             }}
           />
           {errors.email && <div style={{ color: 'red', fontSize: 12 }}>{errors.email}</div>}
-  
+
           <input
             type="password"
             placeholder="Hasło"
@@ -99,26 +135,27 @@ function Login() {
               margin: '8px 0',
               borderRadius: '8px',
               border: errors.password ? '1px solid red' : '1px solid #ccc',
-              boxSizing: 'border-box'
+              boxSizing: 'border-box',
             }}
           />
           {errors.password && <div style={{ color: 'red', fontSize: 12 }}>{errors.password}</div>}
-  
+
           <button
             type="submit"
+            disabled={loading}
             style={{
               width: '100%',
               padding: '10px',
               marginTop: '12px',
-              backgroundColor: '#007bff',
+              backgroundColor: loading ? '#999' : '#007bff',
               color: '#fff',
               border: 'none',
               borderRadius: '8px',
-              cursor: 'pointer',
-              boxSizing: 'border-box'
+              cursor: loading ? 'not-allowed' : 'pointer',
+              boxSizing: 'border-box',
             }}
           >
-            Zaloguj się
+            {loading ? 'Logowanie...' : 'Zaloguj się'}
           </button>
         </form>
         <p style={{ marginTop: 10 }}>

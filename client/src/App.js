@@ -8,6 +8,8 @@ import { getUser } from './auth';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ResetPassword from './ResetPassword';
+import PublicFeedbackForm from './PublicFeedbackForm';
+
 function App() {
 
   const user = getUser();
@@ -20,6 +22,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/" element={user ? <Dashboard /> : <Navigate to="/login" />} />
+        <Route path="/formularz-feedback/:token" element={<PublicFeedbackForm />} /> {/* 👈 nowy route */}
       </Routes>
       <ToastContainer position="top-right" autoClose={3000} />
     </Router>

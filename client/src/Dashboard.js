@@ -1,4 +1,3 @@
-// Dashboard.js
 import React, { useState, useEffect } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
 import axios from 'axios';
@@ -10,7 +9,10 @@ import TabViewData from './TabViewData';
 import TabChangePassword from './TabChangePassword';
 import TabSprawyBiezace from './TabSprawyBiezace';
 import TabInputSprawyBiezace from './TabInputSprawyBiezace';
-import { FaPlus, FaDatabase, FaLock, FaClipboardList } from 'react-icons/fa';
+import TabFeedback from './TabFeedback';
+import TabFeedbackView from './TabFeedbackView';
+import { FaPlus, FaDatabase, FaLock, FaClipboardList, FaTag } from 'react-icons/fa';
+import TabSmsLogs from './TabSmsLogs';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL;
 
@@ -113,8 +115,8 @@ const Dashboard = () => {
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('input');
   const [entries, setEntries] = useState([]);
+  const [feedbackSelected, setFeedbackSelected] = useState(null);
 
-  // 1) Deklarujemy fetchUser jako funkcję
   const fetchUser = async () => {
     const token = localStorage.getItem('token');
     if (!token) return;
@@ -128,7 +130,6 @@ const Dashboard = () => {
     }
   };
 
-  // 2) Funkcja pobierająca wpisy
   const fetchEntries = async () => {
     const token = localStorage.getItem('token');
     if (!token) return;
@@ -142,16 +143,24 @@ const Dashboard = () => {
     }
   };
 
-  // 3) Handler przełączający na "view" po dodaniu opiekunki
   const handleAddedCaregiver = async () => {
     await fetchEntries();
     setActiveTab('view');
   };
 
-  // 4) Po zamontowaniu: pobierz usera i wpisy
   useEffect(() => {
     fetchUser();
     fetchEntries();
+  }, []);
+
+  useEffect(() => {
+    const handleGoToFeedbackList = () => {
+      setFeedbackSelected(null);
+      setActiveTab('responses');
+    };
+  
+    window.addEventListener('goToFeedbackList', handleGoToFeedbackList);
+    return () => window.removeEventListener('goToFeedbackList', handleGoToFeedbackList);
   }, []);
 
   const handleLogout = () => {
@@ -159,43 +168,45 @@ const Dashboard = () => {
     window.location.href = '/login';
   };
 
-  // 5) Wybór contentu w zależności od activeTab
+  const handleFeedbackListClick = () => {
+    window.dispatchEvent(new CustomEvent('feedbackBack'));
+    setActiveTab('responses');
+  };
+
   let content;
   switch (activeTab) {
     case 'input':
-      content = (
-        <TabInputData
-          setIsAdding={() => {}}
-          fetchEntries={handleAddedCaregiver}
-          editingEntry={null}
-        />
-      );
+      content = <TabInputData setIsAdding={() => {}} fetchEntries={handleAddedCaregiver} editingEntry={null} />;
       break;
-
     case 'view':
       content = <TabViewData entries={entries} user={user} />;
       break;
-
     case 'cases':
       content = <TabSprawyBiezace />;
       break;
-
     case 'add-case':
-      content = (
-        <TabInputSprawyBiezace
-          setIsAdding={() => setActiveTab('cases')}
-          fetchCases={fetchEntries}
-          editingSprawa={null}
-        />
-      );
+      content = <TabInputSprawyBiezace setIsAdding={() => setActiveTab('cases')} fetchCases={fetchEntries} editingSprawa={null} />;
       break;
-
+    case 'feedback':
+      content = <TabFeedback />;
+      break;
+      case 'responses':
+        content = (
+          <TabFeedbackView
+            selected={feedbackSelected}
+            setSelected={setFeedbackSelected}
+            resetSelected={() => setFeedbackSelected(null)}
+          />
+        );
+        break;
     case 'password':
       content = <TabChangePassword />;
       break;
-
     default:
       content = null;
+      case 'smsLogs':
+  content = <TabSmsLogs />;
+  break;
   }
 
   return (
@@ -203,41 +214,25 @@ const Dashboard = () => {
       <GlobalStyle />
       <DashboardContainer>
         <Sidebar>
+          {/* logo */}
           <div style={{ textAlign: 'center', marginBottom: '15px' }}>
             <img src="/images/logo.jpg" alt="Logo" style={{ width: '100px' }} />
           </div>
-          <SidebarButton
-            $active={activeTab==='input'}
-            onClick={()=>setActiveTab('input')}
-          >
-            <FaPlus size={18}/> Dodaj opiekunkę
-          </SidebarButton>
-          <SidebarButton
-            $active={activeTab==='view'}
-            onClick={()=>setActiveTab('view')}
-          >
-            <FaDatabase size={18}/> Podgląd opiekunek
-          </SidebarButton>
-          <SidebarButton
-            $active={activeTab==='add-case'}
-            onClick={()=>setActiveTab('add-case')}
-          >
-            <FaPlus size={18}/> Dodaj bieżącą sprawę
-          </SidebarButton>
-          <SidebarButton
-            $active={activeTab==='cases'}
-            onClick={()=>setActiveTab('cases')}
-          >
-            <FaClipboardList size={18}/> Sprawy bieżące
-          </SidebarButton>
-
-          <SidebarButton
-            $active={activeTab==='password'}
-            onClick={()=>setActiveTab('password')}
-          >
-            <FaLock size={18}/> Zmiana hasła
-          </SidebarButton>
+          {/* sidebar buttons */}
+          <SidebarButton $active={activeTab==='input'} onClick={()=>setActiveTab('input')}><FaPlus size={18}/> Dodaj opiekunkę</SidebarButton>
+          <SidebarButton $active={activeTab==='view'} onClick={()=>setActiveTab('view')}><FaDatabase size={18}/> Podgląd opiekunek</SidebarButton>
+          <SidebarButton $active={activeTab==='add-case'} onClick={()=>setActiveTab('add-case')}><FaPlus size={18}/> Dodaj bieżącą sprawę</SidebarButton>
+          <SidebarButton $active={activeTab==='cases'} onClick={()=>setActiveTab('cases')}><FaClipboardList size={18}/>Podgląd spraw bieżących</SidebarButton>
+          <SidebarButton $active={activeTab==='feedback'} onClick={()=>setActiveTab('feedback')}><FaPlus size={18}/> Dodaj feedback</SidebarButton>
+          <SidebarButton $active={activeTab==='responses'} onClick={handleFeedbackListClick}><FaTag size={18}/> Podgląd feedbacków</SidebarButton>
+          <SidebarButton $active={activeTab==='password'} onClick={()=>setActiveTab('password')}><FaLock size={18}/> Zmiana hasła</SidebarButton>
+          {user?.role === 'admin' && (
+  <SidebarButton $active={activeTab === 'smsLogs'} onClick={() => setActiveTab('smsLogs')}>
+    <FaClipboardList size={18} /> Logi SMS
+  </SidebarButton>
+)}
         </Sidebar>
+
         <MainArea>
           <Header>
             <UserInfo>

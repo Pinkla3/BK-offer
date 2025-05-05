@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
+const axios = require('axios');
 
 const pool = require('./db'); // import puli połączeń mysql2
 
@@ -16,7 +17,7 @@ const port = 3009;
 app.use(cors({
   origin: ['http://localhost:3008', 'https://desk.berlin-opiekunki.pl'],
   credentials: true,
-  methods: ['GET','POST','PUT','DELETE','OPTIONS'],
+  methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
   allowedHeaders: ['Content-Type','Authorization']
 }));
 app.use(bodyParser.json());
@@ -88,7 +89,6 @@ app.post('/api/login', async (req, res) => {
     }
     
     // Debug: wyświetlenie JWT_SECRET (usuń w produkcji)
-    console.log('JWT_SECRET (generowanie):', process.env.JWT_SECRET);
     
     const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '8h' });
     res.json({ message: 'Zalogowano', token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
@@ -471,7 +471,379 @@ app.post('/api/update-password', async (req, res) => {
     res.status(500).json({ error: 'Błąd serwera' });
   }
 });
+app.post('/api/tabResponses', authenticate, async (req, res) => {
+  const {
+    caregiverFirstName, caregiverLastName, caregiverPhone,
+    patientFirstName, patientLastName,
+    q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, notes
+  } = req.body;
 
+  try {
+    const userId = req.user.id;
+    const publicToken = crypto.randomBytes(16).toString('hex');
+
+    const sql = `
+      INSERT INTO tab_responses (
+        caregiver_first_name, caregiver_last_name, caregiver_phone,
+        patient_first_name, patient_last_name,
+        q1, q2, q3, q4, q5, q6, q7, q8, q9, q10,
+        notes, user_id, public_token
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const params = [
+      caregiverFirstName, caregiverLastName, caregiverPhone,
+      patientFirstName, patientLastName,
+      q1, q2, q3, q4, q5, q6, q7, q8, q9, q10,
+      notes, userId, publicToken
+    ];
+
+    const [result] = await pool.query(sql, params);
+    const insertedId = result.insertId;
+
+    const [[inserted]] = await pool.query(`
+      SELECT tab_responses.*, users.name AS user_name
+      FROM tab_responses
+      JOIN users ON tab_responses.user_id = users.id
+      WHERE tab_responses.id = ?
+    `, [insertedId]);
+
+    res.status(201).json(inserted);
+
+  } catch (err) {
+    console.error('Błąd zapisu feedback:', err);
+    res.status(500).json({ error: 'Błąd serwera podczas zapisu feedback.' });
+  }
+});
+
+// Pobierz wszystkie odpowiedzi (admin widzi wszystkie, user tylko swoje)
+app.get('/api/tabResponses', authenticate, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const isAdmin = req.user.role === 'admin';
+
+    const {
+      search = '',
+      sortBy = 'tab_responses.id',
+      order = 'DESC'
+    } = req.query;
+
+    const searchSql = `%${search}%`;
+
+    const whereClause = isAdmin
+      ? ''
+      : 'WHERE tab_responses.user_id = ?';
+
+    const searchConditions = `
+      (${[
+        'tab_responses.caregiver_first_name',
+        'tab_responses.caregiver_last_name',
+        'tab_responses.patient_first_name',
+        'tab_responses.patient_last_name',
+        'tab_responses.caregiver_phone'
+      ].map(field => `${field} LIKE ?`).join(' OR ')})
+    `;
+
+    const finalWhere = whereClause
+      ? `${whereClause} AND ${searchConditions}`
+      : `WHERE ${searchConditions}`;
+
+    const sortColumn = [
+      'tab_responses.id',
+      'tab_responses.created_at',
+      'tab_responses.caregiver_first_name',
+      'tab_responses.patient_first_name',
+      'tab_responses.caregiver_phone'
+    ].includes(sortBy) ? sortBy : 'tab_responses.id';
+
+    const sortDirection = order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+
+    const query = `
+      SELECT tab_responses.*, users.name AS user_name
+      FROM tab_responses
+      JOIN users ON tab_responses.user_id = users.id
+      ${finalWhere}
+      ORDER BY ${sortColumn} ${sortDirection}
+    `;
+
+    const searchParams = Array(5).fill(searchSql);
+    const queryParams = isAdmin ? searchParams : [userId, ...searchParams];
+
+    const [rows] = await pool.query(query, queryParams);
+
+    res.json(rows);
+  } catch (err) {
+    console.error('Błąd pobierania odpowiedzi:', err);
+    res.status(500).json({ error: 'Błąd serwera przy pobieraniu odpowiedzi.' });
+  }
+});
+app.post('/api/translate', authenticate, async (req, res) => {
+  const { texts, source='pl', target='de' } = req.body;
+  try {
+    const translations = [];
+    for (const text of texts) {
+      const r = await axios.post(
+        'http://hosting.poznysz.eu:5000/translate',
+        { q: text, source, target, format: 'text' },
+        { headers: {'Content-Type':'application/json'} }
+      );
+      // Jeżeli proxy zwraca string lub obiekt z różnymi kluczami:
+      const t = typeof r.data === 'string'
+        ? r.data
+        : r.data.translatedText    // LibreTranslate
+          || r.data.translation    // inne proxy
+          || r.data.translated_text
+          || '';
+      translations.push(t);
+    }
+    return res.json({ translations });
+  } catch (err) {
+    console.error('Translate error:', err.response?.data || err.message);
+    return res.status(502).json({ error: 'Błąd tłumaczenia' });
+  }
+});
+app.patch('/api/tabResponses/:id', authenticate, async (req, res) => {
+  const { id } = req.params;
+  const updates = req.body; 
+
+  try {
+    const now = new Date();
+    const [[userRow]] = await pool.query('SELECT name FROM users WHERE id = ?', [req.user.id]);
+    const userName = userRow ? userRow.name : 'nieznany użytkownik';
+    const historyEntry = `Edytowano przez ${userName} dnia ${now.toLocaleString()}`;
+  
+    const [rows] = await pool.query('SELECT edit_history FROM tab_responses WHERE id = ?', [id]);
+  
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Nie znaleziono odpowiedzi' });
+    }
+  
+    const current = rows[0];
+    let updatedHistory = [];
+  
+    if (current.edit_history) {
+      try {
+        updatedHistory = JSON.parse(current.edit_history);
+        if (!Array.isArray(updatedHistory)) {
+          updatedHistory = [];
+        }
+      } catch (err) {
+        console.error('Niepoprawny JSON w edit_history:', err);
+        updatedHistory = [];
+      }
+    }
+  
+    updatedHistory.push(historyEntry);
+
+    const [result] = await pool.query(`
+      UPDATE tab_responses SET
+        caregiver_first_name = ?, caregiver_last_name = ?, caregiver_phone = ?,
+        patient_first_name = ?, patient_last_name = ?,
+        q1 = ?, q2 = ?, q3 = ?, q4 = ?, q5 = ?,
+        q6 = ?, q7 = ?, q8 = ?, q9 = ?, q10 = ?,
+        notes = ?, q1_de = ?, q2_de = ?, q3_de = ?, q4_de = ?, q5_de = ?,
+        q6_de = ?, q7_de = ?, q8_de = ?, q9_de = ?, q10_de = ?,
+        notes_de = ?, user_name = ?, edit_history = ?
+      WHERE id = ?
+    `, [
+      updates.caregiver_first_name, updates.caregiver_last_name, updates.caregiver_phone,
+      updates.patient_first_name, updates.patient_last_name,
+      updates.q1, updates.q2, updates.q3, updates.q4, updates.q5,
+      updates.q6, updates.q7, updates.q8, updates.q9, updates.q10,
+      updates.notes,
+      updates.q1_de, updates.q2_de, updates.q3_de, updates.q4_de, updates.q5_de,
+      updates.q6_de, updates.q7_de, updates.q8_de, updates.q9_de, updates.q10_de,
+      updates.notes_de,
+      updates.user_name,
+      JSON.stringify(updatedHistory),
+      id
+    ]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Nie znaleziono odpowiedzi' });
+    }
+
+    const [[updated]] = await pool.query('SELECT * FROM tab_responses WHERE id = ?', [id]);
+
+    res.json(updated);
+
+  } catch (err) {
+    console.error('Błąd przy aktualizacji feedback:', err);
+    res.status(500).json({ error: 'Błąd serwera podczas zapisu feedback.' });
+  }
+});
+
+app.delete('/api/tabResponses/:id', authenticate, async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user.id;
+  const isAdmin = req.user.role === 'admin';
+
+  try {
+    // Sprawdź, czy wpis istnieje i należy do użytkownika (jeśli nie admin)
+    const [rows] = await pool.query(
+      'SELECT * FROM tab_responses WHERE id = ?',
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Nie znaleziono wpisu.' });
+    }
+
+    const entry = rows[0];
+
+    if (!isAdmin && entry.user_id !== userId) {
+      return res.status(403).json({ error: 'Brak dostępu do usunięcia tego wpisu.' });
+    }
+
+    await pool.query('DELETE FROM tab_responses WHERE id = ?', [id]);
+
+    res.json({ message: 'Wpis został usunięty.' });
+  } catch (err) {
+    console.error('Błąd usuwania wpisu:', err);
+    res.status(500).json({ error: 'Błąd serwera podczas usuwania wpisu.' });
+  }
+});
+async function sendSmsViaSmsApi(to, message) {
+  const token = process.env.SMSAPI_TOKEN;
+  const sender = process.env.SMSAPI_SENDER || '';
+  let status = 'error';
+  let smsapi_id = '';
+  let full_response = '';
+
+  try {
+    const res = await axios.post(
+      'https://api.smsapi.pl/sms.do',
+      new URLSearchParams({
+        to,
+        message,
+        from: sender,
+        format: 'json'
+      }),
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }
+    );
+
+    const response = res.data;
+    full_response = JSON.stringify(response);
+
+    if (response && Array.isArray(response.list) && response.list.length > 0) {
+      const sms = response.list[0];
+      status = sms.status;
+      smsapi_id = sms.id;
+
+      if (['OK', 'QUEUE'].includes(status)) {
+        console.log(`✅ Wysłano SMS do ${sms.number} | Status: ${status}`);
+      } else {
+        console.warn(`❌ Nieudana wysyłka SMS do ${sms.number} | Status: ${status}`);
+      }
+    } else {
+      status = 'unknown';
+      console.warn('❌ Brak poprawnej odpowiedzi z SMSAPI:', response);
+    }
+  } catch (err) {
+    full_response = JSON.stringify(err.response?.data || err.message);
+    console.error('❌ Błąd sieci SMSAPI:', full_response);
+  }
+
+  // logowanie do bazy
+  try {
+    await pool.query(
+      `INSERT INTO sms_logs (recipient_phone, message, status, smsapi_id, full_response)
+       VALUES (?, ?, ?, ?, ?)`,
+      [to, message, status, smsapi_id, full_response]
+    );
+  } catch (dbErr) {
+    console.error('❌ Błąd zapisu sms_logs:', dbErr);
+  }
+
+  return { success: ['OK', 'QUEUE'].includes(status), status, smsapi_id, number: to, message };
+}
+
+app.post('/api/send-sms-feedback-link', authenticate, async (req, res) => {
+  const { id } = req.body;
+
+  try {
+    const [rows] = await pool.query('SELECT * FROM tab_responses WHERE id = ?', [id]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Nie znaleziono wpisu.' });
+    }
+
+    const feedback = rows[0];
+    const link = `${process.env.FRONTEND_URL}/formularz-feedback/${feedback.public_token}`;
+    const phone = feedback.caregiver_phone.startsWith('+') ? feedback.caregiver_phone : `+48${feedback.caregiver_phone}`;
+    const message = `Wypełnij formularz: ${link}`;
+
+    const result = await sendSmsViaSmsApi(phone, message);
+
+    if (result.success) {
+      res.json({
+        message: 'SMS został wysłany.',
+        ...result
+      });
+    } else {
+      res.status(500).json({
+        error: 'Nie udało się wysłać SMS-a.',
+        ...result
+      });
+    }
+  } catch (err) {
+    console.error('❌ Błąd przy wysyłce SMS:', err);
+    res.status(500).json({ error: 'Błąd przy wysyłce SMS.' });
+  }
+});
+
+app.get('/api/sms-logs', authenticate, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Brak dostępu' });
+  }
+
+  const {
+    page = 1,
+    pageSize = 20,
+    search = '',
+    sortBy = 'sent_at',
+    order = 'DESC'
+  } = req.query;
+
+  const allowedSortFields = ['sent_at', 'recipient_phone', 'status'];
+  const sortColumn = allowedSortFields.includes(sortBy) ? sortBy : 'sent_at';
+  const sortDirection = order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+
+  const offset = (parseInt(page) - 1) * parseInt(pageSize);
+  const like = `%${search}%`;
+
+  try {
+    const [rows] = await pool.query(
+      `
+      SELECT id, recipient_phone, message, status, smsapi_id, sent_at
+      FROM sms_logs
+      WHERE recipient_phone LIKE ? OR status LIKE ?
+      ORDER BY ${sortColumn} ${sortDirection}
+      LIMIT ? OFFSET ?
+      `,
+      [like, like, parseInt(pageSize), offset]
+    );
+
+    const [[{ count }]] = await pool.query(
+      `
+      SELECT COUNT(*) as count
+      FROM sms_logs
+      WHERE recipient_phone LIKE ? OR status LIKE ?
+      `,
+      [like, like]
+    );
+
+    res.json({ data: rows, total: count });
+  } catch (err) {
+    console.error('❌ Błąd przy pobieraniu sms_logs:', err);
+    res.status(500).json({ error: 'Błąd serwera przy pobieraniu logów SMS' });
+  }
+});
 
 // ---------------------- START SERVER ----------------------
 app.listen(port, () => {
