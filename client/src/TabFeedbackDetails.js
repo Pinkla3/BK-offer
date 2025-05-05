@@ -280,13 +280,13 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
   const [editedPatientLastName, setEditedPatientLastName] = useState('');
   const [showHistoryModal, setShowHistoryModal] = useState(false);
 
-  const fetchDetails = async () => {
+  const fetchDetails = async (id) => {
     try {
       const token = localStorage.getItem('token');
       const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/tabResponses`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      const match = res.data.find(r => r.id === selected.id);
+      const match = res.data.find(r => r.id === id);
       if (match) setEntry(match);
     } catch (err) {
       console.error('Błąd pobierania szczegółów feedbacku:', err);
@@ -294,13 +294,16 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
   };
 
   useEffect(() => {
-    fetchDetails();
+    if (!selected?.id) return;
+    fetchDetails(selected.id);
     const interval = setInterval(() => {
-      fetchDetails();
+      fetchDetails(selected.id);
     }, 10000);
 
     return () => clearInterval(interval);
-  }, [selected]);
+  }, [selected?.id]);
+
+  if (!entry) return <p style={{ padding: '2rem' }}>Ładowanie szczegółów...</p>;
 
   useEffect(() => {
 
