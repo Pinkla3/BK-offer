@@ -281,28 +281,6 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [entry, setEntry] = useState(null);
 
-  const fetchDetails = async (id) => {
-    try {
-      const token = localStorage.getItem('token');
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/tabResponses`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const match = res.data.find(r => r.id === id);
-      if (match) setEntry(match);
-    } catch (err) {
-      console.error('Błąd pobierania szczegółów feedbacku:', err);
-    }
-  };
-
-  useEffect(() => {
-    if (selected?.id) {
-      fetchDetails(selected.id);
-    }
-  }, [selected?.id]);
-
-  if (!entry) return <p style={{ padding: '2rem' }}>Ładowanie szczegółów...</p>;
-
-
   useEffect(() => {
 
     const handleFeedbackBack = () => {
@@ -482,6 +460,28 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
   if (loading) return <Wrapper><p>Ładowanie...</p></Wrapper>;
   if (error) return <Wrapper><p>{error}</p></Wrapper>;
 
+  const fetchDetails = async (id) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/tabResponses`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const match = res.data.find(r => r.id === id);
+      if (match) setEntry(match);
+    } catch (err) {
+      console.error('Błąd pobierania szczegółów feedbacku:', err);
+    }
+  };
+  
+  useEffect(() => {
+    if (selected?.id) {
+      fetchDetails(selected.id);
+    }
+  }, [selected?.id]);
+  
+  // 🔻 Dopiero tutaj warunek z return
+  if (!entry) return <p style={{ padding: '2rem' }}>Ładowanie szczegółów...</p>;
+  
   const questions = showGerman ? questionsDe : questionsPl;
   const answers = editing
     ? (showGerman ? editedAnswersDe : editedAnswers)
