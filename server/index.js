@@ -441,9 +441,8 @@ app.post('/api/reset-password', async (req, res) => {
       text: `Kliknij: ${link}\nLink ważny 1h.`
     });
     res.json({ message: 'Link resetujący został wysłany' });
-  }  catch (err) {
-    console.error('❌ Błąd resetu hasła:', err);
-    res.status(500).json({ error: 'Błąd resetu hasła', details: err.message });
+  } catch {
+    res.status(500).json({ error: 'Błąd serwera' });
   }
 });
 
@@ -775,7 +774,7 @@ app.post('/api/send-sms-feedback-link', authenticate, async (req, res) => {
     }
 
     const feedback = rows[0];
-    const link = `bk-offer.pl/formularz-feedback/${feedback.public_token}`;
+    const link = `${process.env.FRONTEND_URL}/formularz-feedback/${feedback.public_token}`;
     const phone = feedback.caregiver_phone.startsWith('+') ? feedback.caregiver_phone : `+48${feedback.caregiver_phone}`;
     const message = `Wypełnij formularz: ${link}`;
 
