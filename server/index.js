@@ -846,6 +846,26 @@ app.get('/api/sms-logs', authenticate, async (req, res) => {
   }
 });
 
+app.get('/api/public-feedback/:token', async (req, res) => {
+  const token = req.params.token;
+
+  try {
+    const [[feedback]] = await pool.query(
+      'SELECT * FROM tab_responses WHERE public_token = ?',
+      [token]
+    );
+
+    if (!feedback) {
+      return res.status(404).json({ error: 'Nie znaleziono formularza' });
+    }
+
+    res.json(feedback);
+  } catch (err) {
+    console.error('Błąd przy pobieraniu formularza publicznego:', err);
+    res.status(500).json({ error: 'Błąd serwera' });
+  }
+});
+
 // ---------------------- START SERVER ----------------------
 app.listen(port, () => {
   console.log(`Server działa na http://localhost:${port}`);
