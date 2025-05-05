@@ -441,8 +441,9 @@ app.post('/api/reset-password', async (req, res) => {
       text: `Kliknij: ${link}\nLink ważny 1h.`
     });
     res.json({ message: 'Link resetujący został wysłany' });
-  } catch {
-    res.status(500).json({ error: 'Błąd serwera' });
+  }  catch (err) {
+    console.error('❌ Błąd resetu hasła:', err);
+    res.status(500).json({ error: 'Błąd resetu hasła', details: err.message });
   }
 });
 
