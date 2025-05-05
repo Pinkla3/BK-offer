@@ -280,6 +280,19 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
   const [editedPatientLastName, setEditedPatientLastName] = useState('');
   const [showHistoryModal, setShowHistoryModal] = useState(false);
 
+  const fetchDetails = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/tabResponses`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const match = res.data.find(r => r.id === selected.id);
+      if (match) setEntry(match);
+    } catch (err) {
+      console.error('Błąd pobierania szczegółów feedbacku:', err);
+    }
+  };
+
   useEffect(() => {
     fetchDetails();
     const interval = setInterval(() => {
@@ -288,7 +301,7 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
 
     return () => clearInterval(interval);
   }, [selected]);
-  
+
   useEffect(() => {
 
     const handleFeedbackBack = () => {
