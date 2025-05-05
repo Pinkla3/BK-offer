@@ -1,20 +1,108 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import styled from 'styled-components';
 import axios from 'axios';
+import { useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
+// Reużyte style z TabFeedback
+const Wrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+`;
+
+const Container = styled.div`
+  padding: 5px;
+  width: 100%;
+  max-width: 800px;
+  position: relative;
+  z-index: 2;
+  border-radius: 12px;
+  box-sizing: border-box;
+`;
+
+const Title = styled.h2`
+  text-align: center;
+  width: 100%;
+  padding: 12px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  margin-top: 0;
+  margin-bottom: 20px;
+`;
+
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+`;
+
+const QuestionGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+`;
+
+const Label = styled.label`
+  font-weight: 600;
+  margin-bottom: 4px;
+`;
+
+const Input = styled.input`
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+`;
+
+const TextArea = styled.textarea`
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: vertical;
+`;
+
+const Button = styled.button`
+  width: 100%;
+  padding: 12px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background .2s;
+  &:hover { background: #0056b3; }
+`;
+
+const questions = [
+  '1. Jak BK ogólnie czuje się z klientem?',
+  '2. Jak została przyjęta przez pacjenta?',
+  '3. Jak wygląda współpraca z członkami rodziny?',
+  '4. Czy istnieją trudności w opiece nad pacjentem/pacjentką?',
+  '5. Czy dyżuruje służba pielęgniarska (Pflegedienst)?',
+  '6. Czy BK ma przerwy i czas wolny?',
+  '7. Czy wszystko jest dobrze zorganizowane?',
+  '8. Czy BK chciałby wrócić? Jeśli tak, w jakim rytmie? Jeśli nie, dlaczego nie?',
+  '9. W jaki sposób aktywizujesz seniora?',
+  '10. Czy jest coś, co klient lub firma Berlin Opieka może zoptymalizować?'
+];
 
 const PublicFeedbackForm = () => {
   const { token } = useParams();
-  const [data, setData] = useState(null);
   const [form, setForm] = useState({});
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchFeedback = async () => {
+    const load = async () => {
       try {
         const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/public-feedback/${token}`);
-        setData(res.data);
         setForm({
           q1: res.data.q1 || '',
           q2: res.data.q2 || '',
@@ -26,19 +114,20 @@ const PublicFeedbackForm = () => {
           q8: res.data.q8 || '',
           q9: res.data.q9 || '',
           q10: res.data.q10 || '',
-          notes: res.data.notes || '',
+          notes: res.data.notes || ''
         });
-      } catch (err) {
-        setError('Nie znaleziono formularza lub wystąpił błąd.');
+      } catch {
+        setError('❌ Nie znaleziono formularza lub wystąpił błąd.');
       } finally {
         setLoading(false);
       }
     };
-    fetchFeedback();
+    load();
   }, [token]);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -46,50 +135,46 @@ const PublicFeedbackForm = () => {
     try {
       await axios.patch(`${process.env.REACT_APP_API_URL}/api/public-feedback/${token}`, form);
       setSuccess(true);
+      toast.success('✅ Formularz został zapisany!');
     } catch (err) {
       console.error(err);
-      setError('Wystąpił błąd podczas zapisu.');
+      setError('❌ Błąd podczas zapisu formularza.');
     }
   };
 
-  if (loading) return <p className="p-4">Ładowanie...</p>;
-  if (error) return <p className="p-4 text-red-600">{error}</p>;
-  if (success) return <p className="p-4 text-green-600">✅ Formularz został zapisany. Dziękujemy!</p>;
+  if (loading) return <p style={{ padding: '2rem' }}>Ładowanie...</p>;
+  if (error) return <p style={{ padding: '2rem', color: 'red' }}>{error}</p>;
+  if (success) return <p style={{ padding: '2rem', color: 'green' }}>✅ Formularz został zapisany. Dziękujemy!</p>;
 
   return (
-    <div className="p-4 max-w-xl mx-auto">
-      <h2 className="text-xl font-semibold mb-4">Formularz oceny opiekunki</h2>
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {[...Array(10)].map((_, i) => (
-          <div key={`q${i + 1}`}>
-            <label className="block font-medium mb-1">Pytanie {i + 1}</label>
-            <input
-              type="text"
-              name={`q${i + 1}`}
-              value={form[`q${i + 1}`]}
+    <Wrapper>
+      <Container>
+        <Title>Formularz opinii</Title>
+        <Form onSubmit={handleSubmit}>
+          {questions.map((q, i) => (
+            <QuestionGroup key={i}>
+              <Label>{q}</Label>
+              {i === 4 ? (
+                <Input name={`q${i + 1}`} value={form[`q${i + 1}`]} onChange={handleChange} />
+              ) : (
+                <TextArea name={`q${i + 1}`} value={form[`q${i + 1}`]} onChange={handleChange} rows={3} />
+              )}
+            </QuestionGroup>
+          ))}
+          <QuestionGroup>
+            <Label>Notatka (opcjonalnie)</Label>
+            <TextArea
+              name="notes"
+              value={form.notes}
               onChange={handleChange}
-              className="w-full border rounded px-3 py-2"
-              required
+              rows={4}
+              placeholder="Wygląd okolicy, warunki mieszkalne, inne pozytywy"
             />
-          </div>
-        ))}
-
-        <div>
-          <label className="block font-medium mb-1">Uwagi (opcjonalnie)</label>
-          <textarea
-            name="notes"
-            value={form.notes}
-            onChange={handleChange}
-            className="w-full border rounded px-3 py-2"
-          />
-        </div>
-
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-          Wyślij
-        </button>
-      </form>
-    </div>
+          </QuestionGroup>
+          <Button type="submit">Zapisz odpowiedzi</Button>
+        </Form>
+      </Container>
+    </Wrapper>
   );
 };
 
