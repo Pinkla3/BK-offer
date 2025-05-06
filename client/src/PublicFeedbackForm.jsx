@@ -146,6 +146,7 @@ const PublicFeedbackForm = () => {
   if (error) return <p style={{ padding: '2rem', color: 'red' }}>{error}</p>;
   if (success) {
     return (
+      <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
       <div style={{ textAlign: 'center', marginTop: '3rem', padding: '1rem' }}>
         <a href="https://berlin-opiekunk.pl" target="_blank" rel="noopener noreferrer">
           <img
@@ -154,6 +155,7 @@ const PublicFeedbackForm = () => {
             style={{ maxWidth: '180px', marginBottom: '2rem' }}
           />
         </a>
+        </div>
         <h2 style={{ fontSize: '1.8rem', marginBottom: '1rem' }}>Gotowe!</h2>
         <p style={{ fontSize: '1.2rem', maxWidth: '600px', margin: '0 auto' }}>
           Dziękujemy za wypełnienie formularza. W przypadku zmian prosimy o kontakt z koordynatorem.
@@ -165,6 +167,7 @@ const PublicFeedbackForm = () => {
   return (
     <Wrapper>
       <Container>
+      <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
       <a href="https://berlin-opiekunk.pl" target="_blank" rel="noopener noreferrer">
       <img
         src="/images/logo.jpg" // lub własna ścieżka
@@ -172,6 +175,7 @@ const PublicFeedbackForm = () => {
         style={{ maxWidth: '160px', marginBottom: '2rem' }}
       />
     </a>
+    </div>
         <Title>Formularz opinii</Title>
         <Form onSubmit={handleSubmit}>
           {questions.map((q, i) => (
