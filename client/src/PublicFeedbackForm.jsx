@@ -149,7 +149,7 @@ const PublicFeedbackForm = () => {
       <div style={{ textAlign: 'center', marginTop: '3rem', padding: '1rem' }}>
         <a href="https://berlin-opiekunk.pl" target="_blank" rel="noopener noreferrer">
           <img
-            src="/logo192.png" // lub zamień na własną ścieżkę do logo
+            src="/images/logo.jpg" // lub zamień na własną ścieżkę do logo
             alt="Logo Berlin Opiekunek"
             style={{ maxWidth: '180px', marginBottom: '2rem' }}
           />
@@ -167,7 +167,7 @@ const PublicFeedbackForm = () => {
       <Container>
       <a href="https://berlin-opiekunk.pl" target="_blank" rel="noopener noreferrer">
       <img
-        src="/logo192.png" // lub własna ścieżka
+        src="/images/logo.jpg" // lub własna ścieżka
         alt="Logo Berlin Opiekunek"
         style={{ maxWidth: '160px', marginBottom: '2rem' }}
       />
