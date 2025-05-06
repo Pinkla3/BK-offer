@@ -193,7 +193,6 @@ const PublicFeedbackForm = () => {
 
   return (
     <Wrapper>
-      <Container>
       <div
           style={{
             backgroundColor: 'rgb(255, 255, 255)',
@@ -205,6 +204,8 @@ const PublicFeedbackForm = () => {
             boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
           }}
         >
+      <Container>
+      
       <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
       <a href="https://berlin-opiekunk.pl" target="_blank" rel="noopener noreferrer">
       <img
@@ -238,8 +239,9 @@ const PublicFeedbackForm = () => {
           </QuestionGroup>
           <Button type="submit">Zapisz odpowiedzi</Button>
         </Form>
-        </div>
+        
       </Container>
+      </div>
     </Wrapper>
   );
 };
