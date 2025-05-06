@@ -146,18 +146,27 @@ const PublicFeedbackForm = () => {
   if (error) return <p style={{ padding: '2rem', color: 'red' }}>{error}</p>;
   if (success) {
     return (
-      <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
-      <div style={{ textAlign: 'center', marginTop: '3rem', padding: '1rem' }}>
+      <div
+        style={{
+          minHeight: '100vh',
+          background: 'linear-gradient(to bottom right, #e0f2ff, #cce4f6)', // jasnoniebieski gradient
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '2rem',
+          textAlign: 'center',
+        }}
+      >
         <a href="https://berlin-opiekunk.pl" target="_blank" rel="noopener noreferrer">
           <img
-            src="/images/logo.jpg" // lub zamień na własną ścieżkę do logo
+            src="/images/logo"
             alt="Logo Berlin Opiekunek"
-            style={{ maxWidth: '180px', marginBottom: '2rem' }}
+            style={{ maxWidth: '160px', marginBottom: '2rem' }}
           />
         </a>
-        </div>
-        <h2 style={{ fontSize: '1.8rem', marginBottom: '1rem' }}>Gotowe!</h2>
-        <p style={{ fontSize: '1.2rem', maxWidth: '600px', margin: '0 auto' }}>
+        <h2 style={{ fontSize: '2rem', color: '#1a73e8', marginBottom: '1rem' }}>✅ Gotowe!</h2>
+        <p style={{ fontSize: '1.2rem', maxWidth: '600px', color: '#2c3e50' }}>
           Dziękujemy za wypełnienie formularza. W przypadku zmian prosimy o kontakt z koordynatorem.
         </p>
       </div>
