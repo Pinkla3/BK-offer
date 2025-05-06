@@ -50,11 +50,13 @@ const QuestionGroup = styled.div`
   display: flex;
   flex-direction: column;
   flex: 1;
+  align-items: flex-start;
 `;
 
 const Label = styled.label`
   font-weight: 600;
   margin-bottom: 4px;
+    text-align: left;
 `;
 
 const Input = styled.input`
@@ -184,8 +186,9 @@ const PublicFeedbackForm = () => {
           </a>
           <h2 style={{ fontSize: '2rem', color: '#2c3e50', marginBottom: '1rem' }}>✅ Gotowe!</h2>
           <p style={{ fontSize: '1.2rem', color: '#2c3e50' }}>
-            Dziękujemy za wypełnienie formularza. W przypadku zmian prosimy o kontakt z koordynatorem.
+            Dziękujemy za wypełnienie formularza. 
           </p>
+          <p>W przypadku zmian prosimy o kontakt z koordynatorem.</p>
         </div>
       </div>
     );
