@@ -135,7 +135,7 @@ const PublicFeedbackForm = () => {
     try {
       await axios.patch(`${process.env.REACT_APP_API_URL}/api/public-feedback/${token}`, form);
       setSuccess(true);
-      toast.success('✅ Formularz został zapisany!');
+      window.dispatchEvent(new Event('feedbackUpdated')); // 🔔 informuj panel admina
     } catch (err) {
       console.error(err);
       setError('❌ Błąd podczas zapisu formularza.');
@@ -144,11 +144,34 @@ const PublicFeedbackForm = () => {
 
   if (loading) return <p style={{ padding: '2rem' }}>Ładowanie...</p>;
   if (error) return <p style={{ padding: '2rem', color: 'red' }}>{error}</p>;
-  if (success) return <p style={{ padding: '2rem', color: 'green' }}>✅ Formularz został zapisany. Dziękujemy!</p>;
+  if (success) {
+    return (
+      <div style={{ textAlign: 'center', marginTop: '3rem', padding: '1rem' }}>
+        <a href="https://berlin-opiekunk.pl" target="_blank" rel="noopener noreferrer">
+          <img
+            src="/logo192.png" // lub zamień na własną ścieżkę do logo
+            alt="Logo Berlin Opiekunek"
+            style={{ maxWidth: '180px', marginBottom: '2rem' }}
+          />
+        </a>
+        <h2 style={{ fontSize: '1.8rem', marginBottom: '1rem' }}>Gotowe!</h2>
+        <p style={{ fontSize: '1.2rem', maxWidth: '600px', margin: '0 auto' }}>
+          Dziękujemy za wypełnienie formularza. W przypadku zmian prosimy o kontakt z koordynatorem.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <Wrapper>
       <Container>
+      <a href="https://berlin-opiekunk.pl" target="_blank" rel="noopener noreferrer">
+      <img
+        src="/logo192.png" // lub własna ścieżka
+        alt="Logo Berlin Opiekunek"
+        style={{ maxWidth: '160px', marginBottom: '2rem' }}
+      />
+    </a>
         <Title>Formularz opinii</Title>
         <Form onSubmit={handleSubmit}>
           {questions.map((q, i) => (

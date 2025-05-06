@@ -1,97 +1,105 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import TabFeedbackList from './TabFeedbackList';
 import TabFeedbackDetails from './TabFeedbackDetails';
-
+import { toast } from 'react-toastify';
 
 const TabFeedbackView = ({ resetSelected }) => {
-  const [responses, setResponses] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [step, setStep] = useState(1);
   const [selected, setSelected] = useState(null);
+  const [responses, setResponses] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/tabResponses`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
+      setResponses(res.data);
+    } catch (err) {
+      console.error('Błąd podczas pobierania danych:', err);
+      setError('Nie udało się załadować danych');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/tabResponses`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        });
-        setResponses(res.data);
-      } catch (err) {
-        setError('Błąd pobierania danych');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
   }, []);
 
-  useEffect(() => {
-    const handleFeedbackBack = () => {
-      setStep(1);
-      setSelected(null);
-      if (resetSelected) resetSelected(); // wyczyść stan w Dashboardzie
-    };
+  const handleNext = (entry) => {
+    setSelected(entry);
+    setStep(2);
+  };
 
-    window.addEventListener('feedbackBack', handleFeedbackBack);
-    return () => window.removeEventListener('feedbackBack', handleFeedbackBack);
-  }, [resetSelected]);
+  const handleAddResponse = (entry) => {
+    setSelected(entry);
+    setStep(2);
+  };
+
+  const handleFeedbackBack = async () => {
+    setSelected(null);
+    setStep(1);
+
+    try {
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/tabResponses`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
+      setResponses(res.data);
+      console.log('📥 Lista odświeżona po powrocie z widoku szczegółowego');
+    } catch (err) {
+      console.error('Błąd odświeżania po powrocie:', err);
+    }
+
+    if (resetSelected) resetSelected();
+  };
 
   useEffect(() => {
     const refreshList = async () => {
       try {
+        setLoading(true);
+        setError(null);
         const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/tabResponses`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
         });
         setResponses(res.data);
         console.log('✅ Feedback list refreshed');
       } catch (err) {
         console.error('❌ Błąd przy odświeżaniu feedbacków:', err);
+        setError('Błąd podczas odświeżania danych');
+      } finally {
+        setLoading(false);
       }
     };
-  
+
     const handleUpdate = () => {
       refreshList();
     };
-  
+
     window.addEventListener('feedbackUpdated', handleUpdate);
     return () => window.removeEventListener('feedbackUpdated', handleUpdate);
   }, []);
 
-  const handleNext = (item) => {
-    setSelected(item);
-    setStep(2);
-  };
-
-  const handleBack = () => {
-    setStep(1);
-    setSelected(null);
-    if (resetSelected) resetSelected(); // wyczyść stan w rodzicu
-  };
-  
-
-  if (loading) return <p style={{ padding: '40px' }}>Ładowanie...</p>;
-  if (error) return <p style={{ padding: '40px', color: 'red' }}>{error}</p>;
-
-  const handleAddResponse = (newEntry) => {
-    setResponses(prev => [newEntry, ...prev]);
-  };
-  
-  if (step === 1) {
-    return (
-      <TabFeedbackList
-        key={responses.length} // 🔁 wymuszenie rerenderowania po zmianie długości listy
-        responses={responses}
-        onSelect={handleNext}
-        onAdd={handleAddResponse}
-      />
-    );
-  }
-
   return (
-    <TabFeedbackDetails selected={selected} onBack={handleBack} setSelected={setSelected} />
+    <div>
+      {step === 1 ? (
+        <TabFeedbackList
+          key={JSON.stringify(responses.map((r) => r.edit_history))}
+          responses={responses}
+          onSelect={handleNext}
+          onAdd={handleAddResponse}
+        />
+      ) : (
+        <TabFeedbackDetails
+  selected={selected}
+  setSelected={setSelected}
+  onBack={handleFeedbackBack}
+/>
+      )}
+    </div>
   );
 };
 

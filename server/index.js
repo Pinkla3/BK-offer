@@ -783,7 +783,8 @@ app.post('/api/send-sms-feedback-link', authenticate, async (req, res) => {
     const link = `${process.env.FRONTEND_URL}/formularz-feedback/${feedback.public_token}`;
     console.log('🔗 Token do formularza:', feedback.public_token);
     const phone = feedback.caregiver_phone.startsWith('+') ? feedback.caregiver_phone : `+48${feedback.caregiver_phone}`;
-    const message = `Wypełnij formularz: ${link}`;
+    const message = `Dzień dobry, dziękujemy za zaufanie. Prosimy o wypenienie formularza: ${link}
+    Pozdrawiamy zespół Berlin Opieka 24`;
     console.log('🔗 Link:', link);
     const result = await sendSmsViaSmsApi(phone, message);
 
