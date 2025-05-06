@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { FaArrowLeft, FaEdit, FaSave, FaSpinner } from 'react-icons/fa';
+import { FaArrowLeft, FaEdit, FaSave, FaSpinner, FaSyncAlt } from 'react-icons/fa';
 import Modal from 'react-modal';
 
 const Wrapper = styled.div`
@@ -206,7 +206,34 @@ const SmallButton = styled(Button)`
     transform: none;
   }
 `;
+const SmallButtonRefresh = styled(Button)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  position: relative;
 
+  svg {
+    transition: transform 0.3s ease;
+  }
+
+  &:hover svg {
+    transform: rotate(90deg); /* 💫 obrót ikony */
+  }
+
+  &:disabled {
+    background: #ccc;
+    color: #666;
+    cursor: not-allowed;
+  }
+
+  &:disabled svg {
+    transform: none;
+  }
+`;
 const SpinnerIcon = styled(FaSpinner)`
   animation: spin 1s linear infinite;
   opacity: 0.8;
@@ -279,7 +306,6 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
   const [editedPatientFirstName, setEditedPatientFirstName] = useState('');
   const [editedPatientLastName, setEditedPatientLastName] = useState('');
   const [showHistoryModal, setShowHistoryModal] = useState(false);
-  const [entry, setEntry] = useState(null);
 
   useEffect(() => {
 
@@ -483,18 +509,17 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
             headers: { Authorization: `Bearer ${token}` }
           });
           const match = res.data.find(r => r.id === id);
-          if (match) setEntry(match);
+          if (match) {
+            setSelected(match); // 🔁 aktualizujemy selected
+            toast.success('Dane zostały odświeżone.');
+          } else {
+            toast.warn('Nie znaleziono wpisu.');
+          }
         } catch (err) {
           console.error('Błąd pobierania szczegółów feedbacku:', err);
+          toast.error('Błąd odświeżania danych.');
         }
       };
-    
-      useEffect(() => {
-        if (selected?.id) {
-          fetchDetails(selected.id);
-        }
-      }, [selected?.id]);
-
 
   return (
     <Wrapper>
@@ -506,19 +531,7 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
   </LeftButtons>
 
   <Title>Szczegóły odpowiedzi</Title>
-            <button
-              onClick={() => fetchDetails(selected.id)}
-              style={{
-                padding: '8px 12px',
-                background: '#007bff',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              Odśwież
-            </button>
+
   <RightButtons>
     {editing ? (
       <SmallButton onClick={handleSave} disabled={translating}>
@@ -596,7 +609,17 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
     </FieldItem>
   </FieldCard>
 </DetailSection>
-<CenteredSectionTitle>Feedback:</CenteredSectionTitle>
+<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+  <div style={{ width: '80px' }} /> {/* lewa przestrzeń */}
+
+  <Title style={{ textAlign: 'center', flex: 1 }}>Feedback</Title>
+
+  <SmallButtonRefresh onClick={() => fetchDetails(selected.id)}>
+    <FaSyncAlt style={{ transition: 'transform 0.3s ease' }} />
+    Odśwież
+  </SmallButtonRefresh>
+</div>
+
         <TabSection>
           <TabsBar>
             <TabButton active={!showGerman} onClick={() => setShowGerman(false)} disabled={translating}>Polski</TabButton>
