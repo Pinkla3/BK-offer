@@ -17,7 +17,7 @@ export default function TabSendSms() {
       const token = localStorage.getItem('token');
       await axios.post(`${process.env.REACT_APP_API_URL}/api/send-sms`, {
         phone,
-        message: 'Szczęśliwej podróży!'
+        message: 'Szczesliwej i bezpiecznej podrozy zyczy Berlin Opieka 24'
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -41,7 +41,7 @@ export default function TabSendSms() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <input
           type="text"
-          placeholder="Numer telefonu (np. 48123123123)"
+          placeholder="Numer telefonu (np. 577595055)"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           style={{
