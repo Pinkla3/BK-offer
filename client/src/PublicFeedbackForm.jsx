@@ -86,16 +86,16 @@ const Button = styled.button`
 `;
 
 const questions = [
-  '1. Jak BK ogólnie czuje się z klientem?',
-  '2. Jak została przyjęta przez pacjenta?',
+  '1. Jak ogólnie czuje się pan/pani z pacjentem/pacjentką?',
+  '2. Jak został/została pan/pani przyjęta przez pacjenta/pacjentkę?',
   '3. Jak wygląda współpraca z członkami rodziny?',
   '4. Czy istnieją trudności w opiece nad pacjentem/pacjentką?',
   '5. Czy dyżuruje służba pielęgniarska (Pflegedienst)?',
-  '6. Czy BK ma przerwy i czas wolny?',
-  '7. Czy wszystko jest dobrze zorganizowane?',
-  '8. Czy BK chciałby wrócić? Jeśli tak, w jakim rytmie? Jeśli nie, dlaczego nie?',
-  '9. W jaki sposób aktywizujesz seniora?',
-  '10. Czy jest coś, co klient lub firma Berlin Opieka może zoptymalizować?'
+  '6. Czy są przerwy i czas wolny?',
+  '7. Czy wszystko jest dobrze zorganizowane w kwesti budżetu domowego, planu dnia itd. ?',
+  '8. Czy chciałby pan/pani wrócić? Jeśli tak, w jakim rytmie? Jeśli nie, dlaczego nie?',
+  '9. W jaki sposób aktywizuje pan/pani pacjenta/pacjentkę?',
+  '10. Czy jest coś, co rodzina pacjenta/pacjentki lub firma Berlin Opieka 24 może zoptymalizować?'
 ];
 
 const PublicFeedbackForm = () => {
@@ -177,7 +177,7 @@ const PublicFeedbackForm = () => {
         >
           <a href="https://berlin-opiekunk.pl" target="_blank" rel="noopener noreferrer">
             <img
-              src="/images/logo"
+              src="/images/logo.jpg"
               alt="Logo Berlin Opiekunek"
               style={{ maxWidth: '160px', marginBottom: '1.5rem' }}
             />
