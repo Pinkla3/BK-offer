@@ -13,6 +13,7 @@ import TabFeedback from './TabFeedback';
 import TabFeedbackView from './TabFeedbackView';
 import { FaPlus, FaDatabase, FaLock, FaClipboardList, FaTag } from 'react-icons/fa';
 import TabSmsLogs from './TabSmsLogs';
+import TabSendSms from './TabSendSms';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL;
 
@@ -199,6 +200,9 @@ const Dashboard = () => {
           />
         );
         break;
+        case 'sendSms':
+  content = <TabSendSms />;
+  break;
     case 'password':
       content = <TabChangePassword />;
       break;
@@ -225,6 +229,9 @@ const Dashboard = () => {
           <SidebarButton $active={activeTab==='cases'} onClick={()=>setActiveTab('cases')}><FaClipboardList size={18}/>Podgląd spraw bieżących</SidebarButton>
           <SidebarButton $active={activeTab==='feedback'} onClick={()=>setActiveTab('feedback')}><FaPlus size={18}/> Dodaj feedback</SidebarButton>
           <SidebarButton $active={activeTab==='responses'} onClick={handleFeedbackListClick}><FaTag size={18}/> Podgląd feedbacków</SidebarButton>
+          <SidebarButton $active={activeTab==='sendSms'} onClick={()=>setActiveTab('sendSms')}>
+  <FaTag size={18}/> Wyślij SMS
+</SidebarButton>
           <SidebarButton $active={activeTab==='password'} onClick={()=>setActiveTab('password')}><FaLock size={18}/> Zmiana hasła</SidebarButton>
           {user?.role === 'admin' && (
   <SidebarButton $active={activeTab === 'smsLogs'} onClick={() => setActiveTab('smsLogs')}>
