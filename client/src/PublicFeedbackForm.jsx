@@ -132,9 +132,75 @@ const PublicFeedbackForm = () => {
         });
       } catch (err) {
         if (err.response && err.response.status === 410) {
-          setError('⚠️ Link wygasł. Prosimy o kontakt z koordynatorem.');
+          setError(<div
+            style={{
+              minHeight: '100vh',
+              backgroundImage: 'url("/images/background.jfif")',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              padding: '2rem',
+            }}
+          >
+            <div
+              style={{
+                backgroundColor: 'rgb(255, 255, 255)',
+                padding: '2rem',
+                borderRadius: '12px',
+                maxWidth: '600px',
+                width: '100%',
+                textAlign: 'center',
+                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+              }}
+            >
+              <a href="https://berlin-opiekunki.pl" target="_blank" rel="noopener noreferrer">
+                <img
+                  src="/images/logo.jpg"
+                  alt="Logo Berlin Opiekunek"
+                  style={{ maxWidth: '160px', marginBottom: '1.5rem' }}
+                />
+              </a>
+              <h2 style={{ fontSize: '2rem', color: '#FF0000', marginBottom: '1rem' }}>⚠️ Link wygasł.</h2>
+              <p> Prosimy o kontakt z koordynatorem.</p>
+            </div>
+          </div>);
         } else {
-          setError('❌ Nie znaleziono formularza lub wystąpił błąd.');
+          setError(<div
+            style={{
+              minHeight: '100vh',
+              backgroundImage: 'url("/images/background.jfif")',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              padding: '2rem',
+            }}
+          >
+            <div
+              style={{
+                backgroundColor: 'rgb(255, 255, 255)',
+                padding: '2rem',
+                borderRadius: '12px',
+                maxWidth: '600px',
+                width: '100%',
+                textAlign: 'center',
+                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+              }}
+            >
+              <a href="https://berlin-opiekunki.pl" target="_blank" rel="noopener noreferrer">
+                <img
+                  src="/images/logo.jpg"
+                  alt="Logo Berlin Opiekunek"
+                  style={{ maxWidth: '160px', marginBottom: '1.5rem' }}
+                />
+              </a>
+              <h2 style={{ fontSize: '2rem', color: '#FF0000', marginBottom: '1rem' }}>❌ Nie znaleziono formularza lub wystąpił błąd.</h2>
+              <p> Prosimy o kontakt.</p>
+            </div>
+          </div>);
         }
       } finally {
         setLoading(false);
