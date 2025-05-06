@@ -80,7 +80,14 @@ const TabFeedbackView = ({ resetSelected }) => {
   };
   
   if (step === 1) {
-    return <TabFeedbackList responses={responses} onSelect={handleNext} onAdd={handleAddResponse} />;
+    return (
+      <TabFeedbackList
+        key={responses.length} // 🔁 wymuszenie rerenderowania po zmianie długości listy
+        responses={responses}
+        onSelect={handleNext}
+        onAdd={handleAddResponse}
+      />
+    );
   }
 
   return (
