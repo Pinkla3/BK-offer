@@ -78,16 +78,19 @@ const TextArea = styled.textarea`
 `;
 
 const Button = styled.button`
-  width: 100%;
-  padding: 12px;
+  padding: 12px 24px;
   background-color: #007bff;
   color: #fff;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  margin-top: 10px;
-  transition: background .2s;
-  &:hover { background: #0056b3; }
+  margin-top: 20px;
+  align-self: center;
+  width: fit-content;
+  transition: background 0.2s;
+  &:hover {
+    background-color: #0056b3;
+  }
 `;
 
 const questions = [
