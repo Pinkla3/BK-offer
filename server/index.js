@@ -925,7 +925,7 @@ app.patch('/api/public-feedback/:token', async (req, res) => {
 app.post('/api/send-feedback-notification', async (req, res) => {
   try {
     const mailOptions = {
-      to: 'it.berlin-opiekunki@gmail.com',
+      to: 'it.berlinopiekunki@gmail.com',
       from: process.env.EMAIL_USER, // desk.berlinopiekunki@gmail.com
       subject: 'Nowy feedback od opiekunki',
       text: 'Dodano feedback. Zaloguj się do desk.berlin-opiekunki.pl by sprawdzić jego treść.'
