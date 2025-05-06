@@ -77,11 +77,15 @@ const getLastEditInfo = (entry) => {
   try {
     const edits = JSON.parse(entry.edit_history || '[]');
     if (!Array.isArray(edits) || edits.length === 0) return null;
+
     const last = edits[edits.length - 1];
-    const match = last.match(/przez ([^ ]+) dnia (\d{2})\.(\d{2})\.(\d{4})/);
+    const match = last.match(/przez\s+(.+?)\s+dnia\s+(\d{1,2})\.(\d{1,2})\.(\d{4})/i);
     if (!match) return null;
+
     const [, user, dd, mm, yyyy] = match;
-    return { user, date: `${dd}.${mm}.${yyyy}` };
+    const day = dd.padStart(2, '0');
+    const month = mm.padStart(2, '0');
+    return { user, date: `${day}.${month}.${yyyy}` };
   } catch {
     return null;
   }
@@ -264,7 +268,9 @@ const TabFeedbackList = ({ responses: initialResponses, onSelect, onAdd }) => {
                   <td style={cellStyle}>{r.patient_first_name} {r.patient_last_name}</td>
                   <td style={cellStyle}>{r.caregiver_phone}</td>
                   <td style={cellStyle}>{new Date(r.created_at).toLocaleDateString('pl-PL')}</td>
-                  <td style={cellStyle}>{lastEditInfo ? `${lastEditInfo.user}, ${lastEditInfo.date}` : '—'}</td>
+                  <td style={cellStyle}>
+  {lastEditInfo ? `Edytowano przez ${lastEditInfo.user} dnia ${lastEditInfo.date}` : '—'}
+</td>
                   <td style={{ ...cellStyle, textAlign: 'center' }}>
                     <button onClick={(e) => handleDelete(r.id, e)} style={deleteBtnStyle} title="Usuń">
                       <FaTrash />
