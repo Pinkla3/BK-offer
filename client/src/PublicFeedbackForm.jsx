@@ -148,6 +148,7 @@ const PublicFeedbackForm = () => {
     e.preventDefault();
     try {
       await axios.patch(`${process.env.REACT_APP_API_URL}/api/public-feedback/${token}`, form);
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/send-feedback-notification`);
       setSuccess(true);
       window.dispatchEvent(new Event('feedbackUpdated')); // 🔔 informuj panel admina
     } catch (err) {
@@ -183,7 +184,7 @@ const PublicFeedbackForm = () => {
             boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
           }}
         >
-          <a href="https://berlin-opiekunk.pl" target="_blank" rel="noopener noreferrer">
+          <a href="https://berlin-opiekunki.pl" target="_blank" rel="noopener noreferrer">
             <img
               src="/images/logo.jpg"
               alt="Logo Berlin Opiekunek"
@@ -216,7 +217,7 @@ const PublicFeedbackForm = () => {
       <Container>
       
       <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
-      <a href="https://berlin-opiekunk.pl" target="_blank" rel="noopener noreferrer">
+      <a href="https://berlin-opiekunki.pl" target="_blank" rel="noopener noreferrer">
       <img
         src="/images/logo.jpg" // lub własna ścieżka
         alt="Logo Berlin Opiekunek"

@@ -921,6 +921,24 @@ app.patch('/api/public-feedback/:token', async (req, res) => {
     res.status(500).json({ error: 'Błąd serwera przy zapisie publicznego formularza' });
   }
 });
+
+app.post('/api/send-feedback-notification', async (req, res) => {
+  try {
+    const mailOptions = {
+      to: 'it.berlin-opiekunki@gmail.com',
+      from: process.env.EMAIL_USER, // desk.berlinopiekunki@gmail.com
+      subject: 'Nowy feedback od opiekunki',
+      text: 'Dodano feedback. Zaloguj się do desk.berlin-opiekunki.pl by sprawdzić jego treść.'
+    };
+
+    await transporter.sendMail(mailOptions);
+    res.json({ message: 'Email został wysłany.' });
+  } catch (err) {
+    console.error('❌ Błąd wysyłki powiadomienia:', err);
+    res.status(500).json({ error: 'Nie udało się wysłać powiadomienia e-mail.' });
+  }
+});
+
 // ---------------------- START SERVER ----------------------
 app.listen(port, () => {
   console.log(`Server działa na http://localhost:${port}`);
