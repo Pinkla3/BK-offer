@@ -783,8 +783,8 @@ app.post('/api/send-sms-feedback-link', authenticate, async (req, res) => {
     const link = `${process.env.FRONTEND_URL}/formularz-feedback/${feedback.public_token}`;
     console.log('🔗 Token do formularza:', feedback.public_token);
     const phone = feedback.caregiver_phone.startsWith('+') ? feedback.caregiver_phone : `+48${feedback.caregiver_phone}`;
-    const message = `Dzień dobry, dziękujemy za zaufanie. Prosimy o wypenienie formularza: ${link}
-    Pozdrawiamy zespół Berlin Opieka 24`;
+    const message = `Dzien dobry, dziekujemy za zaufanie. Prosimy o wypenienie formularza: ${link}
+    Pozdrawiamy Berlin Opieka 24`;
     console.log('🔗 Link:', link);
     const result = await sendSmsViaSmsApi(phone, message);
 
@@ -866,6 +866,14 @@ app.get('/api/public-feedback/:token', async (req, res) => {
       return res.status(404).json({ error: 'Nie znaleziono formularza' });
     }
 
+    const createdAt = new Date(feedback.public_token_created_at);
+    const now = new Date();
+    const diffDays = (now - createdAt) / (1000 * 60 * 60 * 24);
+
+    if (diffDays > 3) {
+      return res.status(410).json({ error: 'Link wygasł' });
+    }
+
     res.json(feedback);
   } catch (err) {
     console.error('❌ Błąd przy pobieraniu formularza publicznego:', err);
@@ -880,14 +888,20 @@ app.patch('/api/public-feedback/:token', async (req, res) => {
     const [[entry]] = await pool.query('SELECT * FROM tab_responses WHERE public_token = ?', [token]);
     if (!entry) return res.status(404).json({ error: 'Nie znaleziono formularza' });
 
+    const createdAt = new Date(entry.public_token_created_at);
     const now = new Date();
+    const diffDays = (now - createdAt) / (1000 * 60 * 60 * 24);
+
+    if (diffDays > 3) {
+      return res.status(410).json({ error: 'Link wygasł' });
+    }
+
     const dd = String(now.getDate()).padStart(2, '0');
     const mm = String(now.getMonth() + 1).padStart(2, '0');
     const yyyy = now.getFullYear();
     const hh = String(now.getHours()).padStart(2, '0');
     const min = String(now.getMinutes()).padStart(2, '0');
     const ss = String(now.getSeconds()).padStart(2, '0');
-
     const formattedDateTime = `${dd}.${mm}.${yyyy}, ${hh}:${min}:${ss}`;
     const historyEntry = `Edytowano przez Opiekunkę dnia ${formattedDateTime}`;
 

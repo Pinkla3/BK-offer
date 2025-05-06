@@ -130,8 +130,12 @@ const PublicFeedbackForm = () => {
           q10: res.data.q10 || '',
           notes: res.data.notes || ''
         });
-      } catch {
-        setError('❌ Nie znaleziono formularza lub wystąpił błąd.');
+      } catch (err) {
+        if (err.response && err.response.status === 410) {
+          setError('⚠️ Link wygasł. Prosimy o kontakt z koordynatorem.');
+        } else {
+          setError('❌ Nie znaleziono formularza lub wystąpił błąd.');
+        }
       } finally {
         setLoading(false);
       }
