@@ -1,78 +1,135 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import styled from 'styled-components';
+import axios from 'axios';
+import { useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
-const Title = styled.h1`
+// Reużyte style z TabFeedback
+const Wrapper = styled.div`
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  background-image: url('/images/background.jfif');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+`;
+
+const Container = styled.div`
+  padding: 5px;
+  width: 100%;
+  max-width: 800px;
+  position: relative;
+  z-index: 2;
+  border-radius: 12px;
+  box-sizing: border-box;
+`;
+
+const Title = styled.h2`
   text-align: center;
-  margin-bottom: 1.5rem;
+  width: 100%;
+  padding: 12px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  margin-top: 0;
+  margin-bottom: 20px;
 `;
 
 const Form = styled.form`
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 16px;
+`;
+
+const QuestionGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+`;
+
+const Label = styled.label`
+  font-weight: 600;
+  margin-bottom: 4px;
 `;
 
 const Input = styled.input`
-  padding: 0.5rem;
-  border-radius: 4px;
+  padding: 8px;
+  font-size: 14px;
   border: 1px solid #ccc;
+  border-radius: 4px;
 `;
 
-const Textarea = styled.textarea`
-  padding: 0.5rem;
-  border-radius: 4px;
+const TextArea = styled.textarea`
+  padding: 8px;
+  font-size: 14px;
   border: 1px solid #ccc;
+  border-radius: 4px;
   resize: vertical;
 `;
 
 const Button = styled.button`
-  padding: 0.75rem;
-  background-color: #1a73e8;
-  color: white;
+  width: 100%;
+  padding: 12px;
+  background-color: #007bff;
+  color: #fff;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 1rem;
-  &:hover {
-    background-color: #1669c1;
-  }
+  margin-top: 10px;
+  transition: background .2s;
+  &:hover { background: #0056b3; }
 `;
 
+const questions = [
+  '1. Jak BK ogólnie czuje się z klientem?',
+  '2. Jak została przyjęta przez pacjenta?',
+  '3. Jak wygląda współpraca z członkami rodziny?',
+  '4. Czy istnieją trudności w opiece nad pacjentem/pacjentką?',
+  '5. Czy dyżuruje służba pielęgniarska (Pflegedienst)?',
+  '6. Czy BK ma przerwy i czas wolny?',
+  '7. Czy wszystko jest dobrze zorganizowane?',
+  '8. Czy BK chciałby wrócić? Jeśli tak, w jakim rytmie? Jeśli nie, dlaczego nie?',
+  '9. W jaki sposób aktywizujesz seniora?',
+  '10. Czy jest coś, co klient lub firma Berlin Opieka może zoptymalizować?'
+];
+
 const PublicFeedbackForm = () => {
+  const { token } = useParams();
   const [form, setForm] = useState({});
-  const [token, setToken] = useState('');
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
-  const questions = [
-    'Czy opiekunka była punktualna i zorganizowana?',
-    'Czy opiekunka miała dobre relacje z podopiecznym?',
-    'Czy opiekunka utrzymywała czystość w domu?',
-    'Czy opiekunka dbała o higienę podopiecznego?',
-    'Czy opiekunka przygotowywała posiłki zgodnie z wymaganiami?',
-    'Czy opiekunka była pomocna i uprzejma?',
-    'Czy opiekunka informowała rodzinę o stanie podopiecznego?',
-    'Czy opiekunka radziła sobie w trudnych sytuacjach?',
-    'Czy opiekunka była komunikatywna?',
-    'Czy ogólnie jesteście Państwo zadowoleni z pracy opiekunki?'
-  ];
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    const parts = window.location.pathname.split('/');
-    const tokenFromUrl = parts[parts.length - 1];
-    setToken(tokenFromUrl);
-
-    axios.get(`${process.env.REACT_APP_API_URL}/api/public-feedback/${tokenFromUrl}`)
-      .then(res => {
-        setForm(res.data || {});
+    const load = async () => {
+      try {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/public-feedback/${token}`);
+        setForm({
+          q1: res.data.q1 || '',
+          q2: res.data.q2 || '',
+          q3: res.data.q3 || '',
+          q4: res.data.q4 || '',
+          q5: res.data.q5 || '',
+          q6: res.data.q6 || '',
+          q7: res.data.q7 || '',
+          q8: res.data.q8 || '',
+          q9: res.data.q9 || '',
+          q10: res.data.q10 || '',
+          notes: res.data.notes || ''
+        });
+      } catch {
+        setError('❌ Nie znaleziono formularza lub wystąpił błąd.');
+      } finally {
         setLoading(false);
-      })
-      .catch(() => {
-        setError('Nie znaleziono formularza lub wystąpił błąd.');
-        setLoading(false);
-      });
-  }, []);
+      }
+    };
+    load();
+  }, [token]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -84,91 +141,106 @@ const PublicFeedbackForm = () => {
     try {
       await axios.patch(`${process.env.REACT_APP_API_URL}/api/public-feedback/${token}`, form);
       setSuccess(true);
-      window.dispatchEvent(new Event('feedbackUpdated'));
+      window.dispatchEvent(new Event('feedbackUpdated')); // 🔔 informuj panel admina
     } catch (err) {
-      setError('Wystąpił błąd podczas zapisu formularza.');
+      console.error(err);
+      setError('❌ Błąd podczas zapisu formularza.');
     }
   };
 
   if (loading) return <p style={{ padding: '2rem' }}>Ładowanie...</p>;
   if (error) return <p style={{ padding: '2rem', color: 'red' }}>{error}</p>;
-
   if (success) {
     return (
-      <div style={{
-        backgroundImage: 'url("/images/background.jfif")',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        minHeight: '100vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: '20px',
-      }}>
-        <div style={{
-          width: '100%',
-          maxWidth: '800px',
-          background: '#fff',
-          padding: '30px',
-          borderRadius: '12px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-          textAlign: 'center'
-        }}>
+      <div
+        style={{
+          minHeight: '100vh',
+          backgroundImage: 'url("/images/background.jfif")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: '2rem',
+        }}
+      >
+        <div
+          style={{
+            backgroundColor: 'rgb(255, 255, 255)',
+            padding: '2rem',
+            borderRadius: '12px',
+            maxWidth: '600px',
+            width: '100%',
+            textAlign: 'center',
+            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+          }}
+        >
           <a href="https://berlin-opiekunk.pl" target="_blank" rel="noopener noreferrer">
-            <img src="/images/logo" alt="Logo" style={{ maxWidth: '160px', marginBottom: '2rem' }} />
+            <img
+              src="/images/logo"
+              alt="Logo Berlin Opiekunek"
+              style={{ maxWidth: '160px', marginBottom: '1.5rem' }}
+            />
           </a>
-          <h2 style={{ color: '#1a73e8' }}>✅ Gotowe!</h2>
-          <p>Dziękujemy za wypełnienie formularza. W przypadku zmian prosimy o kontakt z koordynatorem.</p>
+          <h2 style={{ fontSize: '2rem', color: '#2c3e50', marginBottom: '1rem' }}>✅ Gotowe!</h2>
+          <p style={{ fontSize: '1.2rem', color: '#2c3e50' }}>
+            Dziękujemy za wypełnienie formularza. W przypadku zmian prosimy o kontakt z koordynatorem.
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div style={{
-      backgroundImage: 'url("/images/background.jfif")',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      minHeight: '100vh',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: '20px',
-    }}>
-      <div style={{
-        width: '100%',
-        maxWidth: '800px',
-        background: '#fff',
-        padding: '30px',
-        borderRadius: '12px',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-      }}>
-        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-          <a href="https://berlin-opiekunk.pl" target="_blank" rel="noopener noreferrer">
-            <img src="/images/logo" alt="Logo" style={{ maxWidth: '160px' }} />
-          </a>
-        </div>
+    <Wrapper>
+      <Container>
+      <div
+          style={{
+            backgroundColor: 'rgb(255, 255, 255)',
+            padding: '2rem',
+            borderRadius: '12px',
+            maxWidth: '600px',
+            width: '100%',
+            textAlign: 'center',
+            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+          }}
+        >
+      <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
+      <a href="https://berlin-opiekunk.pl" target="_blank" rel="noopener noreferrer">
+      <img
+        src="/images/logo.jpg" // lub własna ścieżka
+        alt="Logo Berlin Opiekunek"
+        style={{ maxWidth: '160px', marginBottom: '2rem' }}
+      />
+    </a>
+    </div>
         <Title>Formularz opinii</Title>
         <Form onSubmit={handleSubmit}>
-          {questions.map((question, i) => (
-            <div key={i}>
-              <label>{question}</label>
-              <Textarea
-                name={`q${i + 1}`}
-                value={form[`q${i + 1}`] || ''}
-                onChange={handleChange}
-                rows="3"
-              />
-            </div>
+          {questions.map((q, i) => (
+            <QuestionGroup key={i}>
+              <Label>{q}</Label>
+              {i === 4 ? (
+                <Input name={`q${i + 1}`} value={form[`q${i + 1}`]} onChange={handleChange} />
+              ) : (
+                <TextArea name={`q${i + 1}`} value={form[`q${i + 1}`]} onChange={handleChange} rows={3} />
+              )}
+            </QuestionGroup>
           ))}
-
-          <label>Uwagi</label>
-          <Textarea name="notes" value={form.notes || ''} onChange={handleChange} rows="4" />
-
+          <QuestionGroup>
+            <Label>Notatka (opcjonalnie)</Label>
+            <TextArea
+              name="notes"
+              value={form.notes}
+              onChange={handleChange}
+              rows={4}
+              placeholder="Wygląd okolicy, warunki mieszkalne, inne pozytywy"
+            />
+          </QuestionGroup>
           <Button type="submit">Zapisz odpowiedzi</Button>
         </Form>
-      </div>
-    </div>
+        </div>
+      </Container>
+    </Wrapper>
   );
 };
 
