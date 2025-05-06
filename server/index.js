@@ -780,11 +780,26 @@ app.post('/api/send-sms-feedback-link', authenticate, async (req, res) => {
     }
 
     const feedback = rows[0];
-    const link = `${process.env.FRONTEND_URL}/formularz-feedback/${feedback.public_token}`;
-    console.log('🔗 Token do formularza:', feedback.public_token);
+
+    // 🔐 Wygeneruj token, jeśli nie istnieje
+    let token = feedback.public_token;
+    if (!token) {
+      token = crypto.randomUUID();
+    }
+
+    // ⏱ Zapisz token i datę utworzenia
+    await pool.query(
+      'UPDATE tab_responses SET public_token = ?, public_token_created_at = NOW() WHERE id = ?',
+      [token, id]
+    );
+
+    const link = `${process.env.FRONTEND_URL}/formularz-feedback/${token}`;
+    console.log('🔗 Token do formularza:', token);
+
     const phone = feedback.caregiver_phone.startsWith('+') ? feedback.caregiver_phone : `+48${feedback.caregiver_phone}`;
-    const message = `Dzien dobry, dziekujemy za zaufanie. Prosimy o wypenienie formularza: ${link}
-    Pozdrawiamy Berlin Opieka 24`;
+    const message = `Dzien dobry, dziekujemy za zaufanie. Prosimy o wypełnienie formularza: ${link}
+Pozdrawiamy, Berlin Opieka 24`;
+
     console.log('🔗 Link:', link);
     const result = await sendSmsViaSmsApi(phone, message);
 

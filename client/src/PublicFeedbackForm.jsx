@@ -228,7 +228,7 @@ const PublicFeedbackForm = () => {
   };
 
   if (loading) return <p style={{ padding: '2rem' }}>Ładowanie...</p>;
-  if (error) return <p style={{ padding: '2rem', color: 'red' }}>{error}</p>;
+  if (error) return error;
   if (success) {
     return (
       <div
