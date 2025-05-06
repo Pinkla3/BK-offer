@@ -602,37 +602,44 @@ app.post('/api/translate', authenticate, async (req, res) => {
     return res.status(502).json({ error: 'Błąd tłumaczenia' });
   }
 });
+
 app.patch('/api/tabResponses/:id', authenticate, async (req, res) => {
   const { id } = req.params;
-  const updates = req.body; 
+  const updates = req.body;
 
   try {
     const now = new Date();
+
+    // Ręczne formatowanie daty i godziny
+    const dd = String(now.getDate()).padStart(2, '0');
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const yyyy = now.getFullYear();
+    const hh = String(now.getHours()).padStart(2, '0');
+    const min = String(now.getMinutes()).padStart(2, '0');
+    const ss = String(now.getSeconds()).padStart(2, '0');
+
+    const formattedDateTime = `${dd}.${mm}.${yyyy}, ${hh}:${min}:${ss}`;
     const [[userRow]] = await pool.query('SELECT name FROM users WHERE id = ?', [req.user.id]);
     const userName = userRow ? userRow.name : 'nieznany użytkownik';
-    const historyEntry = `Edytowano przez ${userName} dnia ${now.toLocaleString()}`;
-  
+    const historyEntry = `Edytowano przez ${userName} dnia ${formattedDateTime}`;
+
     const [rows] = await pool.query('SELECT edit_history FROM tab_responses WHERE id = ?', [id]);
-  
     if (rows.length === 0) {
       return res.status(404).json({ error: 'Nie znaleziono odpowiedzi' });
     }
-  
+
     const current = rows[0];
     let updatedHistory = [];
-  
+
     if (current.edit_history) {
       try {
         updatedHistory = JSON.parse(current.edit_history);
-        if (!Array.isArray(updatedHistory)) {
-          updatedHistory = [];
-        }
-      } catch (err) {
-        console.error('Niepoprawny JSON w edit_history:', err);
+        if (!Array.isArray(updatedHistory)) updatedHistory = [];
+      } catch {
         updatedHistory = [];
       }
     }
-  
+
     updatedHistory.push(historyEntry);
 
     const [result] = await pool.query(`
@@ -664,7 +671,6 @@ app.patch('/api/tabResponses/:id', authenticate, async (req, res) => {
     }
 
     const [[updated]] = await pool.query('SELECT * FROM tab_responses WHERE id = ?', [id]);
-
     res.json(updated);
 
   } catch (err) {
@@ -873,9 +879,16 @@ app.patch('/api/public-feedback/:token', async (req, res) => {
     const [[entry]] = await pool.query('SELECT * FROM tab_responses WHERE public_token = ?', [token]);
     if (!entry) return res.status(404).json({ error: 'Nie znaleziono formularza' });
 
-    // 🕒 Dodaj wpis do historii edycji
     const now = new Date();
-    const historyEntry = `Edytowano przez Opiekunkę dnia ${now.toLocaleDateString('pl-PL')}, ${now.toLocaleTimeString('pl-PL')}`;
+    const dd = String(now.getDate()).padStart(2, '0');
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const yyyy = now.getFullYear();
+    const hh = String(now.getHours()).padStart(2, '0');
+    const min = String(now.getMinutes()).padStart(2, '0');
+    const ss = String(now.getSeconds()).padStart(2, '0');
+
+    const formattedDateTime = `${dd}.${mm}.${yyyy}, ${hh}:${min}:${ss}`;
+    const historyEntry = `Edytowano przez Opiekunkę dnia ${formattedDateTime}`;
 
     let updatedHistory = [];
     if (entry.edit_history) {
@@ -892,7 +905,6 @@ app.patch('/api/public-feedback/:token', async (req, res) => {
     const fields = Object.keys(updates);
     const values = Object.values(updates);
 
-    // Dołączamy `edit_history` do aktualizacji
     fields.push('edit_history');
     values.push(JSON.stringify(updatedHistory));
 

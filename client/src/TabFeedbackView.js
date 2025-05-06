@@ -39,6 +39,27 @@ const TabFeedbackView = ({ resetSelected }) => {
     return () => window.removeEventListener('feedbackBack', handleFeedbackBack);
   }, [resetSelected]);
 
+  useEffect(() => {
+    const refreshList = async () => {
+      try {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/tabResponses`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        });
+        setResponses(res.data);
+        console.log('✅ Feedback list refreshed');
+      } catch (err) {
+        console.error('❌ Błąd przy odświeżaniu feedbacków:', err);
+      }
+    };
+  
+    const handleUpdate = () => {
+      refreshList();
+    };
+  
+    window.addEventListener('feedbackUpdated', handleUpdate);
+    return () => window.removeEventListener('feedbackUpdated', handleUpdate);
+  }, []);
+
   const handleNext = (item) => {
     setSelected(item);
     setStep(2);

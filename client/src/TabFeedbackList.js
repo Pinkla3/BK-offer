@@ -79,18 +79,17 @@ const getLastEditInfo = (entry) => {
     if (!Array.isArray(edits) || edits.length === 0) return null;
 
     const last = edits[edits.length - 1];
-    const match = last.match(/przez\s+(.+?)\s+dnia\s+(\d{1,2})\.(\d{1,2})\.(\d{4})/i);
+
+    // 🎯 Obsługuje format z godziną po przecinku
+    const match = last.match(/Edytowano przez\s+(.+?)\s+dnia\s+(\d{2})\.(\d{2})\.(\d{4}),?/i);
     if (!match) return null;
 
     const [, user, dd, mm, yyyy] = match;
-    const day = dd.padStart(2, '0');
-    const month = mm.padStart(2, '0');
-    return { user, date: `${day}.${month}.${yyyy}` };
+    return { user, date: `${dd}.${mm}.${yyyy}` };
   } catch {
     return null;
   }
 };
-
 const ITEMS_PER_PAGE = 10;
 
 const TabFeedbackList = ({ responses: initialResponses, onSelect, onAdd }) => {
@@ -103,20 +102,21 @@ const TabFeedbackList = ({ responses: initialResponses, onSelect, onAdd }) => {
   const [isAdding, setIsAdding] = useState(false);
 
   useEffect(() => {
-    const interval = setInterval(async () => {
+    const handleRefresh = async () => {
       try {
         const token = localStorage.getItem('token');
         const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/tabResponses`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setResponses(res.data);
-        console.log('🔁 Odświeżono dane feedbacków');
+        console.log('🔄 Dane feedbacków zaktualizowane po edycji');
       } catch (err) {
         console.warn('Błąd odświeżania feedbacków:', err);
       }
-    }, 10000);
-
-    return () => clearInterval(interval);
+    };
+  
+    window.addEventListener('feedbackUpdated', handleRefresh);
+    return () => window.removeEventListener('feedbackUpdated', handleRefresh);
   }, []);
 
   const handleSort = (key) => {
@@ -357,6 +357,7 @@ onSuccess={(entry) => {
   setResponses(prev => [entry, ...prev]);
   toast.success('Feedback dodany');
   setIsAdding(false);
+  window.dispatchEvent(new Event('feedbackUpdated'));
 }}
 />
       </Modal>

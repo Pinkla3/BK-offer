@@ -366,29 +366,24 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
         patient_last_name: editedPatientLastName,
       };
   
-      editedAnswers.forEach((ans, i) => { payload[`q${i+1}`] = ans; });
-      editedAnswersDe.forEach((ans, i) => { payload[`q${i+1}_de`] = ans; });
+      editedAnswers.forEach((ans, i) => { payload[`q${i + 1}`] = ans; });
+      editedAnswersDe.forEach((ans, i) => { payload[`q${i + 1}_de`] = ans; });
       payload.notes = editedNote;
       payload.notes_de = editedNoteDe;
   
-      const userName = localStorage.getItem('user_name');
-      if (userName) {
-        payload.user_name = userName;
-      }
-  
-      // 🔥 tutaj - czekamy na aktualizację
+      // 🔁 Zapis do backendu
       const res = await axios.patch(
         `${process.env.REACT_APP_API_URL}/api/tabResponses/${selected.id}`,
         payload,
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
   
-      const updated = res.data; // 📥 tu dostajesz cały rekord po aktualizacji
+      const updated = res.data;
   
-      const updatedSelected = { 
-        ...selected, 
+      const updatedSelected = {
+        ...selected,
         ...payload,
-        user_name: updated.user_name || selected.user_name,  // 👈 NIE NADPISUJ jeśli brak
+        user_name: updated.user_name || selected.user_name,
         edit_history: updated.edit_history
       };
   
@@ -399,6 +394,7 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
       setIsTranslated(true);
   
       toast.success('Dane zapisane pomyślnie!');
+      window.dispatchEvent(new Event('feedbackUpdated')); // 🔔 odśwież listę w tle
     } catch (err) {
       console.error('Błąd zapisu:', err);
       toast.error('Wystąpił błąd podczas zapisywania. Spróbuj ponownie.');
