@@ -51,6 +51,7 @@ const QuestionGroup = styled.div`
   flex-direction: column;
   flex: 1;
   align-items: flex-start;
+  width: 100%;
 `;
 
 const Label = styled.label`
@@ -64,6 +65,7 @@ const Input = styled.input`
   font-size: 14px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  width: 100%;
 `;
 
 const TextArea = styled.textarea`
@@ -72,6 +74,7 @@ const TextArea = styled.textarea`
   border: 1px solid #ccc;
   border-radius: 4px;
   resize: vertical;
+  width: 100%;
 `;
 
 const Button = styled.button`
