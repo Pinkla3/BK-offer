@@ -6,10 +6,16 @@ import { toast } from 'react-toastify';
 
 // Reużyte style z TabFeedback
 const Wrapper = styled.div`
+  min-height: 100vh;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
+  background-image: url('/images/background.jfif');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 `;
 
 const Container = styled.div`
@@ -149,26 +155,38 @@ const PublicFeedbackForm = () => {
       <div
         style={{
           minHeight: '100vh',
-          background: 'linear-gradient(to bottom right, #e0f2ff, #cce4f6)', // jasnoniebieski gradient
+          backgroundImage: 'url("/images/background.jfif")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
           display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
           justifyContent: 'center',
+          alignItems: 'center',
           padding: '2rem',
-          textAlign: 'center',
         }}
       >
-        <a href="https://berlin-opiekunk.pl" target="_blank" rel="noopener noreferrer">
-          <img
-            src="/images/logo"
-            alt="Logo Berlin Opiekunek"
-            style={{ maxWidth: '160px', marginBottom: '2rem' }}
-          />
-        </a>
-        <h2 style={{ fontSize: '2rem', color: '#1a73e8', marginBottom: '1rem' }}>✅ Gotowe!</h2>
-        <p style={{ fontSize: '1.2rem', maxWidth: '600px', color: '#2c3e50' }}>
-          Dziękujemy za wypełnienie formularza. W przypadku zmian prosimy o kontakt z koordynatorem.
-        </p>
+        <div
+          style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.5)',
+            padding: '2rem',
+            borderRadius: '12px',
+            maxWidth: '600px',
+            width: '100%',
+            textAlign: 'center',
+            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+          }}
+        >
+          <a href="https://berlin-opiekunk.pl" target="_blank" rel="noopener noreferrer">
+            <img
+              src="/images/logo"
+              alt="Logo Berlin Opiekunek"
+              style={{ maxWidth: '160px', marginBottom: '1.5rem' }}
+            />
+          </a>
+          <h2 style={{ fontSize: '2rem', color: '#1a73e8', marginBottom: '1rem' }}>✅ Gotowe!</h2>
+          <p style={{ fontSize: '1.2rem', color: '#2c3e50' }}>
+            Dziękujemy za wypełnienie formularza. W przypadku zmian prosimy o kontakt z koordynatorem.
+          </p>
+        </div>
       </div>
     );
   }
