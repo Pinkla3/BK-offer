@@ -611,14 +611,10 @@ app.patch('/api/tabResponses/:id', authenticate, async (req, res) => {
     const now = new Date();
 
     // Ręczne formatowanie daty i godziny
-    const dd = String(now.getDate()).padStart(2, '0');
-    const mm = String(now.getMonth() + 1).padStart(2, '0');
-    const yyyy = now.getFullYear();
-    const hh = String(now.getHours()).padStart(2, '0');
-    const min = String(now.getMinutes()).padStart(2, '0');
-    const ss = String(now.getSeconds()).padStart(2, '0');
-
-    const formattedDateTime = `${dd}.${mm}.${yyyy}, ${hh}:${min}:${ss}`;
+    const formattedDateTime = new Date().toLocaleString('pl-PL', {
+      timeZone: 'Europe/Warsaw',
+      hour12: false
+    });
     const [[userRow]] = await pool.query('SELECT name FROM users WHERE id = ?', [req.user.id]);
     const userName = userRow ? userRow.name : 'nieznany użytkownik';
     const historyEntry = `Edytowano przez ${userName} dnia ${formattedDateTime}`;
@@ -797,7 +793,7 @@ app.post('/api/send-sms-feedback-link', authenticate, async (req, res) => {
     console.log('🔗 Token do formularza:', token);
 
     const phone = feedback.caregiver_phone.startsWith('+') ? feedback.caregiver_phone : `+48${feedback.caregiver_phone}`;
-    const message = `Dzien dobry, dziekujemy za zaufanie. Prosimy o wypełnienie formularza: ${link}
+    const message = `Dzien dobry, dziekujemy za zaufanie. Prosimy o wypelnienie formularza: ${link}
 Pozdrawiamy, Berlin Opieka 24`;
 
     console.log('🔗 Link:', link);
@@ -911,13 +907,10 @@ app.patch('/api/public-feedback/:token', async (req, res) => {
       return res.status(410).json({ error: 'Link wygasł' });
     }
 
-    const dd = String(now.getDate()).padStart(2, '0');
-    const mm = String(now.getMonth() + 1).padStart(2, '0');
-    const yyyy = now.getFullYear();
-    const hh = String(now.getHours()).padStart(2, '0');
-    const min = String(now.getMinutes()).padStart(2, '0');
-    const ss = String(now.getSeconds()).padStart(2, '0');
-    const formattedDateTime = `${dd}.${mm}.${yyyy}, ${hh}:${min}:${ss}`;
+    const formattedDateTime = new Date().toLocaleString('pl-PL', {
+      timeZone: 'Europe/Warsaw',
+      hour12: false
+    });
     const historyEntry = `Edytowano przez Opiekunkę dnia ${formattedDateTime}`;
 
     let updatedHistory = [];
