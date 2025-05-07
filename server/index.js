@@ -613,7 +613,13 @@ app.patch('/api/tabResponses/:id', authenticate, async (req, res) => {
     // Ręczne formatowanie daty i godziny
     const formattedDateTime = new Date().toLocaleString('pl-PL', {
       timeZone: 'Europe/Warsaw',
-      hour12: false
+      hour12: false,
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
     });
     const [[userRow]] = await pool.query('SELECT name FROM users WHERE id = ?', [req.user.id]);
     const userName = userRow ? userRow.name : 'nieznany użytkownik';
@@ -909,7 +915,13 @@ app.patch('/api/public-feedback/:token', async (req, res) => {
 
     const formattedDateTime = new Date().toLocaleString('pl-PL', {
       timeZone: 'Europe/Warsaw',
-      hour12: false
+      hour12: false,
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
     });
     const historyEntry = `Edytowano przez Opiekunkę dnia ${formattedDateTime}`;
 
