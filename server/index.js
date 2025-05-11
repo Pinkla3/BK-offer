@@ -962,7 +962,7 @@ app.post('/api/send-feedback-notification', async (req, res) => {
       to: 'it.berlinopiekunki@gmail.com',
       from: process.env.EMAIL_USER, // desk.berlinopiekunki@gmail.com
       subject: 'Nowy feedback od opiekunki',
-      text: 'Dodano feedback. Zaloguj się do bk-offer.pl by sprawdzić jego treść.'
+      text: 'Dodano feedback. Zaloguj się do desk by sprawdzić jego treść.'
     };
 
     await transporter.sendMail(mailOptions);

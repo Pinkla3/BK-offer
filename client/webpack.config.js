@@ -40,7 +40,7 @@ module.exports = {
     // Konfiguracja WebSocketu (dla HMR / live reload)
     client: {
       // Adres, którego użyje WebSocket
-      webSocketURL: 'wss://bk-offer.pl/ws'
+      webSocketURL: 'wss://desk.berlin-opiekunki.pl/ws'
     },
 
     // Tylko w razie potrzeby – aby devServer nasłuchiwał na https lokalnie
