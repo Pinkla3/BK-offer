@@ -15,7 +15,7 @@ const port = 3009;
 
 // CORS + JSON
 app.use(cors({
-  origin: ['http://localhost:3008', 'https://desk.berlin-opiekunki.pl', 'https://bk-offer.pl'],
+  origin: ['http://localhost:3008', 'https://desk.berlin-opiekunki.pl'],
   credentials: true,
   methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
   allowedHeaders: ['Content-Type','Authorization']
