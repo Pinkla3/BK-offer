@@ -121,7 +121,13 @@ export default function TabSprawyBiezace() {
       });
   };
 
-  const formatDate = ds => (ds ? new Date(ds).toLocaleDateString('pl-PL') : '—');
+  const formatDate = ds => {
+  try {
+    return ds ? new Date(ds).toLocaleDateString('pl-PL') : '—';
+  } catch {
+    return '—';
+  }
+};
 
   const openEdit = id => {
     setEditingId(id);
