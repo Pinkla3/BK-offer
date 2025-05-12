@@ -19,7 +19,7 @@ export default function TabSendSms() {
       const token = localStorage.getItem('token');
       await axios.post(`${API_BASE_URL}/api/send-sms`, {
         phone,
-        message: 'Szczesliwej i bezpiecznej podrozy zyczy Berlin Opieka 24'
+        message: 'Bezpiecznej i spokojnej podróży życzy zespół Berlin Opieka 24'
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -37,7 +37,7 @@ export default function TabSendSms() {
   return (
     <div style={{ padding: 20, maxWidth: 500, margin: '0 auto' }}>
       <h2 style={{ textAlign: 'center', marginBottom: 20 }}>
-        Wyślij SMS: „Szczesliwej i bezpiecznej podrozy zyczy Berlin Opieka 24”
+        Wyślij SMS: „Bezpiecznej i spokojnej podróży życzy zespół Berlin Opieka 24”
       </h2>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
