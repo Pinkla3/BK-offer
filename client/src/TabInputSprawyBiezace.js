@@ -20,20 +20,19 @@ export default function TabInputSprawyBiezace({
     podjete_dzialanie: ''
   });
 
-  useEffect(() => {
-    if (!editingSprawa) return;
+useEffect(() => {
+  if (editingSprawa) {
     setForm({
       imie: editingSprawa.imie || '',
       nazwisko: editingSprawa.nazwisko || '',
       telefon: editingSprawa.telefon || '',
-      data_wplyniecia: editingSprawa.data_wplyniecia
-        ? editingSprawa.data_wplyniecia.slice(0, 10)
-        : '',
-        do_wykonania: editingSprawa?.do_wykonania?.slice(0, 10) || '',
+      data_wplyniecia: editingSprawa.data_wplyniecia?.slice(0, 10) || '',
+      do_wykonania: editingSprawa.do_wykonania?.slice(0, 10) || '',
       sprawa: editingSprawa.sprawa || '',
       podjete_dzialanie: editingSprawa.podjete_dzialanie || ''
     });
-  }, [editingSprawa]);
+  }
+}, [editingSprawa]);
 
   const handleChange = (field, value) => {
     setForm(prev => ({ ...prev, [field]: value }));
