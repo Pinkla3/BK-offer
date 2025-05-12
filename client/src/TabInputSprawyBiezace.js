@@ -168,14 +168,16 @@ setForm({
             />
           </div>
         </div>
-<div style={{ flex: 1 }}>
-  <label style={labelStyle}>Do wykonania</label>
-  <input
-    type="date"
-    value={form.do_wykonania}
-    onChange={e => handleChange('do_wykonania', e.target.value)}
-    style={inputStyle}
-  />
+<div style={{ display: 'flex', gap: '10px' }}>
+  <div style={{ flex: 1 }}>
+    <label style={labelStyle}>Do wykonania</label>
+    <input
+      type="date"
+      value={form.do_wykonania}
+      onChange={e => handleChange('do_wykonania', e.target.value)}
+      style={inputStyle}
+    />
+  </div>
 </div>
         <div>
           <label style={labelStyle}>Sprawa</label>
