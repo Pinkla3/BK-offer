@@ -726,7 +726,7 @@ async function sendSmsViaSmsApi(to, message) {
         message,
         from: sender,
         format: 'json',
-         encoding: 'unicode'
+        encoding: 'utf-8'
       }),
       {
         headers: {
