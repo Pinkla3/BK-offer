@@ -378,15 +378,15 @@ let { imie, nazwisko, telefon, data_wplyniecia, do_wykonania, sprawa, podjete_dz
 }
 
   try {
-await pool.query(
+const [result] = await pool.query(
   `UPDATE sprawy_biezace SET
      imie = ?, nazwisko = ?, telefon = ?, data_wplyniecia = ?, do_wykonania = ?, sprawa = ?, podjete_dzialanie = ?
    WHERE id = ?`,
   [imie, nazwisko, telefon, data_wplyniecia, do_wykonania, sprawa, podjete_dzialanie, id]
 );
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'Nie znaleziono sprawy o podanymm ID.' });
-    }
+if (result.affectedRows === 0) {
+  return res.status(404).json({ message: 'Nie znaleziono sprawy o podanym ID.' });
+}
     res.json({ message: 'Zaktualizowano sprawę' });
   } catch (err) {
     console.error('Błąd podczas aktualizacji sprawy:', err);
