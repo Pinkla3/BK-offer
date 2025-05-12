@@ -15,7 +15,7 @@ import { FaPlus, FaDatabase, FaLock, FaClipboardList, FaTag } from 'react-icons/
 import TabSmsLogs from './TabSmsLogs';
 import TabSendSms from './TabSendSms';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL;
+const API_BASE_URL = 'https://desk.berlin-opiekunki.pl';
 
 const GlobalStyle = createGlobalStyle`
   * { margin:0; padding:0; box-sizing:border-box; }

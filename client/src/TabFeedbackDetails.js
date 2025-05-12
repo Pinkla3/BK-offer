@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { FaArrowLeft, FaEdit, FaSave, FaSpinner, FaSyncAlt } from 'react-icons/fa';
 import Modal from 'react-modal';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL;
+const API_BASE_URL = 'https://desk.berlin-opiekunki.pl';
 
 const Wrapper = styled.div`
   padding: 40px;

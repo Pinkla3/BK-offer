@@ -4,7 +4,7 @@ import TabFeedbackList from './TabFeedbackList';
 import TabFeedbackDetails from './TabFeedbackDetails';
 import { toast } from 'react-toastify';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL;
+const API_BASE_URL = 'https://desk.berlin-opiekunki.pl';
 
 const TabFeedbackView = ({ resetSelected }) => {
   const [step, setStep] = useState(1);

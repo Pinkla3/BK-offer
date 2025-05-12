@@ -4,7 +4,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 // Ustawienie zmiennej API_BASE_URL z pliku .env (Vite)
-const API_BASE_URL = process.env.REACT_APP_API_URL;
+const API_BASE_URL = 'https://desk.berlin-opiekunki.pl';
 
 function TabInputData({ setIsAdding, fetchEntries, editingEntry }) {
   // Inicjalizacja formularza z wartościami z editingEntry, jeśli istnieje

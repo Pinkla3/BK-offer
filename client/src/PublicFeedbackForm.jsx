@@ -4,6 +4,8 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
+const API_BASE_URL = 'https://desk.berlin-opiekunki.pl';
+
 // Reużyte style z TabFeedback
 const Wrapper = styled.div`
   min-height: 100vh;
@@ -116,7 +118,7 @@ const PublicFeedbackForm = () => {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/public-feedback/${token}`);
+        const res = await axios.get(`${API_BASE_URL}/api/public-feedback/${token}`);
         setForm({
           q1: res.data.q1 || '',
           q2: res.data.q2 || '',
@@ -217,8 +219,8 @@ const PublicFeedbackForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.patch(`${process.env.REACT_APP_API_URL}/api/public-feedback/${token}`, form);
-      await axios.post(`${process.env.REACT_APP_API_URL}/api/send-feedback-notification`);
+      await axios.patch(`${API_BASE_URL}/api/public-feedback/${token}`, form);
+      await axios.post(`${API_BASE_URLL}/api/send-feedback-notification`);
       setSuccess(true);
       window.dispatchEvent(new Event('feedbackUpdated')); // 🔔 informuj panel admina
     } catch (err) {

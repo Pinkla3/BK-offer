@@ -7,7 +7,7 @@ import TabInputData from './TabInputData';
 import EditOffersModal from './EditOffersModal';
 import { FaPlus, FaTrash, FaSearch } from 'react-icons/fa';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL;
+const API_BASE_URL = 'https://desk.berlin-opiekunki.pl';
 
 Modal.setAppElement('#root');
 

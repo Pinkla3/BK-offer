@@ -10,7 +10,7 @@ import { FaPlus, FaTrash, FaSearch } from 'react-icons/fa';
 Modal.setAppElement('#root');
 
 // Utwórz instancję Axios z baseURL i obsługą ciasteczek (jeśli potrzebne)
-const API_BASE_URL = process.env.REACT_APP_API_URL || '';
+const API_BASE_URL = 'https://desk.berlin-opiekunki.pl'|| '';
 
 const headerStyle = {
   padding: 10,

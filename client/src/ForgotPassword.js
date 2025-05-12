@@ -4,8 +4,7 @@ import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
 // Ustawienie zmiennej API_BASE_URL z pliku .env (Create React App)
-const API_BASE_URL = process.env.REACT_APP_API_URL;
-console.log("API_BASE_URL:", API_BASE_URL);
+const API_BASE_URL = 'https://desk.berlin-opiekunki.pl';
 
 function ForgotPassword() {
   const [email, setEmail] = useState('');

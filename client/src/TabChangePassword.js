@@ -3,7 +3,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 // Ustawienie zmiennej API_BASE_URL z pliku .env (Create React App)
-const API_BASE_URL = process.env.REACT_APP_API_URL;
+const API_BASE_URL = 'https://desk.berlin-opiekunki.pl';
 
 function TabChangePassword() {
   const [oldPassword, setOldPassword] = useState('');

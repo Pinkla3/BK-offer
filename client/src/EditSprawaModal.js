@@ -4,7 +4,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 Modal.setAppElement('#root');
-const API_BASE_URL = process.env.REACT_APP_API_URL;
+const API_BASE_URL = 'https://desk.berlin-opiekunki.pl';
 
 // pomocnicza funkcja zwracająca lokalną datę w formacie YYYY-MM-DD
 const formatLocalDate = dateLike => {
