@@ -22,6 +22,7 @@ export default function EditSprawaModal({ isOpen, onRequestClose, id, onUpdated 
     nazwisko: '',
     telefon: '',
     data_wplyniecia: '',
+    do_wykonania: '',
     sprawa: '',
     podjete_dzialanie: ''
   };
@@ -39,22 +40,25 @@ export default function EditSprawaModal({ isOpen, onRequestClose, id, onUpdated 
         { headers: { Authorization: `Bearer ${token}` } }
       )
       .then(res => {
-        const {
-          imie,
-          nazwisko,
-          telefon,
-          data_wplyniecia: rawDate,
-          sprawa,
-          podjete_dzialanie
-        } = res.data;
-        setForm({
-          imie,
-          nazwisko,
-          telefon: telefon || '',
-          data_wplyniecia: rawDate ? formatLocalDate(rawDate) : '',
-          sprawa,
-          podjete_dzialanie
-        });
+       const {
+  imie,
+  nazwisko,
+  telefon,
+  data_wplyniecia: rawDate,
+  do_wykonania: rawDue,
+  sprawa,
+  podjete_dzialanie
+} = res.data;
+
+setForm({
+  imie,
+  nazwisko,
+  telefon: telefon || '',
+  data_wplyniecia: rawDate ? formatLocalDate(rawDate) : '',
+  do_wykonania: rawDue ? formatLocalDate(rawDue) : '',
+  sprawa,
+  podjete_dzialanie
+});
       })
       .catch(err => {
         console.error('Błąd wczytywania sprawy:', err);
@@ -135,7 +139,13 @@ export default function EditSprawaModal({ isOpen, onRequestClose, id, onUpdated 
           onChange={e => handleChange('data_wplyniecia', e.target.value)}
           style={inputStyle}
         />
-
+<label style={labelStyle}>Do wykonania</label>
+<input
+  type="date"
+  value={form.do_wykonania}
+  onChange={e => handleChange('do_wykonania', e.target.value)}
+  style={inputStyle}
+/>
         <label style={labelStyle}>Sprawa</label>
         <textarea
           rows={3}
