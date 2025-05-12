@@ -583,7 +583,7 @@ app.post('/api/translate', authenticate, async (req, res) => {
     const translations = [];
     for (const text of texts) {
       const r = await axios.post(
-        'http://hosting.poznysz.eu:5000/translate',
+        'http://plesk.berlinpflege24.de:5000/translate',
         { q: text, source, target, format: 'text' },
         { headers: {'Content-Type':'application/json'} }
       );
