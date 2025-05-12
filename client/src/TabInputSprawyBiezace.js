@@ -51,14 +51,14 @@ export default function TabInputSprawyBiezace({
 
       if (editingSprawa) {
         await axios.put(
-          `${API_BASE_URL}/api/sprawy-biezace/${editingSprawa.id}`,
+          `/api/sprawy-biezace/${editingSprawa.id}`,
           payload,
           config
         );
         toast.success('Zaktualizowano sprawę bieżącą');
       } else {
         await axios.post(
-          `${API_BASE_URL}/api/sprawy-biezace`,
+          `/api/sprawy-biezace`,
           payload,
           config
         );

@@ -15,7 +15,7 @@ export default function TabSendSms() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      await axios.post(`${process.env.REACT_APP_API_URL}/api/send-sms`, {
+      await axios.post(`/api/send-sms`, {
         phone,
         message: 'Szczesliwej i bezpiecznej podrozy zyczy Berlin Opieka 24'
       }, {

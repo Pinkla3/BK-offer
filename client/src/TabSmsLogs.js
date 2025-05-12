@@ -54,7 +54,7 @@ export default function TabSMSLogs() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/sms-logs`, {
+      const res = await axios.get(`/api/sms-logs`, {
         params: { page, pageSize, search, sortBy, order },
         headers: { Authorization: `Bearer ${token}` }
       });

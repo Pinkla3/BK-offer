@@ -158,7 +158,7 @@ function TabViewData({ user }) {
       return;
     }
     axios
-      .get(`${API_BASE_URL}/api/entries`, {
+      .get(`/api/entries`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -234,7 +234,7 @@ const handleDelete = async (id, e) => {
   if (!window.confirm('Czy na pewno chcesz usunąć ten wpis?')) return;
   try {
     const token = localStorage.getItem('token');
-    await axios.delete(`${API_BASE_URL}/api/entries/${id}`, {
+    await axios.delete(`/api/entries/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -269,7 +269,7 @@ const handleDelete = async (id, e) => {
   const handleSaveEdit = async () => {
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`${API_BASE_URL}/api/entries/${editingEntry.id}`, editForm, {
+      await axios.put(`/api/entries/${editingEntry.id}`, editForm, {
         headers: {
           Authorization: `Bearer ${token}`
         }

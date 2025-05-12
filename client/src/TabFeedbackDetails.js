@@ -322,7 +322,7 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
   }, []);
 
   useEffect(() => {
-    axios.get(`${process.env.REACT_APP_API_URL}/api/tabResponses`, {
+    axios.get(`/api/tabResponses`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     })
     .then(res => { setResponses(res.data); setLoading(false); })
@@ -373,7 +373,7 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
   
       // 🔁 Zapis do backendu
       const res = await axios.patch(
-        `${process.env.REACT_APP_API_URL}/api/tabResponses/${selected.id}`,
+        `/api/tabResponses/${selected.id}`,
         payload,
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
@@ -423,7 +423,7 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
     }
 
     const { data } = await axios.post(
-      `${process.env.REACT_APP_API_URL}/api/translate`,
+      `/api/translate`,
       { texts: toSend, source: 'pl', target: 'de' },
       { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
     );
@@ -501,7 +501,7 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
       const fetchDetails = async (id) => {
         try {
           const token = localStorage.getItem('token');
-          const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/tabResponses`, {
+          const res = await axios.get(`/api/tabResponses`, {
             headers: { Authorization: `Bearer ${token}` }
           });
           const match = res.data.find(r => r.id === id);

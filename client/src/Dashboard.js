@@ -122,7 +122,7 @@ const Dashboard = () => {
     const token = localStorage.getItem('token');
     if (!token) return;
     try {
-      const res = await axios.get(`${API_BASE_URL}/api/userdb`, {
+      const res = await axios.get(`/api/userdb`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUser(res.data.user);
@@ -135,7 +135,7 @@ const Dashboard = () => {
     const token = localStorage.getItem('token');
     if (!token) return;
     try {
-      const res = await axios.get(`${API_BASE_URL}/api/entries`, {
+      const res = await axios.get(`/api/entries`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setEntries(res.data);

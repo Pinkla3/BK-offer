@@ -30,7 +30,7 @@ function Register() {
     const delay = setTimeout(() => {
       if (!validateEmail(form.email)) return;
 
-      axios.get(`${API_BASE_URL}/api/check-email?email=${form.email}`)
+      axios.get(`/api/check-email?email=${form.email}`)
         .then(res => {
           if (res.data.exists) {
             setErrors(prev => ({ ...prev, email: 'Email już istnieje' }));
@@ -61,7 +61,7 @@ function Register() {
     e.preventDefault();
     if (!validateForm()) return;
     try {
-      await axios.post(`${API_BASE_URL}/api/register`, form);
+      await axios.post(`/api/register`, form);
       toast.success('Zarejestrowano! Możesz się zalogować');
       navigate('/login');
     } catch {

@@ -105,7 +105,7 @@ const TabFeedbackList = ({ responses: initialResponses, onSelect, onAdd }) => {
     const handleRefresh = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/tabResponses`, {
+        const res = await axios.get(`/api/tabResponses`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setResponses(res.data);
@@ -133,7 +133,7 @@ const TabFeedbackList = ({ responses: initialResponses, onSelect, onAdd }) => {
     if (!window.confirm('Czy na pewno chcesz usunąć ten wpis?')) return;
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`${process.env.REACT_APP_API_URL}/api/tabResponses/${id}`, {
+      await axios.delete(`/api/tabResponses/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Wpis usunięty');

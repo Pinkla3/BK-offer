@@ -14,7 +14,7 @@ const TabFeedbackView = ({ resetSelected }) => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/tabResponses`, {
+      const res = await axios.get(`/api/tabResponses`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
       setResponses(res.data);
@@ -45,7 +45,7 @@ const TabFeedbackView = ({ resetSelected }) => {
     setStep(1);
 
     try {
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/tabResponses`, {
+      const res = await axios.get(`/api/tabResponses`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
       setResponses(res.data);
@@ -62,7 +62,7 @@ const TabFeedbackView = ({ resetSelected }) => {
       try {
         setLoading(true);
         setError(null);
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/tabResponses`, {
+        const res = await axios.get(`/api/tabResponses`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
         });
         setResponses(res.data);

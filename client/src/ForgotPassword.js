@@ -13,7 +13,7 @@ function ForgotPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${API_BASE_URL}/api/reset-password`, { email });
+      await axios.post(`/api/reset-password`, { email });
       toast.success('Link resetujący został wysłany na Twój adres e-mail');
       // Opcjonalnie: przekieruj użytkownika na stronę logowania lub wyświetl dodatkowe informacje
       // navigate('/login');
