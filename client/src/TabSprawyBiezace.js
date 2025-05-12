@@ -163,7 +163,7 @@ export default function TabSprawyBiezace() {
   const sorted = [...cases].sort((a, b) => {
     if (!sortColumn) return 0;
     let A = a[sortColumn], B = b[sortColumn];
-    if (sortColumn === 'data_wplyniecia') {
+    if (sortColumn === 'data_wplyniecia' || sortColumn === 'do_wykonania') {
       A = A ? new Date(A) : new Date(0);
       B = B ? new Date(B) : new Date(0);
       return sortOrder === 'asc' ? A - B : B - A;
@@ -231,6 +231,9 @@ export default function TabSprawyBiezace() {
             <th style={headerStyle} onClick={() => handleSort('data_wplyniecia')}>
               Data wpłynięcia {sortColumn==='data_wplyniecia' && (sortOrder==='asc' ? '🔼' : '🔽')}
             </th>
+            <th style={headerStyle} onClick={() => handleSort('do_wykonania')}>
+  Do wykonania {sortColumn === 'do_wykonania' && (sortOrder === 'asc' ? '🔼' : '🔽')}
+</th>
             <th style={headerStyle} onClick={() => handleSort('sprawa')}>
               Sprawa {sortColumn==='sprawa' && (sortOrder==='asc' ? '🔼' : '🔽')}
             </th>
@@ -270,6 +273,7 @@ export default function TabSprawyBiezace() {
                 <td style={cellStyle}>{item.nazwisko}</td>
                 <td style={cellStyle}>{item.telefon}</td>
                 <td style={cellStyle}>{formatDate(item.data_wplyniecia)}</td>
+                <td style={cellStyle}>{formatDate(item.do_wykonania)}</td>
                 <td style={cellStyle}>
                   <div style={noteStyle}>{item.sprawa}</div>
                 </td>

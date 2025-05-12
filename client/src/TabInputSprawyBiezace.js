@@ -15,6 +15,7 @@ export default function TabInputSprawyBiezace({
     nazwisko: '',
     telefon: '',
     data_wplyniecia: '',
+     do_wykonania: '',
     sprawa: '',
     podjete_dzialanie: ''
   });
@@ -28,6 +29,7 @@ export default function TabInputSprawyBiezace({
       data_wplyniecia: editingSprawa.data_wplyniecia
         ? editingSprawa.data_wplyniecia.slice(0, 10)
         : '',
+        do_wykonania: editingSprawa?.do_wykonania?.slice(0, 10) || '',
       sprawa: editingSprawa.sprawa || '',
       podjete_dzialanie: editingSprawa.podjete_dzialanie || ''
     });
@@ -40,12 +42,21 @@ export default function TabInputSprawyBiezace({
   const handleSubmit = async e => {
     e.preventDefault();
     try {
-      let { data_wplyniecia } = form;
-      // jeżeli data pusta → ustaw dzisiejszą
-      if (!data_wplyniecia) {
-        data_wplyniecia = new Date().toISOString().slice(0, 10);
-      }
-      const payload = { ...form, data_wplyniecia };
+let { data_wplyniecia, do_wykonania } = form;
+
+// Ustaw dzisiejszą datę jeśli puste
+if (!data_wplyniecia) {
+  data_wplyniecia = new Date().toISOString().slice(0, 10);
+}
+
+// Domyślnie "do wykonania" za 3 dni
+if (!do_wykonania) {
+  const trzyDni = new Date();
+  trzyDni.setDate(trzyDni.getDate() + 3);
+  do_wykonania = trzyDni.toISOString().slice(0, 10);
+}
+
+const payload = { ...form, data_wplyniecia, do_wykonania };
       const token = localStorage.getItem('token');
       const config = { headers: { Authorization: `Bearer ${token}` } };
 
@@ -67,14 +78,15 @@ export default function TabInputSprawyBiezace({
 
       fetchCases();
       setIsAdding(false);
-      setForm({
-        imie: '',
-        nazwisko: '',
-        telefon: '',
-        data_wplyniecia: '',
-        sprawa: '',
-        podjete_dzialanie: ''
-      });
+setForm({
+  imie: '',
+  nazwisko: '',
+  telefon: '',
+  data_wplyniecia: '',
+  do_wykonania: '',
+  sprawa: '',
+  podjete_dzialanie: ''
+});
     } catch (err) {
       console.error('Błąd zapisu sprawy:', err);
       toast.error('Błąd zapisu sprawy bieżącej');
@@ -157,7 +169,15 @@ export default function TabInputSprawyBiezace({
             />
           </div>
         </div>
-
+<div style={{ flex: 1 }}>
+  <label style={labelStyle}>Do wykonania</label>
+  <input
+    type="date"
+    value={form.do_wykonania}
+    onChange={e => handleChange('do_wykonania', e.target.value)}
+    style={inputStyle}
+  />
+</div>
         <div>
           <label style={labelStyle}>Sprawa</label>
           <textarea

@@ -317,7 +317,7 @@ app.get('/api/sprawy-biezace/:id', authenticate, async (req, res) => {
   try {
     const [[row]] = await pool.query(`
       SELECT id, imie, nazwisko, telefon,
-             data_wplyniecia, sprawa, podjete_dzialanie, user_id
+             data_wplyniecia, do_wykonania, sprawa, podjete_dzialanie, user_id
       FROM sprawy_biezace WHERE id = ?
     `, [id]);
     if (!row) {
@@ -335,20 +335,26 @@ app.get('/api/sprawy-biezace/:id', authenticate, async (req, res) => {
 
 // Dodawanie sprawy — zapisujemy user_id
 app.post('/api/sprawy-biezace', authenticate, async (req, res) => {
-  let { imie, nazwisko, telefon, data_wplyniecia, sprawa, podjete_dzialanie } = req.body;
-  
+let { imie, nazwisko, telefon, data_wplyniecia, do_wykonania, sprawa, podjete_dzialanie } = req.body;
+
   // jeżeli użytkownik nie podał daty, ustaw dzisiejszą
   if (!data_wplyniecia) {
     data_wplyniecia = new Date().toISOString().slice(0,10);
   }
+// jeżeli użytkownik nie podał daty, ustaw +3
+  if (!do_wykonania) {
+  const d = new Date();
+  d.setDate(d.getDate() + 3);
+  do_wykonania = d.toISOString().slice(0,10);
+}
 
   try {
-    await pool.query(
-      `INSERT INTO sprawy_biezace
-        (imie, nazwisko, telefon, data_wplyniecia, sprawa, podjete_dzialanie, user_id)
-      VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [imie, nazwisko, telefon, data_wplyniecia, sprawa, podjete_dzialanie, req.user.id]
-    );
+await pool.query(
+  `INSERT INTO sprawy_biezace
+    (imie, nazwisko, telefon, data_wplyniecia, do_wykonania, sprawa, podjete_dzialanie, user_id)
+   VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+  [imie, nazwisko, telefon, data_wplyniecia, do_wykonania, sprawa, podjete_dzialanie, req.user.id]
+);
     res.status(201).json({ message: 'Dodano sprawę bieżącą' });
   } catch (err) {
     console.error('Błąd podczas dodawania sprawy:', err);
@@ -358,22 +364,28 @@ app.post('/api/sprawy-biezace', authenticate, async (req, res) => {
 // Edycja sprawy — tylko właściciel lub admin
 app.put('/api/sprawy-biezace/:id', authenticate, async (req, res) => {
   const { id } = req.params;
-  let { imie, nazwisko, telefon, data_wplyniecia, sprawa, podjete_dzialanie } = req.body;
+let { imie, nazwisko, telefon, data_wplyniecia, do_wykonania, sprawa, podjete_dzialanie } = req.body;
 
   // jeśli data pusta → ustaw dzisiejszą
   if (!data_wplyniecia) {
     data_wplyniecia = new Date().toISOString().slice(0,10); // YYYY-MM-DD
   }
 
+  if (!do_wykonania) {
+  const d = new Date();
+  d.setDate(d.getDate() + 3);
+  do_wykonania = d.toISOString().slice(0,10);
+}
+
   try {
-    const [result] = await pool.query(
-      `UPDATE sprawy_biezace SET
-         imie = ?, nazwisko = ?, telefon = ?, data_wplyniecia = ?, sprawa = ?, podjete_dzialanie = ?
-       WHERE id = ?`,
-      [imie, nazwisko, telefon, data_wplyniecia, sprawa, podjete_dzialanie, id]
-    );
+await pool.query(
+  `UPDATE sprawy_biezace SET
+     imie = ?, nazwisko = ?, telefon = ?, data_wplyniecia = ?, do_wykonania = ?, sprawa = ?, podjete_dzialanie = ?
+   WHERE id = ?`,
+  [imie, nazwisko, telefon, data_wplyniecia, do_wykonania, sprawa, podjete_dzialanie, id]
+);
     if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'Nie znaleziono sprawy' });
+      return res.status(404).json({ error: 'Nie znaleziono sprawy o podanymm ID.' });
     }
     res.json({ message: 'Zaktualizowano sprawę' });
   } catch (err) {
