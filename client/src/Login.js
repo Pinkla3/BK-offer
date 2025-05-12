@@ -84,7 +84,7 @@ function Login() {
 
   return (
     <div style={{
-      backgroundImage: 'url("/images/background.png")',
+      backgroundImage: 'url("/images/background.jfif")',
       backgroundSize: 'cover',
       backgroundRepeat: 'no-repeat',
       backgroundPosition: 'center',
