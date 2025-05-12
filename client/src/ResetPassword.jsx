@@ -40,7 +40,7 @@ function ResetPassword() {
     if (errors.newPassword || errors.confirmPassword) return;
 
     try {
-      const response = await axios.post(`/api/update-password`, {
+      const response = await axios.post(`${API_BASE_URL}/api/update-password`, {
         token,
         newPassword: form.newPassword,
       });

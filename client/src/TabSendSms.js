@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
+const API_BASE_URL = process.env.REACT_APP_API_URL;
+
 export default function TabSendSms() {
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
@@ -15,7 +17,7 @@ export default function TabSendSms() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      await axios.post(`/api/send-sms`, {
+      await axios.post(`${API_BASE_URL}/api/send-sms`, {
         phone,
         message: 'Szczesliwej i bezpiecznej podrozy zyczy Berlin Opieka 24'
       }, {

@@ -4,6 +4,8 @@ import TabFeedbackList from './TabFeedbackList';
 import TabFeedbackDetails from './TabFeedbackDetails';
 import { toast } from 'react-toastify';
 
+const API_BASE_URL = process.env.REACT_APP_API_URL;
+
 const TabFeedbackView = ({ resetSelected }) => {
   const [step, setStep] = useState(1);
   const [selected, setSelected] = useState(null);
@@ -14,7 +16,7 @@ const TabFeedbackView = ({ resetSelected }) => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`/api/tabResponses`, {
+      const res = await axios.get(`${API_BASE_URL}/api/tabResponses`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
       setResponses(res.data);
@@ -45,7 +47,7 @@ const TabFeedbackView = ({ resetSelected }) => {
     setStep(1);
 
     try {
-      const res = await axios.get(`/api/tabResponses`, {
+      const res = await axios.get(`${API_BASE_URL}/api/tabResponses`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
       setResponses(res.data);
@@ -62,7 +64,7 @@ const TabFeedbackView = ({ resetSelected }) => {
       try {
         setLoading(true);
         setError(null);
-        const res = await axios.get(`/api/tabResponses`, {
+        const res = await axios.get(`${API_BASE_URL}/api/tabResponses`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
         });
         setResponses(res.data);

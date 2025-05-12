@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { FaSearch } from 'react-icons/fa';
 
+const API_BASE_URL = process.env.REACT_APP_API_URL;
+
 const headerStyle = {
   padding: 10,
   color: '#fff',
@@ -54,7 +56,7 @@ export default function TabSMSLogs() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get(`/api/sms-logs`, {
+      const res = await axios.get(`${API_BASE_URL}/api/sms-logs`, {
         params: { page, pageSize, search, sortBy, order },
         headers: { Authorization: `Bearer ${token}` }
       });

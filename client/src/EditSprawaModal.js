@@ -35,7 +35,7 @@ export default function EditSprawaModal({ isOpen, onRequestClose, id, onUpdated 
       setForm(emptyForm);
     } else {
       axios.get(
-        `/api/sprawy-biezace/${id}`,
+        `${API_BASE_URL}/api/sprawy-biezace/${id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       )
       .then(res => {
@@ -75,8 +75,8 @@ export default function EditSprawaModal({ isOpen, onRequestClose, id, onUpdated 
     const payload = { ...form };
 
     const req = isNew
-      ? axios.post(`/api/sprawy-biezace`, payload, config)
-      : axios.put(`/api/sprawy-biezace/${id}`, payload, config);
+      ? axios.post(`${API_BASE_URL}/api/sprawy-biezace`, payload, config)
+      : axios.put(`${API_BASE_URL}/api/sprawy-biezace/${id}`, payload, config);
 
     req
       .then(() => {

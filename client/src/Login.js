@@ -54,7 +54,7 @@ function Login() {
 
     setLoading(true);
     try {
-const res = await axios.post('/api/login', form);
+ const res = await axios.post(`${API_BASE_URL}/api/login`, form);
       if (res.data.token) {
         setToken(res.data.token);
 

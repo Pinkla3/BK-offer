@@ -3,6 +3,8 @@ import styled from 'styled-components';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
+const API_BASE_URL = process.env.REACT_APP_API_URL;
+
 const Wrapper = styled.div`
   display: flex;
   justify-content: center;
@@ -137,7 +139,7 @@ const TabFeedback = ({ onSuccess, onClose }) => {
     setSubmitting(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.post(`/api/tabResponses`, formData, {
+      const res = await axios.post(`${API_BASE_URL}/api/tabResponses`, formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
   
@@ -176,12 +178,12 @@ const TabFeedback = ({ onSuccess, onClose }) => {
       const token = localStorage.getItem('token');
   
       // 🔹 Najpierw zapisz wpis (ale tylko dane podstawowe, bez pytań)
-      const res = await axios.post(`/api/tabResponses`, formData, {
+      const res = await axios.post(`${API_BASE_URL}/api/tabResponses`, formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
   
       // 🔹 Wyślij SMS tylko z linkiem, używając wygenerowanego ID
-      await axios.post(`/api/send-sms-feedback-link`, {
+      await axios.post(`${API_BASE_URL}/api/send-sms-feedback-link`, {
         id: res.data.id
       }, {
         headers: { Authorization: `Bearer ${token}` }

@@ -61,7 +61,7 @@ function Register() {
     e.preventDefault();
     if (!validateForm()) return;
     try {
-      await axios.post(`/api/register`, form);
+      await axios.post(`${API_BASE_URL}/api/register`, form);
       toast.success('Zarejestrowano! Możesz się zalogować');
       navigate('/login');
     } catch {

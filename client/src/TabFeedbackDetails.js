@@ -5,6 +5,8 @@ import { toast } from 'react-toastify';
 import { FaArrowLeft, FaEdit, FaSave, FaSpinner, FaSyncAlt } from 'react-icons/fa';
 import Modal from 'react-modal';
 
+const API_BASE_URL = process.env.REACT_APP_API_URL;
+
 const Wrapper = styled.div`
   padding: 40px;
   max-width: 900px;
@@ -322,7 +324,7 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
   }, []);
 
   useEffect(() => {
-    axios.get(`/api/tabResponses`, {
+    axios.get(`${API_BASE_URL}/api/tabResponses`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     })
     .then(res => { setResponses(res.data); setLoading(false); })
@@ -373,7 +375,7 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
   
       // 🔁 Zapis do backendu
       const res = await axios.patch(
-        `/api/tabResponses/${selected.id}`,
+        `${API_BASE_URL}/api/tabResponses/${selected.id}`,
         payload,
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
@@ -423,7 +425,7 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
     }
 
     const { data } = await axios.post(
-      `/api/translate`,
+      `${API_BASE_URL}/api/translate`,
       { texts: toSend, source: 'pl', target: 'de' },
       { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
     );
@@ -501,7 +503,7 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
       const fetchDetails = async (id) => {
         try {
           const token = localStorage.getItem('token');
-          const res = await axios.get(`/api/tabResponses`, {
+          const res = await axios.get(`${API_BASE_URL}/api/tabResponses`, {
             headers: { Authorization: `Bearer ${token}` }
           });
           const match = res.data.find(r => r.id === id);

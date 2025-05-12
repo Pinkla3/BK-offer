@@ -105,7 +105,7 @@ export default function TabSprawyBiezace() {
   const fetchUser = () => {
     const token = localStorage.getItem('token');
     axios
-    .get(`/api/userdb`, { headers: { Authorization: `Bearer ${token}` } })
+    .get(`${API_BASE_URL}/api/userdb`, { headers: { Authorization: `Bearer ${token}` } })
       .then(res => setUser(res.data.user))
       .catch(() => toast.error('Nie udało się pobrać danych użytkownika'));
   };
@@ -113,7 +113,7 @@ export default function TabSprawyBiezace() {
   const fetchCases = () => {
     const token = localStorage.getItem('token');
     axios
-      .get(`/api/sprawy-biezace`, { headers: { Authorization: `Bearer ${token}` } })
+      .get(`${API_BASE_URL}/api/sprawy-biezace`, { headers: { Authorization: `Bearer ${token}` } })
       .then(res => setCases(res.data))
       .catch(err => {
         console.error('Błąd pobierania spraw bieżących:', err);
@@ -141,7 +141,7 @@ export default function TabSprawyBiezace() {
     if (!window.confirm('Czy na pewno chcesz usunąć ten wpis?')) return;
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`/api/sprawy-biezace/${id}`, {
+      await axios.delete(`${API_BASE_URL}/api/sprawy-biezace/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Wpis usunięty');

@@ -5,6 +5,8 @@ import { toast } from 'react-toastify';
 import Modal from 'react-modal';
 import TabFeedback from './TabFeedback';
 
+const API_BASE_URL = process.env.REACT_APP_API_URL;
+
 const searchToggleBtnStyle = {
   padding: '10px 20px',
   backgroundColor: '#007bff',
@@ -105,7 +107,7 @@ const TabFeedbackList = ({ responses: initialResponses, onSelect, onAdd }) => {
     const handleRefresh = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get(`/api/tabResponses`, {
+        const res = await axios.get(`${API_BASE_URL}/api/tabResponses`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setResponses(res.data);
@@ -133,7 +135,7 @@ const TabFeedbackList = ({ responses: initialResponses, onSelect, onAdd }) => {
     if (!window.confirm('Czy na pewno chcesz usunąć ten wpis?')) return;
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`/api/tabResponses/${id}`, {
+      await axios.delete(`${API_BASE_URL}/api/tabResponses/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Wpis usunięty');
