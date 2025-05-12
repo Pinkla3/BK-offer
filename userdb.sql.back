@@ -1,0 +1,287 @@
+-- MariaDB dump 10.19  Distrib 10.5.23-MariaDB, for debian-linux-gnu (x86_64)
+--
+-- Host: localhost    Database: userdb
+-- ------------------------------------------------------
+-- Server version	10.5.23-MariaDB-0+deb11u1
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `admins`
+--
+
+DROP TABLE IF EXISTS `admins`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `admins` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(255) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username` (`username`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `admins`
+--
+
+LOCK TABLES `admins` WRITE;
+/*!40000 ALTER TABLE `admins` DISABLE KEYS */;
+/*!40000 ALTER TABLE `admins` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `entries`
+--
+
+DROP TABLE IF EXISTS `entries`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `entries` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `imie` varchar(255) DEFAULT NULL,
+  `nazwisko` varchar(255) DEFAULT NULL,
+  `jezyk` varchar(10) DEFAULT NULL,
+  `fs` varchar(10) DEFAULT NULL,
+  `nr` varchar(10) DEFAULT NULL,
+  `telefon` varchar(20) DEFAULT '',
+  `do_opieki` varchar(50) DEFAULT NULL,
+  `dyspozycyjnosc` varchar(20) DEFAULT NULL,
+  `oczekiwania` text DEFAULT NULL,
+  `referencje` varchar(10) DEFAULT NULL,
+  `ostatni_kontakt` date DEFAULT NULL,
+  `notatka` text DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `proponowane_zlecenie` text DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=70 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `entries`
+--
+
+LOCK TABLES `entries` WRITE;
+/*!40000 ALTER TABLE `entries` DISABLE KEYS */;
+INSERT INTO `entries` VALUES (4,'Jan','Kowalski','A0','Tak','Tak','','senior','2025-02','własna łazienka','Tak','2025-02-03','+48 500 500 500',NULL,''),(5,'Anna','Nowak','A1','Nie','Nie','','seniorka','2025-04','bez nocek','Nie','2025-04-07','+48 777 777 777',NULL,''),(6,'Grażyna ','Pieczarek','A2','Tak','Nie','','małżeństwo','2025-09','bez transferu, osobna łazienka, miasto','Nie','2025-04-04','+ 49 01513 6895430',NULL,''),(7,'Adam','Małysz','B1','Nie','Tak','','małżeństwo','2025-06','brak','Nie','2025-03-31','brak',NULL,''),(8,'Sara','Meher','C1','Nie','Nie','','małżeństwo','2025-05','własna łazienka','Tak','2025-04-07','mówi tylko po niemiecku',NULL,''),(9,'Ewa','Zimnoch','A2','Nie','Nie','','seniorka','2025-06','mobilna, bez transferu','Tak','2025-06-04','',NULL,''),(31,'aaa','aaa','A0','Tak','Nie','aaa','małżeństwo,osoba leżąca','2025-10','aaaa','Tak','2025-05-01','aaa',11,'aaaaaaa'),(36,'Bogumiła','Czysz','A1','Nie','','721436992','','2025-04-30','1750 Euro. \n\nMoże zostać do końca czerwca. ','Tak','2025-04-27','Pracowała w szpitalu 25 lat jako pomoc pielęgniarkom. Na endoskopii pracowała.  \n\nWie, jak się zająć osoba leżącą. \n\nCórka wesele. \n\n\n\n\n\n\n \n\n',2,'Fischer'),(38,'Lucyna','Pawlik','B2','Tak','','784773980','','2025-05','Od 30 maja na 4-5 tygodni, blisko granicy, do 1 osoby, może być leżąca.  \n\nNie mniej niż 1950 Euro. ','Tak','2025-04-15','',2,''),(39,'Basia ','Kabała','B2','Nie','Nie','507 040 384','','2025-05-05','','Tak','2025-04-11','Jutro ma dostac info , czy dostanie Sztele za 2600...',2,'Mutert'),(40,'Jola','Szulc','A2','Nie','Tak','511480088','','2025-04-23','','Tak','2025-04-16','Czeka na nowe zlecenie. We wtorek mam zadwzonic. ',2,''),(41,'Grzegorz','Sadowski','','','Tak','603 116 002','','2025-05-15','','','2025-04-14','Jest na zleceniu do maja. ',2,''),(42,'Tomasz','Szlachtowicz','B1','Tak','Tak','695239266','małżeństwo','2025-04-26','Akceptuje 2100 Euro do Harnisch.  \n\n Na ten momenta dostał inne zlecenie. ','Tak','2025-04-15','W piątek zjeżdża ze zlecenia. \n\nDo wtorku jego obecna agencja  będzie szukać innej pracy. \n\nNa e-mail wysłał referencje.   ',2,'1. Harnisch, 2. '),(43,'Jola ','Szychowska','A2','Nie','Tak','667 518 884 ','','2025-06-01','na poczatku czerwca dyspozycyjna','','2025-04-21','',2,''),(44,'Beata ','Dernoga','','','','	 695308614','','2025-12','...','','2025-04-20','Pracuje w Polsce w DPS-ie. i jeździ na krótko raz do roku. Pani bardzo miła. \n\nPani z Hubspota. ',2,''),(45,'Anna ','Baczyńska','','','','','','2025-05','W połowie maja się skontaktować. ','','2025-04-22','Hubspot. ',2,''),(46,'Renata ','Rumierz','A1','Tak','Nie','739541627','senior','2025-04','Szuka dla syna zlecenia. Był 2 x w Niemczech. \n\nhubspot. ','Nie','2025-04-21','',2,''),(47,'Małgorzata ','Madziar','A1','','','605297727 ','senior','2025-05','Połowa maja. Dziadek, samodzielnie sie poruszajacy, bez nocek.  ','','2025-04-21','Hubspot. \n\n5,5 roku w DE. ',2,''),(48,'Agnieszka ','Żelazna','A1','','Nie','668507109','','2025-05','1700- 1800','','2025-04-20','Zadzwonić ok 13.00 \n\nUrlop od 5 maja do 13 czerwiec.\n\nNie odbiera 23.04 (13:01) ',2,''),(49,'Halina ','Jeż','B1','','','516414666','','2025-05','Berlin, od 3-4 maja\n\nOczekiwania od 1800-2000','Tak','2025-04-28',' doświadczenie ponad 10 lat.\nHubspot \n\n',2,''),(50,'Dorota ','Dublińska','A2','','Tak','888415151','','2025-04','1900','Tak','2025-04-20','',2,'Brügmann Ursula'),(55,'Paweł ','Zabrzycki','B1','Tak','Tak','451220329','','2025-05-06','2100 za 1 osobę\n\n','Tak','2025-04-23','pan z Gorzowa. 14 doświadczenia w opiece. \n\n28.04 nie odbiera. (9:04)',2,'Woestmann'),(56,'Andrzej','Jaroszewski','','Tak','Nie','668 687 058','','2025-05-20','około A2+ - do sprawdzenia. \n\n','Tak','2025-04-24','7 lat w de ',2,''),(57,'Beata ','Sza','A1','','','503 878 755','','2025-05-25','','Tak','2025-04-25','z hubspota. miła pani. Wróciła ze zlecenia. ',2,''),(58,'Barbara ','Sawicka','B2','','Tak','512 707 004','','2025-05-15','oczekiwania powyżej 2000 Euro do 1 osoby. Interesuje ja Berlin, Hamburg, Frankfurt.Może jechać na 0,5 roku. Jedzie z pieskiem. Buldog francuski.  \n\nZ córka chciałaby pojechać. Córka A1. \n\nSprawdzic niem. ','Tak','2025-04-23','do 24 lipca będzie na kontrakcie w Szwajcarii.  ',2,''),(59,'Arleta ','Jakubczak','A2','','Nie','794486688','','2025-06-01','Język sprawdzić. \n\n1 osoba bez nocek. ','','2025-04-28','8 lat w DE. \n\n',2,''),(60,'Beata','Przybyłek','','','','726847781','','2025-05-26','','','2025-04-28','18 lat w Austrii, pani bardzo miła \n\nZ Hubspota',2,''),(61,'Mariola ','Tabiś','B2','','','729348365','','2025-05-20','zły numer tel. ','','2025-04-24','\n\npani 16 lat w DE jako BK\n\nnie chce osoby lezącej \n\nSama do mnie na weekend zadzwoniła. \n\nsprawdzić niem. ',2,''),(62,'Aleksandra ','Lange','','','','601168128','','2025-05-05','Jezdzi tylko z koleżanką do pracy. ','','2025-04-28','Hubspot ',2,''),(63,'Aneta ','Masun ','B1','Nie','Nie','577512313','','2025-05-28','blisko granicy. \n\nZarabia 2000 euro przy 2 osobach ','Tak','2025-05-03','jezdzi tylko pociagami \n\nFuhrmann- akceptacja 1900 Euro\n\nPani lubi małżeństwa\n\n\nOgólnie najbardziej pasuje Berlin. ',2,'1.Thonnessen, 2. Uelhoff 3. Fuhrmann (tu na tak)'),(64,'Elżbieta ','Woronowicz','','','','518-403-664','','2025-06-25','Pani chciałaby Solingen- jeśli się da.  Nie małżeństwa.  ','',NULL,'Pod koniec czerwca można dzwonić, teraz jest na zleceniu, ale od razu chce następnego.\n\nhubspot ',2,''),(66,'Katarzyna ','Kwolek','','Tak','Nie','785043803','małżeństwo','2025-06-15',' sprawdzone zlecenie, dobrze płatne (2 osoby 2200 Euro, gdzie jedna osoba mobilna), \nmoże być małżeństwo     ','Tak','2025-04-28','3,5 m-c dyspozycyjna\n\nZadzwonić w czwartek (8.5) o 16.00\n\n',2,''),(67,'Maria','Lis','B1','Nie','Nie','608852014','','2025-05-05','2000 euro 1 osoba, ','Tak','2025-04-29','Nie odbiera 06.05 \n\npolecona od pana Grzegorza, 6-7 lat w DE, ',2,''),(68,'Iwona ','Cyprianska','B1','Tak','','512-044-928','','2025-10-01','Późniejszy termin. Październik. Bez dźwigania.  Zna niem. i ma FS. Min. 2000 Euro','Tak','2025-05-07','z hubspota',2,''),(69,'Aniela ','Bednarek','B1','','','504530799','','2025-12-02','niem spr. ','','2025-05-07','z hubspota pani miła',2,'');
+/*!40000 ALTER TABLE `entries` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `password_resets`
+--
+
+DROP TABLE IF EXISTS `password_resets`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `password_resets` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `email` varchar(255) NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `created_at` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `token` (`token`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `password_resets`
+--
+
+LOCK TABLES `password_resets` WRITE;
+/*!40000 ALTER TABLE `password_resets` DISABLE KEYS */;
+INSERT INTO `password_resets` VALUES (2,'klaudia@bonter.eu','e0b61f396bb91ee9ec0e29d7ec10eb5c2a89bf8e','2025-04-14 22:09:13');
+/*!40000 ALTER TABLE `password_resets` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `sms_logs`
+--
+
+DROP TABLE IF EXISTS `sms_logs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `sms_logs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `recipient_phone` varchar(32) DEFAULT NULL,
+  `message` text DEFAULT NULL,
+  `status` varchar(64) DEFAULT NULL,
+  `smsapi_id` varchar(64) DEFAULT NULL,
+  `full_response` text DEFAULT NULL,
+  `sent_at` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `sms_logs`
+--
+
+LOCK TABLES `sms_logs` WRITE;
+/*!40000 ALTER TABLE `sms_logs` DISABLE KEYS */;
+/*!40000 ALTER TABLE `sms_logs` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `sms_outbox`
+--
+
+DROP TABLE IF EXISTS `sms_outbox`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `sms_outbox` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `phone` varchar(20) DEFAULT NULL,
+  `message` text DEFAULT NULL,
+  `sent` tinyint(1) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `sms_outbox`
+--
+
+LOCK TABLES `sms_outbox` WRITE;
+/*!40000 ALTER TABLE `sms_outbox` DISABLE KEYS */;
+/*!40000 ALTER TABLE `sms_outbox` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `sprawy_biezace`
+--
+
+DROP TABLE IF EXISTS `sprawy_biezace`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `sprawy_biezace` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `imie` varchar(100) NOT NULL,
+  `nazwisko` varchar(100) NOT NULL,
+  `telefon` varchar(50) DEFAULT NULL,
+  `data_wplyniecia` date NOT NULL,
+  `sprawa` text NOT NULL,
+  `podjete_dzialanie` text NOT NULL,
+  `user_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `data_wplyniecia` (`data_wplyniecia`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_polish_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `sprawy_biezace`
+--
+
+LOCK TABLES `sprawy_biezace` WRITE;
+/*!40000 ALTER TABLE `sprawy_biezace` DISABLE KEYS */;
+INSERT INTO `sprawy_biezace` VALUES (5,'Renata ','Kulińska','577609081','2025-04-28','Prosi o zaliczkę w wysokości 500 Euro.  \n\nNie polecam....\n\n ','wysłane -e-mail do Malgosi ',2),(6,'','Konermann','','2025-04-28','Klient zaakceptował podwyżkę dla obu pań ( Grażyna Jarosińska, Ewa kruszyńska) w wysokości 100 Euro od 15.04. ','Wysłany e-mail do Małgosi. ',2),(7,'','Hindemith','','2025-04-28','Agnieszka Czyżewska otrzymała 50 Euro. \n\n \n  ','Napisałem E-Mail w dniu 28.04 ',2),(8,'','Wuppert','','2025-05-02','Potwierdziłem, ze jeśli koordynator znajdzie inna  agencje, to będzie fristlose Kundigung.','',2),(9,'Katarzyna','kwolek','785043803','2025-05-02','przedstawić oferty na poł czerwca w czwartek o 16.00   Moze być małzenstwo','',2),(10,'Elzbieta','Zielinska','','2025-05-06','reklamacja\n\nZgłoszenie do Zusu. ','wysłałem e-maila do pani Zielińskiej z reklamacja od rodziny. (06.05)  ',2);
+/*!40000 ALTER TABLE `sprawy_biezace` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `tab_responses`
+--
+
+DROP TABLE IF EXISTS `tab_responses`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tab_responses` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `caregiver_first_name` varchar(100) NOT NULL,
+  `caregiver_last_name` varchar(100) NOT NULL,
+  `caregiver_phone` varchar(30) NOT NULL,
+  `patient_first_name` varchar(100) NOT NULL,
+  `patient_last_name` varchar(100) NOT NULL,
+  `q1` text DEFAULT NULL,
+  `q2` text DEFAULT NULL,
+  `q3` text DEFAULT NULL,
+  `q4` text DEFAULT NULL,
+  `q5` text DEFAULT NULL,
+  `q6` text DEFAULT NULL,
+  `q7` text DEFAULT NULL,
+  `q8` text DEFAULT NULL,
+  `q9` text DEFAULT NULL,
+  `q10` text DEFAULT NULL,
+  `notes` text DEFAULT NULL,
+  `user_id` int(11) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `q1_de` text DEFAULT NULL,
+  `q2_de` text DEFAULT NULL,
+  `q3_de` text DEFAULT NULL,
+  `q4_de` text DEFAULT NULL,
+  `q5_de` text DEFAULT NULL,
+  `q6_de` text DEFAULT NULL,
+  `q7_de` text DEFAULT NULL,
+  `q8_de` text DEFAULT NULL,
+  `q9_de` text DEFAULT NULL,
+  `q10_de` text DEFAULT NULL,
+  `notes_de` text DEFAULT NULL,
+  `user_name` varchar(255) DEFAULT NULL,
+  `edit_history` text DEFAULT NULL,
+  `public_token` varchar(255) DEFAULT NULL,
+  `public_token_created_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `public_token` (`public_token`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `tab_responses_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `tab_responses`
+--
+
+LOCK TABLES `tab_responses` WRITE;
+/*!40000 ALTER TABLE `tab_responses` DISABLE KEYS */;
+/*!40000 ALTER TABLE `tab_responses` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
+  `role` enum('admin','user') DEFAULT 'user',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `users`
+--
+
+LOCK TABLES `users` WRITE;
+/*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES (1,'Klaudia','klaudia@bonter.eu','$2b$10$RmPQ2.qhq97Uoz/FD9s9keYYLN8cosFIIQZfjZSI8ejVVocPOgGSi','user'),(2,'Paweł','Nowak.firmaberlin@gmail.com','$2b$10$6vN96rNkLw0/FqVtTZqZ6O4.MMHSVjVGM.JjfbBAnsz7r5mTAfNC.','admin'),(9,'Klaudia','klaudiabonter@gmail.com','$2b$10$c.42cJYjp6l/vFk65Sg5SOtsnefMQVyFJF1tR/mk7R1nVM29Nf/eq','admin'),(10,'Monika','monia.idzior@gmail.com','$2b$10$aHBLEqY53OJm9p8gHogh.OfXKosBQlvdbomWJ7PCsmDUiaSGOhpZ.','user'),(12,'Klaudia','pinkla@outlook.com','$2b$10$705eU7NiAZELfpPlxaqq7e/hQ1ZehejAJoA2PytSyEr2UZQLdo9Ta','user'),(13,'Klaudia','pinkla1@outlook.com','$2b$10$wtt2AlKwjp2mriyclxDWM.CdRNfQ0CzGgsrN6NVoYUyKoFCaRN6.C','admin'),(14,'Martyna','martyna.zielonagora@gmail.com','$2b$10$mftikfAxDU9q6.eT2vY6AO/IBOq75Ks1.pOxQzuhQrA0oROMwiJlC','user');
+/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2025-05-11 22:50:55
