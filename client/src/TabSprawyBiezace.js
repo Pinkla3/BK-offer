@@ -279,7 +279,7 @@ export default function TabSprawyBiezace() {
                 <td style={cellStyle}>{item.nazwisko}</td>
                 <td style={cellStyle}>{item.telefon}</td>
                 <td style={cellStyle}>{formatDate(item.data_wplyniecia)}</td>
-                <td style={cellStyle}>{formatDate(item.do_wykonania)}</td>
+                <td style={cellStyle}>{item.do_wykonania || '❌ brak'}</td>
                 <td style={cellStyle}>
                   <div style={noteStyle}>{item.sprawa}</div>
                 </td>
