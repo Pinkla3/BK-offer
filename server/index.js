@@ -274,30 +274,32 @@ app.get('/api/sprawy-biezace', authenticate, async (req, res) => {
     let rows;
     if (req.user.role === 'admin') {
       [rows] = await pool.query(`
-        SELECT 
-          s.id,
-          s.imie,
-          s.nazwisko,
-          s.telefon,
-          s.data_wplyniecia,
-          s.sprawa,
-          s.podjete_dzialanie,
-          u.name AS user_name
+SELECT 
+  s.id,
+  s.imie,
+  s.nazwisko,
+  s.telefon,
+  s.data_wplyniecia,
+  s.do_wykonania,
+  s.sprawa,
+  s.podjete_dzialanie,
+  u.name AS user_name
         FROM sprawy_biezace s
         JOIN users u ON s.user_id = u.id
         ORDER BY s.data_wplyniecia DESC
       `);
     } else {
       [rows] = await pool.query(`
-        SELECT 
-          s.id,
-          s.imie,
-          s.nazwisko,
-          s.telefon,
-          s.data_wplyniecia,
-          s.sprawa,
-          s.podjete_dzialanie,
-          u.name AS user_name
+SELECT 
+  s.id,
+  s.imie,
+  s.nazwisko,
+  s.telefon,
+  s.data_wplyniecia,
+  s.do_wykonania,
+  s.sprawa,
+  s.podjete_dzialanie,
+  u.name AS user_name
         FROM sprawy_biezace s
         JOIN users u ON s.user_id = u.id
         WHERE s.user_id = ?
