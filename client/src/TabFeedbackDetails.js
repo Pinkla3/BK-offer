@@ -309,6 +309,26 @@ const questionsDe = [
   '6. Nennen Sie 2 Pluspunkte:',
   '6a. ...und 2 Minuspunkte (falls vorhanden):'
 ];
+
+const translationMapPlToDe = {
+  // Pytanie 1
+  'bardzo dobrze': 'sehr gut',
+  'dobrze': 'gut',
+  'średnio': 'mittelmäßig',
+  'mam zastrzeżenia': 'ich habe Bedenken',
+
+  // Pytanie 2 (checkboxy)
+  'występują nocki': 'es gibt Nachtdienste',
+  'osoba jest trudna': 'die Person ist schwierig',
+  'jest ciężki transfer': 'es gibt schwierige Transfers',
+  'brak': 'keine',
+  'inne trudności': 'andere Schwierigkeiten',
+
+  // Pytanie 3 i 5
+  'Tak': 'Ja',
+  'Nie': 'Nein'
+};
+
 const noteLabelPl = 'Notatka:';
 const noteLabelDe = 'Anmerkung:';
 
@@ -664,11 +684,11 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
       marginRight: 'auto'
     }}>
       {['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map(val => (
-        <OptionButton key={val} active={answers[0] === val}>{val}</OptionButton>
+        <OptionButton key={val} active={answers[0] === val}>{t(val)}</OptionButton>
       ))}
     </div>
     {(answers[0] === 'średnio' || answers[0] === 'mam zastrzeżenia') && (
-      <TextArea value={answers[1] || ''} readOnly placeholder="Dlaczego?" rows={3} />
+      <TextArea value={answers[1] || ''} readOnly placeholder={t('Dlaczego?')} rows={3} />
     )}
   </QuestionGroup>
 
@@ -692,14 +712,14 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
         ].map((option, index) => (
           <label key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <input type="checkbox" checked={parsedQ3.includes(option)} readOnly style={{ width: '20px', height: '20px', accentColor: '#007bff' }} />
-            <span>{option}</span>
+            <span>{t(option)}</span>
           </label>
         )).concat([
           <label key="inne" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <input type="checkbox" checked={parsedQ3.includes('inne trudności')} readOnly style={{ width: '20px', height: '20px', accentColor: '#007bff' }} />
-            <span>inne trudności</span>
+            <span>{t('inne trudności')}</span>
           </label>,
-          <TextArea key="textarea" value={answers[3] || ''} readOnly placeholder="Szczegóły dotyczące trudności" rows={2} />
+          <TextArea key="textarea" value={answers[3] || ''} readOnly placeholder={t('Szczegóły dotyczące trudności')} rows={2} />
         ]);
       })()}
     </div>
@@ -720,7 +740,7 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
       marginRight: 'auto'
     }}>
       {['Tak', 'Nie'].map(val => (
-        <OptionButton key={val} active={answers[4] === val}>{val}</OptionButton>
+        <OptionButton key={val} active={answers[4] === val}>{t(val)}</OptionButton>
       ))}
     </div>
   </QuestionGroup>
@@ -730,7 +750,7 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
     <Label>{questions[5]}</Label>
     <div style={{ display: 'flex', justifyContent: 'center', marginTop: '12px', width: '100%' }}>
       <div style={{ position: 'relative', maxWidth: '220px', width: '100%' }}>
-        <TextArea value={answers[5] || ''} readOnly placeholder="Np. 50 €" rows={1} style={{ textAlign: 'center', fontSize: '16px' }} />
+        <TextArea value={answers[5] || ''} readOnly placeholder={t('Np. 50 €')} rows={1} style={{ textAlign: 'center', fontSize: '16px' }} />
       </div>
     </div>
   </QuestionGroup>
@@ -750,26 +770,26 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
       marginRight: 'auto'
     }}>
       {['Tak', 'Nie'].map(val => (
-        <OptionButton key={val} active={answers[6] === val}>{val}</OptionButton>
+        <OptionButton key={val} active={answers[6] === val}>{t(val)}</OptionButton>
       ))}
     </div>
     {answers[6] === 'Nie' && (
-      <TextArea value={answers[7] || ''} readOnly placeholder="Dlaczego nie?" rows={3} />
+      <TextArea value={answers[7] || ''} readOnly placeholder={t('Dlaczego nie?')} rows={3} />
     )}
   </QuestionGroup>
 
   {/* Pytanie 6 */}
   <QuestionGroup>
     <Label>{questions[8]}</Label>
-    <TextArea value={answers[8] || ''} readOnly rows={2} placeholder="Np. dobra atmosfera, wsparcie rodziny..." style={{ marginBottom: '16px' }} />
+    <TextArea value={answers[8] || ''} readOnly rows={2} placeholder={t('Np. dobra atmosfera, wsparcie rodziny...')} style={{ marginBottom: '16px' }} />
     <Label>{questions[9]}</Label>
-    <TextArea value={answers[9] || ''} readOnly rows={2} placeholder="Np. brak czasu wolnego, trudna komunikacja..." />
+    <TextArea value={answers[9] || ''} readOnly rows={2} placeholder={t('Np. brak czasu wolnego, trudna komunikacja...')} />
   </QuestionGroup>
 
   {/* Notatka */}
   <QuestionGroup>
     <Label style={{ fontWeight: '600', fontSize: '16px' }}>{noteLabel}</Label>
-    <TextArea value={noteContent || ''} readOnly rows={4} placeholder="Dodatkowe uwagi..." />
+    <TextArea value={noteContent || ''} readOnly rows={4} placeholder={t('Dodatkowe uwagi...')} />
   </QuestionGroup>
 </TabSection>
 
