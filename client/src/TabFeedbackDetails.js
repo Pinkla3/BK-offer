@@ -679,23 +679,45 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
         )}
       </QuestionGroup>
 
-      {/* Pytanie 2: trudności */}
-      <QuestionGroup>
-        <Label>2. Czy istnieją trudności w opiece nad pacjentem/pacjentką?</Label>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '8px' }}>
-          {(selected.q3 || []).map((item, index) => (
-            <OptionButton key={index} active>{item}</OptionButton>
-          ))}
-        </div>
-        {(selected.q3 || []).includes('inne trudności') && (
-          <TextArea
-            value={selected.q4 || ''}
-            readOnly
-            placeholder="Szczegóły dotyczące trudności"
-            rows={3}
-          />
-        )}
-      </QuestionGroup>
+{/* Pytanie 2: trudności */}  
+<QuestionGroup>
+  <Label>2. Czy istnieją trudności w opiece nad pacjentem/pacjentką?</Label>
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(2, minmax(200px, 1fr))',
+      gap: '8px 24px',
+      marginBottom: '8px',
+      maxWidth: '500px'
+    }}
+  >
+    {[
+      'występują nocki',
+      'osoba jest trudna',
+      'jest ciężki transfer',
+      'brak',
+      'Inne trudności'
+    ].map((option, index) => (
+      <label key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <input
+          type="checkbox"
+          checked={(selected.q3 || []).includes(option)}
+          readOnly
+        />
+        <span>{option}</span>
+      </label>
+    ))}
+  </div>
+
+  {(selected.q3 || []).includes('Inne trudności') && (
+    <TextArea
+      value={selected.q4 || ''}
+      readOnly
+      placeholder="Szczegóły dotyczące trudności"
+      rows={3}
+    />
+  )}
+</QuestionGroup>
 
       <QuestionGroup>
   <Label>3. Czy ma Pani/Pan czas wolny?</Label>
