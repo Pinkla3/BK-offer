@@ -783,33 +783,44 @@ const handleToggleGerman = async () => {
 
 {/* Pytanie 2 */}
 <QuestionGroup>
-  <Label>
-  {questions[2]} 
-  {Array.isArray(selected.q3) && selected.q3.length === 0 && (
-    <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
-      Brak odpowiedzi do tłumaczenia
-    </span>
-  )}
-</Label>
-  <div style={{ display: 'grid', gridTemplateColumns: '250px 1fr', columnGap: '30px', rowGap: '12px', marginTop: '10px', maxWidth: '700px', marginLeft: 'auto', marginRight: 'auto' }}>
-    {['występują nocki', 'osoba jest trudna', 'jest ciężki transfer', 'brak', 'inne trudności'].map((val, index) => (
-      <label key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <input type="checkbox" checked={(selected.q3 || []).includes(val)} readOnly style={{ width: '20px', height: '20px', accentColor: '#007bff' }} />
-        <span>{t(val)}</span>
-      </label>
-    ))}
-    {(selected.q3 || []).includes('inne trudności') && (
-      <>
-        <Label>{questions[3]} {getMissingTranslationMessage(answers[3])}</Label>
+  <Label>{questions[2]}</Label>
+  <div style={{
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, 1fr)',
+    columnGap: '32px',
+    rowGap: '12px',
+    marginTop: '10px',
+    maxWidth: '900px',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    alignItems: 'start'
+  }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      {[ 'występują nocki', 'osoba jest trudna', 'jest ciężki transfer', 'brak', 'inne trudności' ].map((val, index) => (
+        <label key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <input
+            type="checkbox"
+            checked={(selected.q3 || []).includes(val)}
+            readOnly
+            style={{ width: '20px', height: '20px', accentColor: '#007bff' }}
+          />
+          <span>{t(val)}</span>
+        </label>
+      ))}
+    </div>
+
+    {selected.q3 && selected.q3.includes('inne trudności') && (
+      <div style={{ width: '100%' }}>
+        <Label>{questions[3]}</Label>
         <TextArea
           key="textarea"
           value={selected.q4 || ''}
           readOnly
           placeholder={t('Szczegóły dotyczące trudności')}
-          rows={2}
+          rows={6}
           style={getTextAreaStyle(selected.q4)}
         />
-      </>
+      </div>
     )}
   </div>
 </QuestionGroup>
