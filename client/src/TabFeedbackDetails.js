@@ -835,13 +835,17 @@ const handleToggleGerman = async () => {
   </div>
 </QuestionGroup>
 
-{/* Pytanie 4 */}
+/* Pytanie 4 */
 <QuestionGroup>
   <Label>
-    {questions[5]} {getMissingTranslationMessage(showGerman ? answers[5] : selected.q6)}
+    {questions[5]} {showGerman && (!selected.q6 || selected.q6 === '0') && (
+      <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
+        Brak odpowiedzi do tłumaczenia
+      </span>
+    )}
   </Label>
   <div style={{ display: 'flex', justifyContent: 'center', marginTop: '12px', width: '100%' }}>
-    <div style={{ position: 'relative', maxWidth: '220px', width: '100%' }}>
+    <div style={{ position: 'relative', maxWidth: '300px', width: '100%' }}>
       <input
         type="number"
         value={selected.q6 || ''}
@@ -849,25 +853,27 @@ const handleToggleGerman = async () => {
         placeholder="np. 50"
         style={{
           width: '100%',
+          height: '48px',
+          fontSize: '18px',
           textAlign: 'center',
-          fontSize: '16px',
-          padding: '8px 24px 8px 8px',
-          border: '1px solid #ccc',
-          borderRadius: '8px',
-          backgroundColor: isMissingTranslation(selected.q6) ? '#f8d7da' : '#fff',
-          color: isMissingTranslation(selected.q6) ? '#721c24' : '#000',
-          appearance: 'textfield', // dla Safari
-          MozAppearance: 'textfield' // dla Firefox
+          padding: '8px 36px 8px 12px',
+          border: '1px solid',
+          borderRadius: '10px',
+          backgroundColor: showGerman && (!selected.q6 || selected.q6 === '0') ? '#f8d7da' : '#fff',
+          borderColor: showGerman && (!selected.q6 || selected.q6 === '0') ? '#f5c6cb' : '#ccc',
+          color: showGerman && (!selected.q6 || selected.q6 === '0') ? '#721c24' : '#000',
+          appearance: 'textfield',
+          MozAppearance: 'textfield'
         }}
-        onWheel={(e) => e.target.blur()} // blokuje scrollowanie liczbą
+        onWheel={(e) => e.target.blur()}
       />
       <span style={{
         position: 'absolute',
-        right: '8px',
+        right: '10px',
         top: '50%',
         transform: 'translateY(-50%)',
-        color: '#666',
-        fontSize: '16px'
+        color: showGerman && (!selected.q6 || selected.q6 === '0') ? '#721c24' : '#666',
+        fontSize: '18px'
       }}>
         €
       </span>
