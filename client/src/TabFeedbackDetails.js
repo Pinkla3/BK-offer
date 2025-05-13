@@ -449,6 +449,12 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
 
  const handleSave = async () => {
   try {
+    // 🔁 Tłumaczenie q8_plus i q8_minus na DE
+    const [translatedQ8Plus, translatedQ8Minus] = await Promise.all([
+      translateToGerman(editedAnswers[8] || ''),
+      translateToGerman(editedAnswers[9] || '')
+    ]);
+
     const payload = {
       caregiver_first_name: editedCaregiverFirstName,
       caregiver_last_name: editedCaregiverLastName,
@@ -474,7 +480,7 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
       notes: editedAnswers[12],
     });
 
-    // 🔁 Wersja DE
+    // 🔁 Wersja DE (z tłumaczeniem dla q8_plus_de i q8_minus_de)
     Object.assign(payload, {
       q1_de: editedAnswersDe[0],
       q2_de: editedAnswersDe[1],
@@ -483,10 +489,12 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
       q5_de: editedAnswersDe[4],
       q6_de: editedAnswersDe[5],
       q7_de: editedAnswersDe[6],
-      q8_de: editedAnswersDe[7],
+      q8_de: editedAnswersDe[7], // jeśli nadal używane
       q9_de: editedAnswersDe[8],
       q10_de: editedAnswersDe[9],
       notes_de: editedAnswersDe[10],
+      q8_plus_de: translatedQ8Plus,
+      q8_minus_de: translatedQ8Minus
     });
 
     // 🔁 Zapis do backendu
@@ -508,17 +516,18 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
 
     setSelected(updatedSelected);
     setGermanAnswers(editedAnswersDe);
-    setTranslatedNote(editedAnswersDe[10]); // opcjonalnie, jeśli notes_de
+    setTranslatedNote(editedAnswersDe[10]);
     setEditing(false);
     setIsTranslated(true);
 
     toast.success('Dane zapisane pomyślnie!');
-    window.dispatchEvent(new Event('feedbackUpdated')); // 🔔 odśwież listę w tle
+    window.dispatchEvent(new Event('feedbackUpdated'));
   } catch (err) {
     console.error('Błąd zapisu:', err);
     toast.error('Wystąpił błąd podczas zapisywania. Spróbuj ponownie.');
   }
 };
+
 const handleDynamicTranslate = async () => {
   setTranslating(true);
   try {

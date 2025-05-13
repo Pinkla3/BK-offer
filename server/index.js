@@ -630,6 +630,7 @@ app.patch('/api/tabResponses/:id', authenticate, async (req, res) => {
   const { id } = req.params;
   const updates = req.body;
 
+  // Jeśli q3 to tablica – zamień na string
   if (Array.isArray(updates.q3)) {
     updates.q3 = updates.q3.join(', ');
   }
@@ -679,6 +680,7 @@ app.patch('/api/tabResponses/:id', authenticate, async (req, res) => {
         notes = ?,
         q1_de = ?, q2_de = ?, q3_de = ?, q4_de = ?, q5_de = ?,
         q6_de = ?, q7_de = ?, q8_de = ?, q9_de = ?, q10_de = ?,
+        q8_plus_de = ?, q8_minus_de = ?, -- 🔥 nowe pola
         notes_de = ?, user_name = ?, edit_history = ?
       WHERE id = ?
     `, [
@@ -689,6 +691,7 @@ app.patch('/api/tabResponses/:id', authenticate, async (req, res) => {
       updates.notes,
       updates.q1_de, updates.q2_de, updates.q3_de, updates.q4_de, updates.q5_de,
       updates.q6_de, updates.q7_de, updates.q8_de, updates.q9_de, updates.q10_de,
+      updates.q8_plus_de, updates.q8_minus_de, // 🔥
       updates.notes_de,
       updates.user_name,
       JSON.stringify(updatedHistory),
