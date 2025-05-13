@@ -463,10 +463,6 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
         ['q6'],
         ['q7', 'q7_why'],
         ['q8_plus', 'q8_minus'],
-        ['q9'],
-        ['q10'],
-        ['q11'],
-        ['q12']
       ];
 
       const textsToTranslate = editing
