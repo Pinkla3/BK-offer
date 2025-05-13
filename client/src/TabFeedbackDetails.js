@@ -370,8 +370,6 @@ useEffect(() => {
       selected.q7_why || '',
       selected.q8_plus || '',
       selected.q8_minus || '',
-      selected.q9 || '',
-      selected.q10 || '',
       selected.notes || ''
     ]);
 
@@ -1067,7 +1065,7 @@ const handleToggleGerman = async () => {
         type="number"
         value={
           editing
-            ? editedAnswers[6] ?? ''
+            ? editedAnswers[5] ?? ''
             : showGerman && (!selected.q6 || selected.q6.trim() === '' || selected.q6 === '0')
               ? '[brak tekstu do tłumaczenia]'
               : selected.q6 || ''
