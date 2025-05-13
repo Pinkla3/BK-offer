@@ -518,14 +518,12 @@ const handleDynamicTranslate = async () => {
       'q7', 'q7_why', 'q8_plus', 'q8_minus', 'q9', 'q10'
     ];
 
-    const textsToTranslate = editing
-      ? fieldsToTranslate.map(key => {
-          const idx = fieldMap[key];
-          const val = editedAnswers[idx];
-          if (Array.isArray(val)) return val.join(', ');
-          return val || '';
-        }).concat(editedAnswers[12] || '')
-      : fieldsToTranslate.map(key => selected[key] || '').concat(selected.notes || '');
+    const textsToTranslate = fieldsToTranslate.map((key) => {
+      const idx = fieldMap[key];
+      const val = editedAnswers[idx];
+      if (Array.isArray(val)) return val.join(', ');
+      return val || '';
+    }).concat(editedAnswers[12] || '');
 
     const trimmed = textsToTranslate.map(t => t.trim());
     const toSend = trimmed.filter(t => t.length > 0);
@@ -561,26 +559,26 @@ const handleDynamicTranslate = async () => {
       }
     }
 
-    // ✅ Pełny payload: wersja PL + tłumaczenia DE
+    // ✅ Pełny payload — PL z editedAnswers + DE z tłumaczenia
     const fullPayload = {
-      // wersja PL – z aktualnego `selected`
-      q1: selected.q1,
-      q2: selected.q2,
-      q3: selected.q3,
-      q4: selected.q4,
-      q5: selected.q5,
-      q6: selected.q6,
-      q7: selected.q7,
-      q7_why: selected.q7_why,
-      q8_plus: selected.q8_plus,
-      q8_minus: selected.q8_minus,
-      q9: selected.q9,
-      q10: selected.q10,
-      notes: selected.notes,
+      // wersja PL (z aktualnych editedAnswers, NIE selected)
+      q1: editedAnswers[0],
+      q2: editedAnswers[1],
+      q3: Array.isArray(editedAnswers[2]) ? editedAnswers[2].join(', ') : editedAnswers[2],
+      q4: editedAnswers[3],
+      q5: editedAnswers[4],
+      q6: editedAnswers[5],
+      q7: editedAnswers[6],
+      q7_why: editedAnswers[7],
+      q8_plus: editedAnswers[8],
+      q8_minus: editedAnswers[9],
+      q9: editedAnswers[10],
+      q10: editedAnswers[11],
+      notes: editedAnswers[12],
 
-      // wersja DE – nowo przetłumaczona
+      // wersja DE — przetłumaczona
       q1_de: answersDe[0],
-      q2_de: '[brak tekstu do tłumaczenia]', // jeśli pomijasz q2
+      q2_de: '[brak tekstu do tłumaczenia]', // jeśli nie tłumaczysz q2
       q3_de: answersDe[1],
       q4_de: answersDe[2],
       q5_de: answersDe[3],
@@ -595,14 +593,14 @@ const handleDynamicTranslate = async () => {
       notes_de: answersDe[11]
     };
 
-    // 🔁 Zapis
+    // 🔁 Zapis do backendu
     const res = await axios.patch(
       `${API_BASE_URL}/api/tabResponses/${selected.id}`,
       fullPayload,
       { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
     );
 
-    // 🔄 Aktualizacja lokalnych danych
+    // 🔄 Aktualizacja lokalnego stanu
     setGermanAnswers(answersDe.slice(0, 11));
     setTranslatedNote(answersDe[11]);
 
