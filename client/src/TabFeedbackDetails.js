@@ -447,121 +447,24 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
     setEditedPatientLastName(selected.patient_last_name || '');
   };
 
-const handleSave = async () => {
+ const handleSave = async () => {
   try {
+    // 🔁 Tłumaczenie q8_plus i q8_minus na DE
+    const [translatedQ8Plus, translatedQ8Minus] = await Promise.all([
+      translateToGerman(editedAnswers[8] || ''),
+      translateToGerman(editedAnswers[9] || '')
+    ]);
+
     const payload = {
       caregiver_first_name: editedCaregiverFirstName,
       caregiver_last_name: editedCaregiverLastName,
       caregiver_phone: editedCaregiverPhone,
       patient_first_name: editedPatientFirstName,
       patient_last_name: editedPatientLastName,
-      q1: editedAnswers[0],
-      q2: editedAnswers[1],
-      q3: Array.isArray(editedAnswers[2]) ? editedAnswers[2].join(', ') : editedAnswers[2],
-      q4: editedAnswers[3],
-      q5: editedAnswers[4],
-      q6: editedAnswers[5],
-      q7: editedAnswers[6],
-      q7_why: editedAnswers[7],
-      q8_plus: editedAnswers[8],
-      q8_minus: editedAnswers[9],
-      q9: editedAnswers[10],
-      q10: editedAnswers[11],
-      notes: editedAnswers[12]
     };
 
-    const res = await axios.patch(
-      `${API_BASE_URL}/api/tabResponses/${selected.id}`,
-      payload,
-      { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
-    );
-
-    const updated = res.data;
-
-    setSelected(prev => ({
-      ...prev,
-      ...payload,
-      user_name: updated.user_name || prev.user_name,
-      edit_history: updated.edit_history
-    }));
-
-    setEditing(false);
-    toast.success('Wersja polska zapisana.');
-    window.dispatchEvent(new Event('feedbackUpdated'));
-  } catch (err) {
-    console.error('Błąd zapisu wersji PL:', err);
-    toast.error('Nie udało się zapisać wersji polskiej.');
-  }
-};
-
-const handleDynamicTranslate = async () => {
-  setTranslating(true);
-  try {
-    const fieldMap = {
-      q1: 0,
-      q2: 1,
-      q3: 2,
-      q4: 3,
-      q5: 4,
-      q6: 5,
-      q7: 6,
-      q7_why: 7,
-      q8_plus: 8,
-      q8_minus: 9,
-      q9: 10,
-      q10: 11,
-      notes: 12
-    };
-
-    const fieldsToTranslate = [
-      'q1', 'q3', 'q4', 'q5', 'q6',
-      'q7', 'q7_why', 'q8_plus', 'q8_minus', 'q9', 'q10'
-    ];
-
-    const textsToTranslate = fieldsToTranslate.map((key) => {
-      const idx = fieldMap[key];
-      const val = editedAnswers[idx];
-      if (Array.isArray(val)) return val.join(', ');
-      return val || '';
-    }).concat(editedAnswers[12] || '');
-
-    const trimmed = textsToTranslate.map(t => t.trim());
-    const toSend = trimmed.filter(t => t.length > 0);
-
-    if (toSend.length === 0) {
-      toast.warn('Brak tekstu do przetłumaczenia.');
-      const emptyAnswersDe = fieldsToTranslate.map(() => '[brak tekstu do tłumaczenia]');
-      setGermanAnswers(emptyAnswersDe);
-      setTranslatedNote('[brak tekstu do tłumaczenia]');
-      setIsTranslated(true);
-      setIsPolishChangedSinceTranslation(false);
-      setTranslating(false);
-      return;
-    }
-
-    const { data } = await axios.post(
-      `${API_BASE_URL}/api/translate`,
-      { texts: toSend, source: 'pl', target: 'de' },
-      { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
-    );
-
-    if (!data || !Array.isArray(data.translations)) {
-      throw new Error('Niepoprawny format odpowiedzi z API');
-    }
-
-    const answersDe = [];
-    let j = 0;
-    for (let i = 0; i < textsToTranslate.length; i++) {
-      if (trimmed[i].length === 0) {
-        answersDe.push('[brak tekstu do tłumaczenia]');
-      } else {
-        answersDe.push(data.translations[j++] || '');
-      }
-    }
-
-    // ✅ Pełny payload — PL z editedAnswers + DE z tłumaczenia
-    const fullPayload = {
-      // wersja PL (z aktualnych editedAnswers, NIE selected)
+    // 🔁 Wypełniamy wszystkie pola feedbacku PL
+    Object.assign(payload, {
       q1: editedAnswers[0],
       q2: editedAnswers[1],
       q3: Array.isArray(editedAnswers[2]) ? editedAnswers[2].join(', ') : editedAnswers[2],
@@ -575,47 +478,129 @@ const handleDynamicTranslate = async () => {
       q9: editedAnswers[10],
       q10: editedAnswers[11],
       notes: editedAnswers[12],
+    });
 
-      // wersja DE — przetłumaczona
-      q1_de: answersDe[0],
-      q2_de: '[brak tekstu do tłumaczenia]', // jeśli nie tłumaczysz q2
-      q3_de: answersDe[1],
-      q4_de: answersDe[2],
-      q5_de: answersDe[3],
-      q6_de: answersDe[4],
-      q7_de: answersDe[5],
-      q7_why_de: answersDe[6],
-      q8_de: answersDe[7],
-      q8_plus_de: answersDe[7],
-      q8_minus_de: answersDe[8],
-      q9_de: answersDe[9],
-      q10_de: answersDe[10],
-      notes_de: answersDe[11]
-    };
+    // 🔁 Wersja DE (z tłumaczeniem dla q8_plus_de i q8_minus_de)
+    Object.assign(payload, {
+      q1_de: editedAnswersDe[0],
+      q2_de: editedAnswersDe[1],
+      q3_de: editedAnswersDe[2],
+      q4_de: editedAnswersDe[3],
+      q5_de: editedAnswersDe[4],
+      q6_de: editedAnswersDe[5],
+      q7_de: editedAnswersDe[6],
+      q8_de: editedAnswersDe[7], // jeśli nadal używane
+      q9_de: editedAnswersDe[8],
+      q10_de: editedAnswersDe[9],
+      notes_de: editedAnswersDe[10],
+      q8_plus_de: translatedQ8Plus,
+      q8_minus_de: translatedQ8Minus
+    });
 
     // 🔁 Zapis do backendu
     const res = await axios.patch(
       `${API_BASE_URL}/api/tabResponses/${selected.id}`,
-      fullPayload,
+      payload,
       { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
     );
 
-    // 🔄 Aktualizacja lokalnego stanu
-    setGermanAnswers(answersDe.slice(0, 11));
-    setTranslatedNote(answersDe[11]);
+    const updated = res.data;
 
-    setSelected(prev => ({
-      ...prev,
-      ...fullPayload,
-      edit_history: res.data.edit_history || prev.edit_history
-    }));
+    // 🔄 odświeżenie danych w widoku szczegółowym
+    const updatedSelected = {
+      ...selected,
+      ...payload,
+      user_name: updated.user_name || selected.user_name,
+      edit_history: updated.edit_history
+    };
 
+    setSelected(updatedSelected);
+    setGermanAnswers(editedAnswersDe);
+    setTranslatedNote(editedAnswersDe[10]);
+    setEditing(false);
     setIsTranslated(true);
-    setIsPolishChangedSinceTranslation(false);
-    toast.success('Tłumaczenie na niemiecki zapisane.');
+
+    toast.success('Dane zapisane pomyślnie!');
+    window.dispatchEvent(new Event('feedbackUpdated'));
+  } catch (err) {
+    console.error('Błąd zapisu:', err);
+    toast.error('Wystąpił błąd podczas zapisywania. Spróbuj ponownie.');
+  }
+};
+
+const handleDynamicTranslate = async () => {
+  setTranslating(true);
+  try {
+    const questionGroups = [
+      ['q1'],
+      ['q3', 'q4'],
+      ['q5'],
+      ['q6'],
+      ['q7', 'q7_why'],
+      ['q8_plus', 'q8_minus']
+    ];
+
+    const fieldsToTranslate = ['q1', 'q3', 'q4', 'q5', 'q6', 'q7', 'q7_why', 'q8_plus', 'q8_minus'];
+
+    const textsToTranslate = editing
+      ? fieldsToTranslate.map((key, idx) => editedAnswers[idx] || '').concat(editedNote)
+      : fieldsToTranslate.map(key => selected[key] || '').concat(selected.notes || '');
+
+    const groupedEmpty = questionGroups
+      .map((fields, idx) =>
+        fields.every(f => ((editing ? (editedAnswers[fieldsToTranslate.indexOf(f)] || '') : (selected[f] || '')).trim() === ''))
+          ? idx
+          : -1
+      )
+      .filter(idx => idx !== -1);
+
+    if (groupedEmpty.length === questionGroups.length) {
+      toast.warn('Brak tekstu do tłumaczenia.');
+
+      const answersDe = fieldsToTranslate.map(() => '[brak tekstu do tłumaczenia]');
+      setGermanAnswers(answersDe);
+      setTranslatedNote('[brak tekstu do tłumaczenia]');
+      setIsTranslated(true);
+      setIsPolishChangedSinceTranslation(false);
+      setTranslating(false);
+      return;
+    }
+
+    if (groupedEmpty.length > 0) {
+      toast.warn(`Brak odpowiedzi w ${groupedEmpty.length} pytaniu/ach. Puste pola zostaną oznaczone.`);
+    }
+
+    const trimmed = textsToTranslate.map(t => t.trim());
+    const toSend = trimmed.filter(t => t.length > 0);
+
+    const { data } = await axios.post(
+      `${API_BASE_URL}/api/translate`,
+      { texts: toSend, source: 'pl', target: 'de' },
+      { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+    );
+
+    if (data && Array.isArray(data.translations)) {
+      const answersDe = [];
+      let j = 0;
+      for (let i = 0; i < textsToTranslate.length; i++) {
+        if (trimmed[i].length === 0) {
+          answersDe.push('[brak tekstu do tłumaczenia]');
+        } else {
+          answersDe.push(data.translations[j++] || '');
+        }
+      }
+
+      setGermanAnswers(answersDe.slice(0, fieldsToTranslate.length));
+      setTranslatedNote(answersDe[fieldsToTranslate.length] || '');
+      setIsTranslated(true);
+      setIsPolishChangedSinceTranslation(false);
+      toast.success('Tłumaczenie zakończone.');
+    } else {
+      throw new Error('Niepoprawny format danych z API');
+    }
   } catch (err) {
     console.error('🔴 Błąd tłumaczenia:', err.response?.data || err.message);
-    toast.error('Nie udało się przetłumaczyć i zapisać.');
+    toast.error('Nie udało się przetłumaczyć.');
   } finally {
     setTranslating(false);
   }
@@ -671,7 +656,6 @@ const handleToggleGerman = async () => {
     setEditedNote(value);
     setIsPolishChangedSinceTranslation(true);
   };
-  
 
   if (loading) return <Wrapper><p>Ładowanie...</p></Wrapper>;
   if (error) return <Wrapper><p>{error}</p></Wrapper>;
@@ -826,12 +810,7 @@ const handleToggleGerman = async () => {
 {/* Pytanie 1 */}
 <QuestionGroup style={{ marginTop: '32px' }}>
   <Label>
-    {questions[0]}
-    {showGerman && isMissingTranslation(selected.q1, selected.q1_de) && (
-      <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
-        Brak odpowiedzi do tłumaczenia
-      </span>
-    )}
+    {questions[0]} {getMissingTranslationMessage(answers[0])}
   </Label>
   <div
     style={{
@@ -866,7 +845,50 @@ const handleToggleGerman = async () => {
       );
     })}
   </div>
+
+  <div
+    style={{
+      marginTop: '16px',
+      overflow: 'hidden',
+      maxHeight:
+        (editing ? editedAnswers[0] : selected.q1) === 'średnio' ||
+        (editing ? editedAnswers[0] : selected.q1) === 'mam zastrzeżenia'
+          ? '200px'
+          : '0px',
+      opacity:
+        (editing ? editedAnswers[0] : selected.q1) === 'średnio' ||
+        (editing ? editedAnswers[0] : selected.q1) === 'mam zastrzeżenia'
+          ? 1
+          : 0,
+      transition: 'all 0.4s ease',
+      width: '100%'
+    }}
+  >
+    <TextArea
+      value={editing ? editedAnswers[1] || '' : selected.q2 || ''}
+      onChange={editing ? (e) => setEditedAnswers(prev => {
+        const updated = [...prev];
+        updated[1] = e.target.value;
+        return updated;
+      }) : undefined}
+      readOnly={!editing}
+      placeholder={t('Dlaczego?')}
+      rows={3}
+      style={{
+        width: '100%',
+        border: '1px solid #ccc',
+        borderRadius: '8px',
+        padding: '10px',
+        fontSize: '14px',
+        boxSizing: 'border-box',
+        transition: 'opacity 0.3s ease',
+        resize: 'vertical',
+        backgroundColor: '#fff'
+      }}
+    />
+  </div>
 </QuestionGroup>
+
 {/* Pytanie 2 */}
 <QuestionGroup>
   <Label>{questions[2]}</Label>
@@ -1192,21 +1214,19 @@ const handleToggleGerman = async () => {
 
 {/* Pytanie 6 */}
 <QuestionGroup>
-  {/* q8_plus */}
+  {/* Pytanie q8_plus */}
   <Label>
     {questions[8]}
-    {showGerman && (!selected.q8_plus_de || selected.q8_plus_de.trim() === '') && (
-      <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
-        Brak odpowiedzi do tłumaczenia
-      </span>
+    {showGerman && (!selected.q8_plus || selected.q8_plus.trim() === '') && (
+      <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>Brak odpowiedzi do tłumaczenia</span>
     )}
   </Label>
   <TextArea
     value={
       editing
         ? editedAnswers[8] || ''
-        : showGerman
-          ? selected.q8_plus_de || '[brak tekstu do tłumaczenia]'
+        : showGerman && (!selected.q8_plus || selected.q8_plus.trim() === '')
+          ? '[brak tekstu do tłumaczenia]'
           : selected.q8_plus || ''
     }
     readOnly={!editing}
@@ -1219,27 +1239,25 @@ const handleToggleGerman = async () => {
     placeholder={t('Np. dobra atmosfera, wsparcie rodziny...')}
     style={{
       marginBottom: '16px',
-      backgroundColor: showGerman && (!selected.q8_plus_de || selected.q8_plus_de.trim() === '') ? '#f8d7da' : '#fff',
-      borderColor: showGerman && (!selected.q8_plus_de || selected.q8_plus_de.trim() === '') ? '#f5c6cb' : '#ccc',
-      color: showGerman && (!selected.q8_plus_de || selected.q8_plus_de.trim() === '') ? '#721c24' : '#000'
+      backgroundColor: showGerman && (!selected.q8_plus || selected.q8_plus.trim() === '') ? '#f8d7da' : '#fff',
+      borderColor: showGerman && (!selected.q8_plus || selected.q8_plus.trim() === '') ? '#f5c6cb' : '#ccc',
+      color: showGerman && (!selected.q8_plus || selected.q8_plus.trim() === '') ? '#721c24' : '#000'
     }}
   />
 
-  {/* q8_minus */}
+  {/* Pytanie q8_minus */}
   <Label>
     {questions[9]}
-    {showGerman && (!selected.q8_minus_de || selected.q8_minus_de.trim() === '') && (
-      <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
-        Brak odpowiedzi do tłumaczenia
-      </span>
+    {showGerman && (!selected.q8_minus || selected.q8_minus.trim() === '') && (
+      <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>Brak odpowiedzi do tłumaczenia</span>
     )}
   </Label>
   <TextArea
     value={
       editing
         ? editedAnswers[9] || ''
-        : showGerman
-          ? selected.q8_minus_de || '[brak tekstu do tłumaczenia]'
+        : showGerman && (!selected.q8_minus || selected.q8_minus.trim() === '')
+          ? '[brak tekstu do tłumaczenia]'
           : selected.q8_minus || ''
     }
     readOnly={!editing}
@@ -1251,9 +1269,9 @@ const handleToggleGerman = async () => {
     rows={2}
     placeholder={t('Np. brak czasu wolnego, trudna komunikacja...')}
     style={{
-      backgroundColor: showGerman && (!selected.q8_minus_de || selected.q8_minus_de.trim() === '') ? '#f8d7da' : '#fff',
-      borderColor: showGerman && (!selected.q8_minus_de || selected.q8_minus_de.trim() === '') ? '#f5c6cb' : '#ccc',
-      color: showGerman && (!selected.q8_minus_de || selected.q8_minus_de.trim() === '') ? '#721c24' : '#000'
+      backgroundColor: showGerman && (!selected.q8_minus || selected.q8_minus.trim() === '') ? '#f8d7da' : '#fff',
+      borderColor: showGerman && (!selected.q8_minus || selected.q8_minus.trim() === '') ? '#f5c6cb' : '#ccc',
+      color: showGerman && (!selected.q8_minus || selected.q8_minus.trim() === '') ? '#721c24' : '#000'
     }}
   />
 </QuestionGroup>
