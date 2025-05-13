@@ -560,6 +560,7 @@ const getOptionWarningStyle = (val, selectedVal) =>
 
 const getOptionWarning = (val) => val === '[brak tekstu do tłumaczenia]';
 
+
 const handleToggleGerman = async () => {
   if (!showGerman) {
     if (germanAnswers.length === 0 || isPolishChangedSinceTranslation || editing) {
