@@ -122,14 +122,15 @@ const questions = [
 ];
 
 const TabFeedback = ({ onSuccess, onClose }) => {
-  const initialState = {
-    caregiverFirstName: '',
-    caregiverLastName: '',
-    caregiverPhone: '',
-    patientFirstName: '',
-    patientLastName: '',
-    q1: '', q2: '', q3: '', q4: '', q5: '', q6: '', q7: '', q8: '', q9: '', q10: '', notes: ''
-  };
+const initialState = {
+  caregiverFirstName: '',
+  caregiverLastName: '',
+  caregiverPhone: '',
+  patientFirstName: '',
+  patientLastName: '',
+  q1: '', q2: '', q3: '', q4: '', q5: '', q6: '', q7: '', q7_why: '',
+  q8_plus: '', q8_minus: '', q9: '', q10: '', notes: ''
+};
   const [formData, setFormData] = useState(initialState);
   const [form, setForm] = useState(initialState);
   const [errors, setErrors] = useState({});
