@@ -738,7 +738,7 @@ const handleToggleGerman = async () => {
 {/* Pytanie 1 */}
 <QuestionGroup style={{ marginTop: '32px' }}>
   <Label>
-    {questions[0]} {getMissingTranslationMessage(showGerman ? answers[0] : selected.q1)}
+    {questions[0]} {getMissingTranslationMessage(selected.q1)}
   </Label>
   <div style={{
     display: 'grid',
@@ -768,14 +768,13 @@ const handleToggleGerman = async () => {
   {(selected.q1 === 'średnio' || selected.q1 === 'mam zastrzeżenia') && (
     <>
       <Label>
-        {questions[1]} {getMissingTranslationMessage(showGerman ? answers[1] : selected.q2)}
+        {questions[1]}
       </Label>
       <TextArea
         value={selected.q2 || ''}
         readOnly
         placeholder={t('Dlaczego?')}
         rows={3}
-        style={getTextAreaStyle(selected.q2)}
       />
     </>
   )}
