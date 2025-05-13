@@ -1060,13 +1060,29 @@ const handleToggleGerman = async () => {
       </span>
     )}
   </Label>
+
   <div style={{ display: 'flex', justifyContent: 'center', marginTop: '12px', width: '100%' }}>
     <div style={{ position: 'relative', maxWidth: '300px', width: '100%' }}>
       <input
-        type="text"
-        value={showGerman && (!selected.q6 || selected.q6.trim() === '' || selected.q6 === '0') ? '[brak tekstu do tłumaczenia]' : selected.q6 || ''}
-        readOnly
+        type="number"
+        value={
+          editing
+            ? editedAnswers[6] ?? ''
+            : showGerman && (!selected.q6 || selected.q6.trim() === '' || selected.q6 === '0')
+              ? '[brak tekstu do tłumaczenia]'
+              : selected.q6 || ''
+        }
         placeholder="np. 50"
+        readOnly={!editing}
+        onChange={editing ? (e) => {
+          const val = e.target.value;
+          setEditedAnswers(prev => {
+            const updated = [...prev];
+            updated[6] = val;
+            return updated;
+          });
+        } : undefined}
+        onWheel={(e) => e.target.blur()} // zapobiega zmianie przez scroll
         style={{
           width: '100%',
           height: '48px',
@@ -1075,13 +1091,15 @@ const handleToggleGerman = async () => {
           padding: '8px 36px 8px 12px',
           border: '1px solid',
           borderRadius: '10px',
-          backgroundColor: showGerman && (!selected.q6 || selected.q6.trim() === '' || selected.q6 === '0') ? '#f8d7da' : '#fff',
-          borderColor: showGerman && (!selected.q6 || selected.q6.trim() === '' || selected.q6 === '0') ? '#f5c6cb' : '#ccc',
-          color: showGerman && (!selected.q6 || selected.q6.trim() === '' || selected.q6 === '0') ? '#721c24' : '#000',
+          backgroundColor: showGerman && (!selected.q6 || selected.q6.trim() === '' || selected.q6 === '0')
+            ? '#f8d7da' : (editing ? '#fff' : '#f9f9f9'),
+          borderColor: showGerman && (!selected.q6 || selected.q6.trim() === '' || selected.q6 === '0')
+            ? '#f5c6cb' : '#ccc',
+          color: showGerman && (!selected.q6 || selected.q6.trim() === '' || selected.q6 === '0')
+            ? '#721c24' : '#000',
           appearance: 'textfield',
           MozAppearance: 'textfield'
         }}
-        onWheel={(e) => e.target.blur()}
       />
       <span style={{
         position: 'absolute',
