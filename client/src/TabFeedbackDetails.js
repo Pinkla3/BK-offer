@@ -7,6 +7,15 @@ import Modal from 'react-modal';
 
 const API_BASE_URL = 'https://desk.berlin-opiekunki.pl';
 
+const InputBase = ({ error, ...rest }) => <input {...rest} />;
+
+const Input = styled(InputBase)`
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid ${p => p.error ? '#e74c3c' : '#ccc'};
+  border-radius: 4px;
+`;
+
 const Wrapper = styled.div`
   padding: 40px;
   max-width: 900px;
