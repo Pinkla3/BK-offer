@@ -816,56 +816,49 @@ const handleToggleGerman = async () => {
       </span>
     )}
   </Label>
-  <div style={{
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, 1fr)',
-    columnGap: '32px',
-    rowGap: '12px',
-    marginTop: '10px',
-    maxWidth: '800px',
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    alignItems: 'start'
-  }}>
-    {[ 'występują nocki', 'jest ciężki transfer', 'osoba jest trudna', 'brak' ].map((val, index) => (
-      <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <input
-          type="checkbox"
-          checked={(selected.q3 || []).includes(val)}
-          readOnly
-          style={{ width: '20px', height: '20px', accentColor: '#007bff' }}
-        />
-        <span>{t(val)}</span>
-      </div>
-    ))}
-    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-      <input
-        type="checkbox"
-        checked={(selected.q3 || []).includes('inne trudności')}
-        readOnly
-        style={{ width: '20px', height: '20px', accentColor: '#007bff' }}
-      />
-      <span>{t('inne trudności')}</span>
-    </div>
-    <div>
-      {(selected.q3 || []).includes('inne trudności') && selected.q4 && selected.q4.trim() !== '' && (
-        <input
-          type="text"
-          value={selected.q4}
-          readOnly
-          placeholder={t('Proszę podać szczegóły')}
-          style={{
-            width: '100%',
-            padding: '6px 10px',
-            borderRadius: '6px',
-            border: '1px solid #ccc',
-            backgroundColor: '#fff',
-            color: '#000',
-            fontSize: '14px'
-          }}
-        />
-      )}
-    </div>
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))',
+      gap: '12px',
+      justifyContent: 'center',
+      marginTop: '12px',
+      width: '100%',
+      maxWidth: '500px',
+      marginLeft: 'auto',
+      marginRight: 'auto'
+    }}
+  >
+    {checkboxOptions.map((val, idx) => {
+      const isChecked = editing
+        ? (editedAnswers[2] || []).includes(val)
+        : (selected.q3 || []).includes(val);
+      return (
+        <label key={val} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <input
+            type="checkbox"
+            checked={isChecked}
+            disabled={!editing}
+            onChange={(e) => {
+              if (!editing) return;
+              setEditedAnswers(prev => {
+                const updated = [...(prev[2] || [])];
+                if (e.target.checked) {
+                  updated.push(val);
+                } else {
+                  const index = updated.indexOf(val);
+                  if (index > -1) updated.splice(index, 1);
+                }
+                const newAnswers = [...prev];
+                newAnswers[2] = updated;
+                return newAnswers;
+              });
+            }}
+          />
+          {t(val)}
+        </label>
+      );
+    })}
   </div>
 </QuestionGroup>
 
@@ -965,38 +958,60 @@ const handleToggleGerman = async () => {
 {/* Pytanie 5 */}
 <QuestionGroup>
   <Label>
-    {questions[6]} 
+    {questions[6]}
     {showGerman && (!selected.q7 || selected.q7.trim() === '') && (
       <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
         Brak odpowiedzi do tłumaczenia
       </span>
     )}
   </Label>
-  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))', columnGap: '120px', rowGap: '12px', justifyContent: 'center', marginTop: '12px', maxWidth: '400px', marginLeft: 'auto', marginRight: 'auto' }}>
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))',
+      columnGap: '120px',
+      rowGap: '12px',
+      justifyContent: 'center',
+      marginTop: '12px',
+      maxWidth: '400px',
+      marginLeft: 'auto',
+      marginRight: 'auto'
+    }}
+  >
     {['Tak', 'Nie'].map(val => {
       const translated = t(val);
+      const isActive = (editing ? editedAnswers[6] : selected.q7) === val;
       return (
         <OptionButton
           key={val}
-          active={selected.q7 === val}
-          warning={isMissingTranslation(translated) && selected.q7 === val}
+          type="button"
+          active={isActive}
+          onClick={() => editing && setEditedAnswers(prev => {
+            const updated = [...prev];
+            updated[6] = val;
+            return updated;
+          })}
+          warning={isMissingTranslation(translated) && isActive}
         >
           {translated}
         </OptionButton>
       );
     })}
   </div>
-  {selected.q7 === 'Nie' && (
+  {(editing ? editedAnswers[6] : selected.q7) === 'Nie' && (
     <>
-      <Label>
-        {questions[7]} {getMissingTranslationMessage(answers[7])}
-      </Label>
+      <Label>{questions[7]}</Label>
       <TextArea
-        value={selected.q7_why || ''}
-        readOnly
+        value={editing ? editedAnswers[7] || '' : selected.q7_why || ''}
+        onChange={editing ? (e) => setEditedAnswers(prev => {
+          const updated = [...prev];
+          updated[7] = e.target.value;
+          return updated;
+        }) : undefined}
+        readOnly={!editing}
         placeholder={t('Dlaczego nie?')}
         rows={3}
-        style={getTextAreaStyle(selected.q7_why)}
+        style={getTextAreaStyle(editing ? editedAnswers[7] : selected.q7_why)}
       />
     </>
   )}
