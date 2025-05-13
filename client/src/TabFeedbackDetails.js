@@ -718,7 +718,7 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
     ))}
   </div>
 
-  {(selected.q3 || []).includes('Inne trudności') && (
+  {(selected.q3 || []).includes('inne trudności') && (
     <TextArea
       value={selected.q4 || ''}
       readOnly
