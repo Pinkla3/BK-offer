@@ -783,45 +783,56 @@ const handleToggleGerman = async () => {
 
 {/* Pytanie 2 */}
 <QuestionGroup>
-  <Label>{questions[2]}</Label>
+  <Label>
+    {questions[2]}
+    {showGerman && (!selected.q3 || selected.q3.length === 0) && (
+      <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
+        Brak odpowiedzi do tłumaczenia
+      </span>
+    )}
+  </Label>
   <div style={{
     display: 'grid',
     gridTemplateColumns: 'repeat(2, 1fr)',
     columnGap: '32px',
     rowGap: '12px',
     marginTop: '10px',
-    maxWidth: '900px',
+    maxWidth: '800px',
     marginLeft: 'auto',
     marginRight: 'auto',
     alignItems: 'start'
   }}>
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-      {[ 'występują nocki', 'osoba jest trudna', 'jest ciężki transfer', 'brak', 'inne trudności' ].map((val, index) => (
-        <label key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <input
-            type="checkbox"
-            checked={(selected.q3 || []).includes(val)}
-            readOnly
-            style={{ width: '20px', height: '20px', accentColor: '#007bff' }}
-          />
-          <span>{t(val)}</span>
-        </label>
-      ))}
-    </div>
-
-    {selected.q3 && selected.q3.includes('inne trudności') && (
-      <div style={{ width: '100%' }}>
-        <Label>{questions[3]}</Label>
-        <TextArea
-          key="textarea"
-          value={selected.q4 || ''}
+    {[ 'występują nocki', 'jest ciężki transfer', 'inne trudności', 'osoba jest trudna', 'brak' ].map((val, index) => (
+      <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <input
+          type="checkbox"
+          checked={(selected.q3 || []).includes(val)}
           readOnly
-          placeholder={t('Szczegóły dotyczące trudności')}
-          rows={6}
-          style={getTextAreaStyle(selected.q4)}
+          style={{ width: '20px', height: '20px', accentColor: '#007bff' }}
         />
+        <span>{t(val)}</span>
+
+        {val === 'inne trudności' && (selected.q3 || []).includes('inne trudności') && selected.q4 && selected.q4.trim() !== '' && (
+          <input
+            type="text"
+            value={selected.q4}
+            readOnly
+            placeholder={t('Proszę podać szczegóły')}
+            style={{
+              marginLeft: '8px',
+              flex: 1,
+              padding: '6px 10px',
+              borderRadius: '6px',
+              border: '1px solid #ccc',
+              backgroundColor: '#fff',
+              color: '#000',
+              fontSize: '14px',
+              minWidth: '180px'
+            }}
+          />
+        )}
       </div>
-    )}
+    ))}
   </div>
 </QuestionGroup>
 
