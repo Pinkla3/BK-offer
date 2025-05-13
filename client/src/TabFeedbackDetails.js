@@ -286,28 +286,28 @@ const RightButtons = styled.div`
 
 // Questions
 const questionsPl = [
-  '1. Jak BK ogólnie czuje się z klientem?',
-  '2. Jak została przyjęta przez pacjenta?',
-  '3. Jak wygląda współpraca z członkami rodziny?',
-  '4. Czy istnieją trudności w opiece nad pacjentem/pacjentką? (noce, transfer, inkontynencja, forma poruszania się)',
-  '5. Czy dyżuruje służba pielęgniarska (Pflegedienst)?',
-  '6. Czy BK ma przerwy i czas wolny?',
-  '7. Czy wszystko jest dobrze zorganizowane (budżet domowy, osoba kontaktowa, produkty pielęgnacyjne, wsparcie przy zakupach, warunki pracy)?',
-  '8. Czy BK chciałby wrócić? Jeśli tak, w jakim rytmie? Jeśli nie, dlaczego nie? Jak wygląda rytm dnia.',
-  '9. Jak aktywizujesz seniora? Jakie są zainteresowania seniora?',
-  '10. Czy jest coś, co klient lub firma Berlin Opieka może zoptymalizować?'
+  '1. Jak ogólnie czuje się Pani/Pan z klientem?',
+  '1a. Dlaczego?',
+  '2. Czy istnieją trudności w opiece nad pacjentem/pacjentką?',
+  '2a. Szczegóły dotyczące trudności',
+  '3. Czy ma Pani/Pan czas wolny?',
+  '4. Ile wynosi budżet na tydzień? (w Euro)',
+  '5. Czy chciałabyś wrócić do rodziny?',
+  '5a. Dlaczego nie?',
+  '6. Napisz 2 plusy:',
+  '6a. ...i 2 minusy zlecenia (jeśli są):'
 ];
 const questionsDe = [
   '1. Wie steht BK generell zum Kunden?',
-  '2. Wie wurde es von der Patientin aufgenommen?',
-  '3. Wie ist die Zusammenarbeit mit den Familienangehörigen?',
-  '4. Gibt es Schwierigkeiten bei der Pflege des Patienten/der Patientin? (Nächte, Transfer, Inkontinenz, Mobilität)',
-  '5. Ist ein Pflegedienst im Einsatz?',
-  '6. Hat BK Pausen und freie Zeit?',
-  '7. Ist alles gut organisiert (Haushaltskasse, Ansprechpartner, Pflegemittel, Unterstützung, Arbeitsbedingungen)?',
-  '8. Würde BK gerne wiederkommen? Wenn ja, in welchem Rhythmus? Wenn nein, warum nicht? Wie ist der Tagesrhythmus?',
-  '9. Wie aktivieren Sie den Senior? Was sind die Interessen des Seniors?',
-  '10. Gibt es etwas, was der Kunde oder Berlin Care optimieren kann?'
+  '1a. Warum?',
+  '2. Gibt es Schwierigkeiten bei der Pflege des Patienten/der Patientin?',
+  '2a. Details zu den Schwierigkeiten',
+  '3. Hat BK freie Zeit?',
+  '4. Wie hoch ist das Wochenbudget? (in Euro)',
+  '5. Möchte BK zur Familie zurückkehren?',
+  '5a. Warum nicht?',
+  '6. Nennen Sie 2 Pluspunkte:',
+  '6a. ...und 2 Minuspunkte (falls vorhanden):'
 ];
 const noteLabelPl = 'Notatka:';
 const noteLabelDe = 'Anmerkung:';
