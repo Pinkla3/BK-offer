@@ -71,6 +71,44 @@ const CenteredSectionTitle = styled(SectionTitle)`
     font-size: 22px;
 `;
 
+const QuestionGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 24px;
+`;
+
+const Label = styled.label`
+  font-weight: 600;
+  margin-bottom: 8px;
+`;
+
+const OptionButton = styled.button`
+  background-color: ${props => (props.active ? '#007bff' : '#f0f0f0')};
+  color: ${props => (props.active ? '#fff' : '#333')};
+  border: 1px solid ${props => (props.active ? '#007bff' : '#ccc')};
+  box-shadow: ${props => (props.active ? '0 0 6px rgba(0, 123, 255, 0.3)' : 'none')};
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: default;
+  margin: 4px 0;
+  width: 100%;
+  max-width: 300px;
+`;
+
+const TextArea = styled('textarea')`
+  width: 100%;
+  min-height: 60px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+nin-height: 60px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+`;
+
 const FieldCard = styled.div`
   background: #f8f9fa;
   border-radius: 12px;
@@ -158,19 +196,7 @@ const TabButton = styled.button.withConfig({
     }
   `;
 
-const TextArea = styled('textarea')`
-  width: 100%;
-  min-height: 60px;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 14px;
-nin-height: 60px;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 14px;
-`;
+
 
 const TitleRow = styled.div`
   display: flex;
@@ -623,53 +649,87 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
             <TabButton active={!showGerman} onClick={() => setShowGerman(false)} disabled={translating}>Polski</TabButton>
             <TabButton active={showGerman} onClick={handleToggleGerman} disabled={translating}>{translating ? 'Tłumaczę...' : 'Deutsch'}</TabButton>
           </TabsBar>
-          <QuestionList>
-            {questions.map((q, i) => (
-              <QuestionItem key={i}>
-                <QuestionText>{q}</QuestionText>
-                {editing ? (
-                  <TextArea
-                    value={answers[i]}
-                    onChange={e => {
-                      if (showGerman) {
-                        const arr = [...editedAnswersDe];
-                        arr[i] = e.target.value;
-                        setEditedAnswersDe(arr);
-                      } else {
-                        handlePolishAnswerChange(i, e.target.value);
-                      }
-                    }}
-                  />
-                ) : (
-                  <AnswerText>
-                  {answers[i]?.trim()
-                    ? answers[i]
-                    : (showGerman
-                        ? <span style={{ color: 'red', fontWeight: 'bold' }}>Brak tekstu do tłumaczenia</span>
-                        : ''
-                      )}
-                </AnswerText>
-                )}
-              </QuestionItem>
-            ))}
-            <QuestionItem>
-              <QuestionText>{noteLabel}</QuestionText>
-              {editing ? (
-                <TextArea
-                  value={noteContent}
-                  onChange={e => {
-                    if (showGerman) {
-                      setEditedNoteDe(e.target.value);
-                    } else {
-                      handlePolishNoteChange(e.target.value);
-                    }
-                  }}
-                />
-              ) : (
-                <AnswerText>{noteContent}</AnswerText>
-              )}
-            </QuestionItem>
-          </QuestionList>
+              <QuestionGroup>
+        <Label>1. Jak ogólnie czuje się Pani/Pan z klientem?</Label>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', maxWidth: '500px' }}>
+          {['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map(val => (
+            <OptionButton key={val} active={selected.q1 === val}>{val}</OptionButton>
+          ))}
+        </div>
+        {(selected.q1 === 'średnio' || selected.q1 === 'mam zastrzeżenia') && (
+          <TextArea
+            value={selected.q2 || ''}
+            readOnly
+            placeholder="Dlaczego?"
+            rows={3}
+          />
+        )}
+      </QuestionGroup>
+
+      {/* Pytanie 2: trudności */}
+      <QuestionGroup>
+        <Label>2. Czy istnieją trudności w opiece nad pacjentem/pacjentką?</Label>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '8px' }}>
+          {(selected.q3 || []).map((item, index) => (
+            <OptionButton key={index} active>{item}</OptionButton>
+          ))}
+        </div>
+        {(selected.q3 || []).includes('inne trudności') && (
+          <TextArea
+            value={selected.q4 || ''}
+            readOnly
+            placeholder="Szczegóły dotyczące trudności"
+            rows={3}
+          />
+        )}
+      </QuestionGroup>
+
+      {/* Pytanie 5: powrót */}
+      <QuestionGroup>
+        <Label>5. Czy chciałabyś wrócić do rodziny?</Label>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', maxWidth: '400px' }}>
+          {['Tak', 'Nie'].map(val => (
+            <OptionButton key={val} active={selected.q7 === val}>{val}</OptionButton>
+          ))}
+        </div>
+        {selected.q7 === 'Nie' && (
+          <TextArea
+            value={selected.q7_why || ''}
+            readOnly
+            placeholder="Dlaczego nie?"
+            rows={3}
+          />
+        )}
+      </QuestionGroup>
+
+      {/* Pytanie 6: plusy i minusy */}
+      <QuestionGroup>
+        <Label>6. Napisz 2 plusy:</Label>
+        <TextArea
+          value={selected.q8_plus || ''}
+          readOnly
+          rows={2}
+          placeholder="Plusy"
+        />
+        <Label style={{ marginTop: '12px' }}>...i 2 minusy:</Label>
+        <TextArea
+          value={selected.q8_minus || ''}
+          readOnly
+          rows={2}
+          placeholder="Minusy"
+        />
+      </QuestionGroup>
+
+      {/* Notatka końcowa */}
+      <QuestionGroup>
+        <Label>Notatka</Label>
+        <TextArea
+          value={selected.notes || ''}
+          readOnly
+          rows={4}
+          placeholder="Dodatkowe uwagi"
+        />
+      </QuestionGroup>
         </TabSection>
 
 
