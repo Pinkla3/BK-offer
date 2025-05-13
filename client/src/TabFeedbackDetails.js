@@ -699,7 +699,7 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
       'osoba jest trudna',
       'jest ciężki transfer',
       'brak',
-      'Inne trudności'
+      'inne trudności'
     ].map((option, index) => (
       <label key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         <input

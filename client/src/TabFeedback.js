@@ -429,7 +429,7 @@ const initialState = {
         accentColor: '#007bff'
       }}
     />
-    <span>Inne trudności</span>
+    <span>inne trudności</span>
   </label>
 
   {/* Kolumna 2: input pojawia się tylko jeśli zaznaczono */}
