@@ -629,7 +629,9 @@ app.post('/api/translate', authenticate, async (req, res) => {
 app.patch('/api/tabResponses/:id', authenticate, async (req, res) => {
   const { id } = req.params;
   const updates = req.body;
-
+if (Array.isArray(updates.q3)) {
+  updates.q3 = updates.q3.join(', ');
+}
   try {
     const now = new Date();
 
