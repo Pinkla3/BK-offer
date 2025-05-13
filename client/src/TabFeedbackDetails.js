@@ -621,6 +621,15 @@ const handleToggleGerman = async () => {
         }
       };
 
+
+const checkboxOptionsQ2 = [
+  'występują nocki',
+  'jest ciężki transfer',
+  'osoba jest trudna',
+  'brak',
+  'inne trudności'
+];
+
   return (
     <Wrapper>
      <TitleRow>
@@ -725,6 +734,8 @@ const handleToggleGerman = async () => {
             <TabButton active={!showGerman} onClick={() => setShowGerman(false)} disabled={translating}>Polski</TabButton>
             <TabButton active={showGerman} onClick={handleToggleGerman} disabled={translating}>{translating ? 'Tłumaczę...' : 'Deutsch'}</TabButton>
           </TabsBar>
+
+          
 {/* Pytanie 1 */}
 <QuestionGroup style={{ marginTop: '32px' }}>
   <Label>
@@ -816,25 +827,23 @@ const handleToggleGerman = async () => {
       </span>
     )}
   </Label>
-  <div
-    style={{
-      display: 'grid',
-      gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))',
-      gap: '12px',
-      justifyContent: 'center',
-      marginTop: '12px',
-      width: '100%',
-      maxWidth: '500px',
-      marginLeft: 'auto',
-      marginRight: 'auto'
-    }}
-  >
-    {checkboxOptions.map((val, idx) => {
+  <div style={{
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, 1fr)',
+    columnGap: '32px',
+    rowGap: '12px',
+    marginTop: '10px',
+    maxWidth: '800px',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    alignItems: 'start'
+  }}>
+    {checkboxOptionsQ2.map((val, index) => {
       const isChecked = editing
         ? (editedAnswers[2] || []).includes(val)
         : (selected.q3 || []).includes(val);
       return (
-        <label key={val} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <input
             type="checkbox"
             checked={isChecked}
@@ -846,19 +855,44 @@ const handleToggleGerman = async () => {
                 if (e.target.checked) {
                   updated.push(val);
                 } else {
-                  const index = updated.indexOf(val);
-                  if (index > -1) updated.splice(index, 1);
+                  const idx = updated.indexOf(val);
+                  if (idx !== -1) updated.splice(idx, 1);
                 }
                 const newAnswers = [...prev];
                 newAnswers[2] = updated;
                 return newAnswers;
               });
             }}
+            style={{ width: '20px', height: '20px', accentColor: '#007bff' }}
           />
-          {t(val)}
-        </label>
+          <span>{t(val)}</span>
+        </div>
       );
     })}
+    <div>
+      {(editing ? editedAnswers[2] : selected.q3)?.includes('inne trudności') && (
+        <input
+          type="text"
+          value={editing ? editedAnswers[3] || '' : selected.q4 || ''}
+          onChange={editing ? (e) => setEditedAnswers(prev => {
+            const updated = [...prev];
+            updated[3] = e.target.value;
+            return updated;
+          }) : undefined}
+          readOnly={!editing}
+          placeholder={t('Proszę podać szczegóły')}
+          style={{
+            width: '100%',
+            padding: '6px 10px',
+            borderRadius: '6px',
+            border: '1px solid #ccc',
+            backgroundColor: '#fff',
+            color: '#000',
+            fontSize: '14px'
+          }}
+        />
+      )}
+    </div>
   </div>
 </QuestionGroup>
 
