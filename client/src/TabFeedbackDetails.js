@@ -839,12 +839,17 @@ const handleToggleGerman = async () => {
 <QuestionGroup>
   <Label>
     {questions[5]}
+    {showGerman && (!selected.q6 || selected.q6.trim() === '' || selected.q6 === '0') && (
+      <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
+        Brak odpowiedzi do tłumaczenia
+      </span>
+    )}
   </Label>
   <div style={{ display: 'flex', justifyContent: 'center', marginTop: '12px', width: '100%' }}>
     <div style={{ position: 'relative', maxWidth: '300px', width: '100%' }}>
       <input
         type="text"
-        value={showGerman && (!selected.q6 || selected.q6 === '0') ? '[brak tekstu do tłumaczenia]' : selected.q6 || ''}
+        value={showGerman && (!selected.q6 || selected.q6.trim() === '' || selected.q6 === '0') ? '[brak tekstu do tłumaczenia]' : selected.q6 || ''}
         readOnly
         placeholder="np. 50"
         style={{
@@ -855,9 +860,9 @@ const handleToggleGerman = async () => {
           padding: '8px 36px 8px 12px',
           border: '1px solid',
           borderRadius: '10px',
-          backgroundColor: showGerman && (!selected.q6 || selected.q6 === '0') ? '#f8d7da' : '#fff',
-          borderColor: showGerman && (!selected.q6 || selected.q6 === '0') ? '#f5c6cb' : '#ccc',
-          color: showGerman && (!selected.q6 || selected.q6 === '0') ? '#721c24' : '#000',
+          backgroundColor: showGerman && (!selected.q6 || selected.q6.trim() === '' || selected.q6 === '0') ? '#f8d7da' : '#fff',
+          borderColor: showGerman && (!selected.q6 || selected.q6.trim() === '' || selected.q6 === '0') ? '#f5c6cb' : '#ccc',
+          color: showGerman && (!selected.q6 || selected.q6.trim() === '' || selected.q6 === '0') ? '#721c24' : '#000',
           appearance: 'textfield',
           MozAppearance: 'textfield'
         }}
@@ -868,7 +873,7 @@ const handleToggleGerman = async () => {
         right: '10px',
         top: '50%',
         transform: 'translateY(-50%)',
-        color: showGerman && (!selected.q6 || selected.q6 === '0') ? '#721c24' : '#666',
+        color: showGerman && (!selected.q6 || selected.q6.trim() === '' || selected.q6 === '0') ? '#721c24' : '#666',
         fontSize: '18px'
       }}>
         €
