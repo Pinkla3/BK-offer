@@ -494,38 +494,46 @@ const handleSave = async () => {
   }
 };
 
-
-
 const handleDynamicTranslate = async () => {
   setTranslating(true);
   try {
-    const questionGroups = [
-      ['q1'],
-      ['q3', 'q4'],
-      ['q5'],
-      ['q6'],
-      ['q7', 'q7_why'],
-      ['q8_plus', 'q8_minus']
+    const fieldMap = {
+      q1: 0,
+      q2: 1,
+      q3: 2,
+      q4: 3,
+      q5: 4,
+      q6: 5,
+      q7: 6,
+      q7_why: 7,
+      q8_plus: 8,
+      q8_minus: 9,
+      q9: 10,
+      q10: 11,
+      notes: 12
+    };
+
+    const fieldsToTranslate = [
+      'q1', 'q3', 'q4', 'q5', 'q6',
+      'q7', 'q7_why', 'q8_plus', 'q8_minus', 'q9', 'q10'
     ];
 
-    const fieldsToTranslate = ['q1', 'q3', 'q4', 'q5', 'q6', 'q7', 'q7_why', 'q8_plus', 'q8_minus', 'q9', 'q10'];
     const textsToTranslate = editing
-      ? fieldsToTranslate.map((key, idx) => editedAnswers[idx] || '').concat(editedAnswers[12] || '')
+      ? fieldsToTranslate.map(key => {
+          const idx = fieldMap[key];
+          const val = editedAnswers[idx];
+          if (Array.isArray(val)) return val.join(', ');
+          return val || '';
+        }).concat(editedAnswers[12] || '')
       : fieldsToTranslate.map(key => selected[key] || '').concat(selected.notes || '');
 
-    const groupedEmpty = questionGroups
-      .map((fields, idx) =>
-        fields.every(f => ((editing ? (editedAnswers[fieldsToTranslate.indexOf(f)] || '') : (selected[f] || '')).trim() === ''))
-          ? idx
-          : -1
-      )
-      .filter(idx => idx !== -1);
+    const trimmed = textsToTranslate.map(t => t.trim());
+    const toSend = trimmed.filter(t => t.length > 0);
 
-    if (groupedEmpty.length === questionGroups.length) {
-      toast.warn('Brak tekstu do tłumaczenia.');
-
-      const answersDe = fieldsToTranslate.map(() => '[brak tekstu do tłumaczenia]');
-      setGermanAnswers(answersDe);
+    if (toSend.length === 0) {
+      toast.warn('Brak tekstu do przetłumaczenia.');
+      const emptyAnswersDe = fieldsToTranslate.map(() => '[brak tekstu do tłumaczenia]');
+      setGermanAnswers(emptyAnswersDe);
       setTranslatedNote('[brak tekstu do tłumaczenia]');
       setIsTranslated(true);
       setIsPolishChangedSinceTranslation(false);
@@ -533,82 +541,73 @@ const handleDynamicTranslate = async () => {
       return;
     }
 
-    if (groupedEmpty.length > 0) {
-      toast.warn(`Brak odpowiedzi w ${groupedEmpty.length} pytaniu/ach. Puste pola zostaną oznaczone.`);
-    }
-
-    const trimmed = textsToTranslate.map(t => t.trim());
-    const toSend = trimmed.filter(t => t.length > 0);
-
     const { data } = await axios.post(
       `${API_BASE_URL}/api/translate`,
       { texts: toSend, source: 'pl', target: 'de' },
       { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
     );
 
-    if (data && Array.isArray(data.translations)) {
-      const answersDe = [];
-      let j = 0;
-      for (let i = 0; i < textsToTranslate.length; i++) {
-        if (trimmed[i].length === 0) {
-          answersDe.push('[brak tekstu do tłumaczenia]');
-        } else {
-          answersDe.push(data.translations[j++] || '');
-        }
-      }
-
-      // 🧠 Zapis do backendu
-      const res = await axios.patch(
-        `${API_BASE_URL}/api/tabResponses/${selected.id}`,
-        {
-          q1_de: answersDe[0],
-          q2_de: answersDe[1],
-          q3_de: answersDe[2],
-          q4_de: answersDe[3],
-          q5_de: answersDe[4],
-          q6_de: answersDe[5],
-          q7_de: answersDe[6],
-          q7_why_de: answersDe[7],
-          q8_de: answersDe[8],
-          q8_plus_de: answersDe[8],
-          q8_minus_de: answersDe[9],
-          q9_de: answersDe[10],
-          q10_de: answersDe[11],
-          notes_de: answersDe[12]
-        },
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        }
-      );
-
-      setGermanAnswers(answersDe.slice(0, 12));
-      setTranslatedNote(answersDe[12]);
-
-      setSelected(prev => ({
-        ...prev,
-        q1_de: answersDe[0],
-        q2_de: answersDe[1],
-        q3_de: answersDe[2],
-        q4_de: answersDe[3],
-        q5_de: answersDe[4],
-        q6_de: answersDe[5],
-        q7_de: answersDe[6],
-        q7_why_de: answersDe[7],
-        q8_de: answersDe[8],
-        q8_plus_de: answersDe[8],
-        q8_minus_de: answersDe[9],
-        q9_de: answersDe[10],
-        q10_de: answersDe[11],
-        notes_de: answersDe[12],
-        edit_history: res.data.edit_history || prev.edit_history
-      }));
-
-      setIsTranslated(true);
-      setIsPolishChangedSinceTranslation(false);
-      toast.success('Tłumaczenie na niemiecki zapisane.');
-    } else {
-      throw new Error('Niepoprawny format danych z API');
+    if (!data || !Array.isArray(data.translations)) {
+      throw new Error('Niepoprawny format odpowiedzi z API');
     }
+
+    const answersDe = [];
+    let j = 0;
+    for (let i = 0; i < textsToTranslate.length; i++) {
+      if (trimmed[i].length === 0) {
+        answersDe.push('[brak tekstu do tłumaczenia]');
+      } else {
+        answersDe.push(data.translations[j++] || '');
+      }
+    }
+
+    // 🔁 Zapis przetłumaczonej wersji DE na backend
+    await axios.patch(
+      `${API_BASE_URL}/api/tabResponses/${selected.id}`,
+      {
+        q1_de: answersDe[0],
+        q2_de: '[brak tekstu do tłumaczenia]', // jeśli nie tłumaczysz q2
+        q3_de: answersDe[1],
+        q4_de: answersDe[2],
+        q5_de: answersDe[3],
+        q6_de: answersDe[4],
+        q7_de: answersDe[5],
+        q7_why_de: answersDe[6],
+        q8_de: answersDe[7],
+        q8_plus_de: answersDe[7],
+        q8_minus_de: answersDe[8],
+        q9_de: answersDe[9],
+        q10_de: answersDe[10],
+        notes_de: answersDe[11]
+      },
+      { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+    );
+
+    // 🔁 Aktualizacja lokalnych danych
+    setGermanAnswers(answersDe.slice(0, 11));
+    setTranslatedNote(answersDe[11]);
+
+    setSelected(prev => ({
+      ...prev,
+      q1_de: answersDe[0],
+      q2_de: '[brak tekstu do tłumaczenia]', // analogicznie
+      q3_de: answersDe[1],
+      q4_de: answersDe[2],
+      q5_de: answersDe[3],
+      q6_de: answersDe[4],
+      q7_de: answersDe[5],
+      q7_why_de: answersDe[6],
+      q8_de: answersDe[7],
+      q8_plus_de: answersDe[7],
+      q8_minus_de: answersDe[8],
+      q9_de: answersDe[9],
+      q10_de: answersDe[10],
+      notes_de: answersDe[11]
+    }));
+
+    setIsTranslated(true);
+    setIsPolishChangedSinceTranslation(false);
+    toast.success('Tłumaczenie na niemiecki zapisane.');
   } catch (err) {
     console.error('🔴 Błąd tłumaczenia:', err.response?.data || err.message);
     toast.error('Nie udało się przetłumaczyć i zapisać.');
