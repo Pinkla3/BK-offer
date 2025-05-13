@@ -500,23 +500,22 @@ app.post('/api/tabResponses', authenticate, async (req, res) => {
     const publicToken = crypto.randomBytes(16).toString('hex');
 
     const sql = `
-      INSERT INTO tab_responses (
-        caregiver_first_name, caregiver_last_name, caregiver_phone,
-        patient_first_name, patient_last_name,
-        q1, q2, q3, q4, q5, q6, q7, q7_why,
-        q8_plus, q8_minus, q9, q10,
-        notes, user_id, public_token
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
+  INSERT INTO tab_responses (
+    caregiver_first_name, caregiver_last_name, caregiver_phone,
+    patient_first_name, patient_last_name,
+    q1, q2, q3, q4, q5, q6, q7, q7_why,
+    q8_plus, q8_minus, q9, q10,
+    notes, user_id, public_token
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+`;
 
-    const params = [
-      caregiverFirstName, caregiverLastName, caregiverPhone,
-      patientFirstName, patientLastName,
-      q1, q2, q3, q4, q5, q6, q7, q7_why,
-      q8_plus, q8_minus, q9, q10,
-      notes, userId, publicToken
-    ];
-
+  const params = [
+  caregiverFirstName, caregiverLastName, caregiverPhone,
+  patientFirstName, patientLastName,
+  q1, q2, q3, q4, q5, q6, q7, q7_why,
+  q8_plus, q8_minus, q9, q10,
+  notes, userId, publicToken
+];
     const [result] = await pool.query(sql, params);
     const insertedId = result.insertId;
 
