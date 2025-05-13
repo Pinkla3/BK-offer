@@ -744,11 +744,7 @@ const handleToggleGerman = async () => {
 {/* Pytanie 1 */}
 <QuestionGroup style={{ marginTop: '32px' }}>
   <Label>
-    {questions[0]} {showGerman && (!selected.q1 || selected.q1.trim() === '') && (
-      <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
-        Brak odpowiedzi do tłumaczenia
-      </span>
-    )}
+    {questions[0]} {getMissingTranslationMessage(answers[0])}
   </Label>
   <div style={{
     display: 'grid',
@@ -763,11 +759,17 @@ const handleToggleGerman = async () => {
   }}>
     {['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map(val => {
       const translated = t(val);
+      const isActive = (editing ? editedAnswers[0] : selected.q1) === val;
       return (
         <OptionButton
           key={val}
-          active={selected.q1 === val}
-          warning={isMissingTranslation(translated) && selected.q1 === val}
+          active={isActive}
+          warning={isMissingTranslation(translated) && isActive}
+          onClick={() => editing && setEditedAnswers(prev => {
+            const updated = [...prev];
+            updated[0] = val;
+            return updated;
+          })}
         >
           {translated}
         </OptionButton>
@@ -775,19 +777,25 @@ const handleToggleGerman = async () => {
     })}
   </div>
 
-  {(selected.q1 === 'średnio' || selected.q1 === 'mam zastrzeżenia') && (
+  {(editing ? editedAnswers[0] : selected.q1) === 'średnio' || (editing ? editedAnswers[0] : selected.q1) === 'mam zastrzeżenia' ? (
     <>
       <Label>
         {questions[1]}
       </Label>
       <TextArea
-        value={selected.q2 || ''}
-        readOnly
+        value={editing ? editedAnswers[1] || '' : selected.q2 || ''}
+        onChange={editing ? (e) => setEditedAnswers(prev => {
+          const updated = [...prev];
+          updated[1] = e.target.value;
+          return updated;
+        }) : undefined}
+        readOnly={!editing}
         placeholder={t('Dlaczego?')}
         rows={3}
+        style={getTextAreaStyle(editing ? editedAnswers[1] : selected.q2)}
       />
     </>
-  )}
+  ) : null}
 </QuestionGroup>
 
 {/* Pytanie 2 */}
