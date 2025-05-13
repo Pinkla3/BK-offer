@@ -925,6 +925,11 @@ app.patch('/api/public-feedback/:token', async (req, res) => {
   const token = req.params.token;
   const updates = req.body;
 
+  // ✅ Zamiana tablicy checkboxów na string
+  if (Array.isArray(updates.q3)) {
+    updates.q3 = updates.q3.join(', ');
+  }
+
   try {
     const [[entry]] = await pool.query('SELECT * FROM tab_responses WHERE public_token = ?', [token]);
     if (!entry) return res.status(404).json({ error: 'Nie znaleziono formularza' });
