@@ -496,14 +496,20 @@ const handleDynamicTranslate = async () => {
       )
       .filter(idx => idx !== -1);
 
-    if (groupedEmpty.length > 0) {
-      toast.warn(`Brak odpowiedzi w ${groupedEmpty.length} pytaniu/ach. Puste pola zostaną oznaczone.`);
-    }
-
     if (groupedEmpty.length === questionGroups.length) {
       toast.warn('Brak tekstu do tłumaczenia.');
+
+      const answersDe = fieldsToTranslate.map(() => '[brak tekstu do tłumaczenia]');
+      setGermanAnswers(answersDe);
+      setTranslatedNote('[brak tekstu do tłumaczenia]');
+      setIsTranslated(true);
+      setIsPolishChangedSinceTranslation(false);
       setTranslating(false);
       return;
+    }
+
+    if (groupedEmpty.length > 0) {
+      toast.warn(`Brak odpowiedzi w ${groupedEmpty.length} pytaniu/ach. Puste pola zostaną oznaczone.`);
     }
 
     const trimmed = textsToTranslate.map(t => t.trim());
