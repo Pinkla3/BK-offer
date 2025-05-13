@@ -842,17 +842,24 @@ const handleToggleGerman = async () => {
   </Label>
   <div style={{ display: 'flex', justifyContent: 'center', marginTop: '12px', width: '100%' }}>
     <div style={{ position: 'relative', maxWidth: '220px', width: '100%' }}>
-      <TextArea
+      <input
+        type="number"
         value={selected.q6 || ''}
         readOnly
-        placeholder={t('Np. 50')}
-        rows={1}
+        placeholder="np. 50"
         style={{
+          width: '100%',
           textAlign: 'center',
           fontSize: '16px',
-          paddingRight: '24px',
-          ...getTextAreaStyle(selected.q6)
+          padding: '8px 24px 8px 8px',
+          border: '1px solid #ccc',
+          borderRadius: '8px',
+          backgroundColor: isMissingTranslation(selected.q6) ? '#f8d7da' : '#fff',
+          color: isMissingTranslation(selected.q6) ? '#721c24' : '#000',
+          appearance: 'textfield', // dla Safari
+          MozAppearance: 'textfield' // dla Firefox
         }}
+        onWheel={(e) => e.target.blur()} // blokuje scrollowanie liczbą
       />
       <span style={{
         position: 'absolute',
