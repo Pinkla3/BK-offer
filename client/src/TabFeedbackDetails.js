@@ -307,7 +307,7 @@ const questionsPl = [
   '1. Jak ogólnie czuje się Pani/Pan z klientem?',
   '',
   '2. Czy istnieją trudności w opiece nad pacjentem/pacjentką?',
-  '2a. Szczegóły dotyczące trudności',
+  '',
   '3. Czy ma pani/pan czas wolny?',
   '4. Ile wynosi budżet na tydzień? (w Euro)',
   '5. Czy chciałby/chciałaby pan/pani wrócić do rodziny?',
@@ -319,7 +319,7 @@ const questionsDe = [
   '1. Wie steht BK generell zum Kunden?',
   '',
   '2. Gibt es Schwierigkeiten bei der Pflege des Patienten/der Patientin?',
-  '2a. Details zu den Schwierigkeiten',
+  '',
   '3. Hat Sie freie Zeit?',
   '4. Wie hoch ist das Wochenbudget? (in Euro)',
   '5. Möchte Sie zur Familie zurückkehren?',
@@ -817,7 +817,12 @@ const handleToggleGerman = async () => {
 {/* Pytanie 3 */}
 <QuestionGroup>
   <Label>
-    {questions[4]} {getMissingTranslationMessage(answers[4])}
+    {questions[4]} 
+    {showGerman && (!selected.q5 || selected.q5.trim() === '') && (
+      <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
+        Brak odpowiedzi do tłumaczenia
+      </span>
+    )}
   </Label>
   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))', columnGap: '120px', rowGap: '12px', justifyContent: 'center', marginTop: '12px', maxWidth: '400px', marginLeft: 'auto', marginRight: 'auto' }}>
     {['Tak', 'Nie'].map(val => {
@@ -882,11 +887,15 @@ const handleToggleGerman = async () => {
   </div>
 </QuestionGroup>
 
-
 {/* Pytanie 5 */}
 <QuestionGroup>
   <Label>
-    {questions[6]} {getMissingTranslationMessage(answers[6])}
+    {questions[6]} 
+    {showGerman && (!selected.q7 || selected.q7.trim() === '') && (
+      <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
+        Brak odpowiedzi do tłumaczenia
+      </span>
+    )}
   </Label>
   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))', columnGap: '120px', rowGap: '12px', justifyContent: 'center', marginTop: '12px', maxWidth: '400px', marginLeft: 'auto', marginRight: 'auto' }}>
     {['Tak', 'Nie'].map(val => {
@@ -904,7 +913,9 @@ const handleToggleGerman = async () => {
   </div>
   {selected.q7 === 'Nie' && (
     <>
-      <Label>{questions[7]} {getMissingTranslationMessage(answers[7])}</Label>
+      <Label>
+        {questions[7]} {getMissingTranslationMessage(answers[7])}
+      </Label>
       <TextArea
         value={selected.q7_why || ''}
         readOnly
