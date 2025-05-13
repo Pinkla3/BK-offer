@@ -507,12 +507,14 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
     const updated = res.data;
 
     // 🔄 odświeżenie danych w widoku szczegółowym
-    const updatedSelected = {
-      ...selected,
-      ...payload,
-      user_name: updated.user_name || selected.user_name,
-      edit_history: updated.edit_history
-    };
+  const updatedSelected = {
+  ...selected,
+  ...payload,
+  q8_plus_de: payload.q8_plus_de,
+  q8_minus_de: payload.q8_minus_de,
+  user_name: updated.user_name || selected.user_name,
+  edit_history: updated.edit_history
+};
 
     setSelected(updatedSelected);
     setGermanAnswers(editedAnswersDe);
