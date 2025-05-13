@@ -1076,7 +1076,7 @@ const handleToggleGerman = async () => {
           const val = e.target.value;
           setEditedAnswers(prev => {
             const updated = [...prev];
-            updated[6] = val;
+            updated[5] = val;
             return updated;
           });
         } : undefined}
