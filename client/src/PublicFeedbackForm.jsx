@@ -94,19 +94,19 @@ const Button = styled.button`
     background-color: #0056b3;
   }
 `;
-
-const questions = [
-  '1. Jak ogólnie czuje się pan/pani z pacjentem/pacjentką?',
-  '2. Jak został/została pan/pani przyjęta przez pacjenta/pacjentkę?',
-  '3. Jak wygląda współpraca z członkami rodziny?',
-  '4. Czy istnieją trudności w opiece nad pacjentem/pacjentką?',
-  '5. Czy dyżuruje służba pielęgniarska (Pflegedienst)?',
-  '6. Czy są przerwy i czas wolny?',
-  '7. Czy wszystko jest dobrze zorganizowane w kwesti budżetu domowego, planu dnia itd. ?',
-  '8. Czy chciałby pan/pani wrócić? Jeśli tak, w jakim rytmie? Jeśli nie, dlaczego nie?',
-  '9. W jaki sposób aktywizuje pan/pani pacjenta/pacjentkę?',
-  '10. Czy jest coś, co rodzina pacjenta/pacjentki lub firma Berlin Opieka 24 może zoptymalizować?'
-];
+const OptionButton = styled(Button)`
+  margin-top: 0;
+  padding: 10px 20px;
+  width: 100%;
+  max-width: 300px;
+  background-color: ${props => (props.active ? '#007bff' : '#f0f0f0')};
+  color: ${props => (props.active ? '#fff' : '#333')};
+  border: 1px solid ${props => (props.active ? '#007bff' : '#ccc')};
+  box-shadow: ${props => (props.active ? '0 0 6px rgba(0, 123, 255, 0.3)' : 'none')};
+  &:hover {
+    background-color: ${props => (props.active ? '#0056b3' : '#e0e0e0')};
+  }
+`;
 
 const PublicFeedbackForm = () => {
   const { token } = useParams();
@@ -115,24 +115,26 @@ const PublicFeedbackForm = () => {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const res = await axios.get(`${API_BASE_URL}/api/public-feedback/${token}`);
-        setForm({
-          q1: res.data.q1 || '',
-          q2: res.data.q2 || '',
-          q3: res.data.q3 || '',
-          q4: res.data.q4 || '',
-          q5: res.data.q5 || '',
-          q6: res.data.q6 || '',
-          q7: res.data.q7 || '',
-          q8: res.data.q8 || '',
-          q9: res.data.q9 || '',
-          q10: res.data.q10 || '',
-          notes: res.data.notes || ''
-        });
-      } catch (err) {
+useEffect(() => {
+  const load = async () => {
+    try {
+      const res = await axios.get(`${API_BASE_URL}/api/public-feedback/${token}`);
+      setForm({
+        q1: res.data.q1 || '',
+        q2: res.data.q2 || '',
+        q3: res.data.q3 || [],
+        q4: res.data.q4 || '',
+        q5: res.data.q5 || '',
+        q6: res.data.q6 || '',
+        q7: res.data.q7 || '',
+        q7_why: res.data.q7_why || '',
+        q8_plus: res.data.q8_plus || '',
+        q8_minus: res.data.q8_minus || '',
+        q9: res.data.q9 || '',
+        q10: res.data.q10 || '',
+        notes: res.data.notes || ''
+      });
+    } catch (err) {
         if (err.response && err.response.status === 410) {
           setError(<div
             style={{
@@ -220,7 +222,7 @@ const PublicFeedbackForm = () => {
     e.preventDefault();
     try {
       await axios.patch(`${API_BASE_URL}/api/public-feedback/${token}`, form);
-      await axios.post(`${API_BASE_URLL}/api/send-feedback-notification`);
+      await axios.post(`${API_BASE_URL}/api/send-feedback-notification`);
       setSuccess(true);
       window.dispatchEvent(new Event('feedbackUpdated')); // 🔔 informuj panel admina
     } catch (err) {
@@ -298,27 +300,380 @@ const PublicFeedbackForm = () => {
     </a>
     </div>
         <Title>Formularz opinii</Title>
-        <Form onSubmit={handleSubmit}>
-          {questions.map((q, i) => (
-            <QuestionGroup key={i}>
-              <Label>{q}</Label>
-              {i === 4 ? (
-                <Input name={`q${i + 1}`} value={form[`q${i + 1}`]} onChange={handleChange} />
-              ) : (
-                <TextArea name={`q${i + 1}`} value={form[`q${i + 1}`]} onChange={handleChange} rows={3} />
-              )}
-            </QuestionGroup>
-          ))}
+<Form onSubmit={handleSubmit}>
+<QuestionGroup>
+  <Label>1. Jak ogólnie czuje się Pani/Pan z klientem?</Label>
+
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))',
+      gap: '16px',
+      justifyContent: 'center',
+      marginTop: '12px',
+      width: '100%',
+      maxWidth: '500px',
+      marginLeft: 'auto',
+      marginRight: 'auto'
+    }}
+  >
+    {['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map(val => (
+      <OptionButton
+        key={val}
+        type="button"
+        active={form.q1 === val}
+        onClick={() => setForm(prev => ({ ...prev, q1: val }))}
+      >
+        {val}
+      </OptionButton>
+    ))}
+  </div>
+
+  {/* Pole tekstowe z animacją jak w pytaniu 5 */}
+  <div
+    style={{
+      marginTop: '16px',
+      overflow: 'hidden',
+      maxHeight: form.q1 === 'średnio' || form.q1 === 'mam zastrzeżenia' ? '200px' : '0px',
+      opacity: form.q1 === 'średnio' || form.q1 === 'mam zastrzeżenia' ? 1 : 0,
+      transition: 'all 0.4s ease',
+      width: '100%'
+    }}
+  >
+    <TextArea
+      name="q2"
+      value={form.q2}
+      onChange={handleChange}
+      placeholder="Dlaczego?"
+      rows={3}
+      style={{
+        width: '100%',
+        border: '1px solid #ccc',
+        borderRadius: '8px',
+        padding: '10px',
+        fontSize: '14px',
+        boxSizing: 'border-box',
+        transition: 'opacity 0.3s ease',
+        resize: 'vertical',
+        backgroundColor: '#fff',
+      }}
+    />
+  </div>
+</QuestionGroup>
+
+{/* Pytanie 2 */}
+<QuestionGroup>
+  <Label>2. Czy istnieją trudności w opiece nad pacjentem/pacjentką?</Label>
+<div
+  style={{
+    display: 'grid',
+    gridTemplateColumns: '250px 1fr', // lewa stała, prawa elastyczna
+    columnGap: '30px',
+    rowGap: '12px',
+    marginTop: '10px',
+    maxWidth: '700px',
+    marginLeft: 'auto',
+    marginRight: 'auto'
+  }}
+>
+  {/* Standardowe checkboxy */}
+  {['występują nocki', 'osoba jest trudna', 'jest ciężki transfer', 'brak'].map(option => {
+    const isChecked = form.q3?.includes(option);
+    return (
+      <label
+        key={option}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          fontSize: '16px',
+          cursor: 'pointer',
+          userSelect: 'none',
+          whiteSpace: 'nowrap'
+        }}
+      >
+        <input
+          type="checkbox"
+          checked={isChecked}
+          onChange={() => {
+            const list = form.q3 || [];
+            const updated = isChecked
+              ? list.filter(i => i !== option)
+              : [...list, option];
+            setForm(prev => ({ ...prev, q3: updated }));
+          }}
+          style={{
+            width: '20px',
+            height: '20px',
+            accentColor: '#007bff'
+          }}
+        />
+        <span>{option}</span>
+      </label>
+    );
+  })}
+
+  {/* Checkbox "Inne trudności" */}
+  <label
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: '10px',
+      fontSize: '16px',
+      cursor: 'pointer',
+      userSelect: 'none',
+      whiteSpace: 'nowrap'
+    }}
+  >
+    <input
+      type="checkbox"
+      checked={form.q3?.includes('inne trudności')}
+      onChange={() => {
+        const list = form.q3 || [];
+        const updated = form.q3?.includes('inne trudności')
+          ? list.filter(i => i !== 'inne trudności')
+          : [...list, 'inne trudności'];
+        setForm(prev => ({ ...prev, q3: updated }));
+      }}
+      style={{
+        width: '20px',
+        height: '20px',
+        accentColor: '#007bff'
+      }}
+    />
+    <span>Inne trudności</span>
+  </label>
+
+  {/* Kolumna 2: input pojawia się tylko jeśli zaznaczono */}
+<Input
+  type="text"
+  name="q4"
+  placeholder="Proszę podać szczegóły"
+  value={form.q4}
+  onChange={handleChange}
+  style={{
+    width: '100%',
+    maxWidth: '300px',
+    visibility: form.q3?.includes('inne trudności') ? 'visible' : 'hidden',
+    pointerEvents: form.q3?.includes('inne trudności') ? 'auto' : 'none',
+  }}
+/>
+</div>
+</QuestionGroup>
+
+ {/* Pytanie 3 */}
+<QuestionGroup>
+  <Label>3. Czy ma Pani/Pan czas wolny?</Label>
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))',
+          columnGap: '120px',
+    rowGap: '12px',
+      justifyContent: 'center',
+      marginTop: '12px',
+      maxWidth: '400px',
+      marginLeft: 'auto',
+      marginRight: 'auto'
+    }}
+  >
+    {['Tak', 'Nie'].map(val => (
+      <OptionButton
+        key={val}
+        type="button"
+        active={form.q5 === val}
+        onClick={() => setForm(prev => ({ ...prev, q5: val }))}
+      >
+        {val}
+      </OptionButton>
+    ))}
+  </div>
+</QuestionGroup>
+
+<QuestionGroup>
+  <Label style={{ textAlign: 'left', width: '100%' }}>
+    4. Ile wynosi budżet na tydzień? (w Euro)
+  </Label>
+
+  <div
+    style={{
+      display: 'flex',
+      justifyContent: 'center',
+      marginTop: '12px',
+      width: '100%'
+    }}
+  >
+    <div
+      style={{
+        position: 'relative',
+        maxWidth: '220px', // większa szerokość pola
+        width: '100%'
+      }}
+    >
+      <Input
+        type="text"
+        inputMode="numeric"
+        pattern="[0-9]*"
+        name="q6"
+        value={form.q6}
+        onChange={handleChange}
+        placeholder="np. 50"
+        style={{
+          paddingRight: '28px',
+          paddingTop: '14px',
+          paddingBottom: '14px',
+          textAlign: 'center',
+          fontSize: '18px',          // większy tekst
+          height: '48px',            // większa wysokość
+          appearance: 'none',
+          WebkitAppearance: 'none',
+          MozAppearance: 'textfield',
+          width: '100%'
+        }}
+      />
+      <span
+        style={{
+          position: 'absolute',
+          right: '10px',
+          top: '50%',
+          transform: 'translateY(-50%)',
+          fontWeight: 'bold',
+          fontSize: '16px',
+          pointerEvents: 'none',
+          color: '#333'
+        }}
+      >
+        €
+      </span>
+    </div>
+  </div>
+</QuestionGroup>
+
+  {/* Pytanie 5 */}
+<QuestionGroup>
+  <Label>5. Czy chciałabyś wrócić do rodziny?</Label>
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))',
+                columnGap: '120px',
+    rowGap: '12px',
+      justifyContent: 'center',
+      marginTop: '12px',
+      maxWidth: '400px',
+      marginLeft: 'auto',
+      marginRight: 'auto'
+    }}
+  >
+    {['Tak', 'Nie'].map(val => (
+      <OptionButton
+        key={val}
+        type="button"
+        active={form.q7 === val}
+        onClick={() => setForm(prev => ({ ...prev, q7: val }))}
+      >
+        {val}
+      </OptionButton>
+    ))}
+  </div>
+<div
+  style={{
+    marginTop: '16px',
+    overflow: 'hidden',
+    maxHeight: form.q7 === 'Nie' ? '200px' : '0px',
+    opacity: form.q7 === 'Nie' ? 1 : 0,
+    transition: 'all 0.4s ease',
+    width: '100%'
+  }}
+>
+  <TextArea
+    name="q7_why"
+    value={form.q7_why || ''}
+    onChange={handleChange}
+    placeholder="Dlaczego nie?"
+    rows={3}
+    style={{
+      width: '100%',
+      border: '1px solid #ccc',     // ramka
+      borderRadius: '8px',          // lekko zaokrąglone rogi
+      padding: '10px',              // komfortowy padding
+      fontSize: '14px',
+      boxSizing: 'border-box',
+      transition: 'opacity 0.3s ease',
+      resize: 'vertical',
+      backgroundColor: '#fff',
+    }}
+  />
+</div>
+
+</QuestionGroup>
+
+ <QuestionGroup>
+  <Label style={{ fontWeight: '600', fontSize: '16px', marginBottom: '8px' }}>
+    6. Napisz 2 plusy:
+  </Label>
+
+  <TextArea
+    name="q8_plus"
+    value={form.q8_plus || ''}
+    onChange={handleChange}
+    rows={2}
+    placeholder="Np. dobra atmosfera, wsparcie rodziny..."
+    style={{
+      width: '100%',
+      border: '1px solid #ccc',
+      borderRadius: '8px',
+      padding: '10px',
+      fontSize: '14px',
+      resize: 'vertical',
+      boxSizing: 'border-box',
+      marginBottom: '16px',
+    }}
+  />
+
+  <Label style={{ fontWeight: '600', fontSize: '16px', marginBottom: '8px' }}>
+    ...i 2 minusy zlecenia (jeśli są):
+  </Label>
+
+  <TextArea
+    name="q8_minus"
+    value={form.q8_minus || ''}
+    onChange={handleChange}
+    rows={2}
+    placeholder="Np. brak czasu wolnego, trudna komunikacja..."
+    style={{
+      width: '100%',
+      border: '1px solid #ccc',
+      borderRadius: '8px',
+      padding: '10px',
+      fontSize: '14px',
+      resize: 'vertical',
+      boxSizing: 'border-box'
+    }}
+  />
+</QuestionGroup>
           <QuestionGroup>
-            <Label>Notatka (opcjonalnie)</Label>
-            <TextArea
-              name="notes"
-              value={form.notes}
-              onChange={handleChange}
-              rows={4}
-              placeholder="Wygląd okolicy, warunki mieszkalne, inne pozytywy"
-            />
-          </QuestionGroup>
+  <Label style={{ fontWeight: '600', fontSize: '16px', marginBottom: '8px' }}>
+    Notatka
+  </Label>
+  <TextArea
+    name="notes"
+    value={form.notes}
+    onChange={handleChange}
+    rows={4}
+    placeholder="Tutaj możesz wpisać dodatkowe uwagi, komentarze, spostrzeżenia..."
+    style={{
+      width: '100%',
+      border: '1px solid #ccc',
+      borderRadius: '8px',
+      padding: '12px',
+      fontSize: '14px',
+      resize: 'vertical',
+      boxSizing: 'border-box',
+      backgroundColor: '#fff'
+    }}
+  />
+</QuestionGroup>
           <Button type="submit">Zapisz odpowiedzi</Button>
         </Form>
         
