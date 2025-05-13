@@ -83,10 +83,28 @@ const Label = styled.label`
 `;
 
 const OptionButton = styled.button`
-  background-color: ${props => (props.active ? '#007bff' : '#f0f0f0')};
-  color: ${props => (props.active ? '#fff' : '#333')};
-  border: 1px solid ${props => (props.active ? '#007bff' : '#ccc')};
-  box-shadow: ${props => (props.active ? '0 0 6px rgba(0, 123, 255, 0.3)' : 'none')};
+  background-color: ${props =>
+    props.active
+      ? '#007bff'
+      : props.warning
+      ? '#f8d7da'
+      : '#f0f0f0'};
+  color: ${props =>
+    props.active
+      ? '#fff'
+      : props.warning
+      ? '#721c24'
+      : '#333'};
+  border: 1px solid ${props =>
+    props.active
+      ? '#007bff'
+      : props.warning
+      ? '#f5c6cb'
+      : '#ccc'};
+  box-shadow: ${props =>
+    props.active
+      ? '0 0 6px rgba(0, 123, 255, 0.3)'
+      : 'none'};
   padding: 10px 20px;
   border-radius: 8px;
   cursor: default;
@@ -453,7 +471,7 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
     }
   };
 
-      const handleDynamicTranslate = async () => {
+ const handleDynamicTranslate = async () => {
     setTranslating(true);
     try {
       const questionGroups = [
@@ -529,6 +547,8 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
     val === '[brak tekstu do tłumaczenia]'
       ? { background: '#f8d7da', borderColor: '#f5c6cb', color: '#721c24' }
       : {};
+
+  const getOptionWarning = (val) => val === '[brak tekstu do tłumaczenia]';
 
 const handleToggleGerman = async () => {
   if (!showGerman) {
@@ -695,120 +715,196 @@ const handleToggleGerman = async () => {
             <TabButton active={!showGerman} onClick={() => setShowGerman(false)} disabled={translating}>Polski</TabButton>
             <TabButton active={showGerman} onClick={handleToggleGerman} disabled={translating}>{translating ? 'Tłumaczę...' : 'Deutsch'}</TabButton>
           </TabsBar>
-   {/* Pytanie 1 */}
-  <QuestionGroup style={{ marginTop: '32px' }}>
-    <Label>{questions[0]}</Label>
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))',
-      gap: '16px',
-      justifyContent: 'center',
-      marginTop: '12px',
-      width: '100%',
-      maxWidth: '500px',
-      marginLeft: 'auto',
-      marginRight: 'auto'
-    }}>
-      {['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map(val => (
-        <OptionButton key={val} active={selected.q1 === val}>{t(val)}</OptionButton>
-      ))}
-    </div>
-    {(selected.q1 === 'średnio' || selected.q1 === 'mam zastrzeżenia') && (
-      <TextArea value={selected.q2 || ''} readOnly placeholder={t('Dlaczego?')} rows={3} />
+{/* Pytanie 1 */}
+<QuestionGroup style={{ marginTop: '32px' }}>
+  <Label>{questions[0]}</Label>
+  <div style={{
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))',
+    gap: '16px',
+    justifyContent: 'center',
+    marginTop: '12px',
+    width: '100%',
+    maxWidth: '500px',
+    marginLeft: 'auto',
+    marginRight: 'auto'
+  }}>
+    {['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map(val => (
+      <OptionButton
+        key={val}
+        active={selected.q1 === val}
+        warning={getOptionWarning(selected.q1)}
+      >
+        {t(val)}
+      </OptionButton>
+    ))}
+  </div>
+  {(selected.q1 === 'średnio' || selected.q1 === 'mam zastrzeżenia') && (
+    <TextArea
+      value={selected.q2 || ''}
+      readOnly
+      placeholder={t('Dlaczego?')}
+      rows={3}
+      style={getTextAreaStyle(selected.q2)}
+    />
+  )}
+</QuestionGroup>
+
+{/* Pytanie 2 */}
+<QuestionGroup>
+  <Label>{questions[2]}</Label>
+  <div style={{
+    display: 'grid',
+    gridTemplateColumns: '250px 1fr',
+    columnGap: '30px',
+    rowGap: '12px',
+    marginTop: '10px',
+    maxWidth: '700px',
+    marginLeft: 'auto',
+    marginRight: 'auto'
+  }}>
+    {[
+      'występują nocki',
+      'osoba jest trudna',
+      'jest ciężki transfer',
+      'brak',
+      'inne trudności'
+    ].map((val, index) => (
+      <label key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <input
+          type="checkbox"
+          checked={(selected.q3 || []).includes(val)}
+          readOnly
+          style={{ width: '20px', height: '20px', accentColor: '#007bff' }}
+        />
+        <span>{t(val)}</span>
+      </label>
+    ))}
+    {(selected.q3 || []).includes('inne trudności') && (
+      <TextArea
+        key="textarea"
+        value={selected.q4 || ''}
+        readOnly
+        placeholder={t('Szczegóły dotyczące trudności')}
+        rows={2}
+        style={getTextAreaStyle(selected.q4)}
+      />
     )}
-  </QuestionGroup>
+  </div>
+</QuestionGroup>
 
-  {/* Pytanie 2 */}  
-  <QuestionGroup>
-    <Label>{questions[2]}</Label>
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: '250px 1fr',
-      columnGap: '30px',
-      rowGap: '12px',
-      marginTop: '10px',
-      maxWidth: '700px',
-      marginLeft: 'auto',
-      marginRight: 'auto'
-    }}>
-      {[ 'występują nocki', 'osoba jest trudna', 'jest ciężki transfer', 'brak', 'inne trudności' ].map((val, index) => (
-        <label key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <input type="checkbox" checked={(selected.q3 || []).includes(val)} readOnly style={{ width: '20px', height: '20px', accentColor: '#007bff' }} />
-          <span>{t(val)}</span>
-        </label>
-      ))}
-      {(selected.q3 || []).includes('inne trudności') && (
-        <TextArea key="textarea" value={selected.q4 || ''} readOnly placeholder={t('Szczegóły dotyczące trudności')} rows={2} />
-      )}
+{/* Pytanie 3 */}
+<QuestionGroup>
+  <Label>{questions[4]}</Label>
+  <div style={{
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))',
+    columnGap: '120px',
+    rowGap: '12px',
+    justifyContent: 'center',
+    marginTop: '12px',
+    maxWidth: '400px',
+    marginLeft: 'auto',
+    marginRight: 'auto'
+  }}>
+    {['Tak', 'Nie'].map(val => (
+      <OptionButton
+        key={val}
+        active={selected.q5 === val}
+        warning={getOptionWarning(selected.q5)}
+      >
+        {t(val)}
+      </OptionButton>
+    ))}
+  </div>
+</QuestionGroup>
+
+{/* Pytanie 4 */}
+<QuestionGroup>
+  <Label>{questions[5]}</Label>
+  <div style={{ display: 'flex', justifyContent: 'center', marginTop: '12px', width: '100%' }}>
+    <div style={{ position: 'relative', maxWidth: '220px', width: '100%' }}>
+      <TextArea
+        value={selected.q6 || ''}
+        readOnly
+        placeholder={t('Np. 50 €')}
+        rows={1}
+        style={{
+          textAlign: 'center',
+          fontSize: '16px',
+          ...getTextAreaStyle(selected.q6)
+        }}
+      />
     </div>
-  </QuestionGroup>
+  </div>
+</QuestionGroup>
 
-  {/* Pytanie 3 */}
-  <QuestionGroup>
-    <Label>{questions[4]}</Label>
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))',
-      columnGap: '120px',
-      rowGap: '12px',
-      justifyContent: 'center',
-      marginTop: '12px',
-      maxWidth: '400px',
-      marginLeft: 'auto',
-      marginRight: 'auto'
-    }}>
-      {['Tak', 'Nie'].map(val => (
-        <OptionButton key={val} active={selected.q5 === val}>{t(val)}</OptionButton>
-      ))}
-    </div>
-  </QuestionGroup>
+{/* Pytanie 5 */}
+<QuestionGroup>
+  <Label>{questions[6]}</Label>
+  <div style={{
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))',
+    columnGap: '120px',
+    rowGap: '12px',
+    justifyContent: 'center',
+    marginTop: '12px',
+    maxWidth: '400px',
+    marginLeft: 'auto',
+    marginRight: 'auto'
+  }}>
+    {['Tak', 'Nie'].map(val => (
+      <OptionButton
+        key={val}
+        active={selected.q7 === val}
+        warning={getOptionWarning(selected.q7)}
+      >
+        {t(val)}
+      </OptionButton>
+    ))}
+  </div>
+  {selected.q7 === 'Nie' && (
+    <TextArea
+      value={selected.q7_why || ''}
+      readOnly
+      placeholder={t('Dlaczego nie?')}
+      rows={3}
+      style={getTextAreaStyle(selected.q7_why)}
+    />
+  )}
+</QuestionGroup>
 
-  {/* Pytanie 4 */}
-  <QuestionGroup>
-    <Label>{questions[5]}</Label>
-    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '12px', width: '100%' }}>
-      <div style={{ position: 'relative', maxWidth: '220px', width: '100%' }}>
-        <TextArea value={selected.q6 || ''} readOnly placeholder={t('Np. 50 €')} rows={1} style={{ textAlign: 'center', fontSize: '16px' }} />
-      </div>
-    </div>
-  </QuestionGroup>
+{/* Pytanie 6 */}
+<QuestionGroup>
+  <Label>{questions[8]}</Label>
+  <TextArea
+    value={selected.q8_plus || ''}
+    readOnly
+    rows={2}
+    placeholder={t('Np. dobra atmosfera, wsparcie rodziny...')}
+    style={{ marginBottom: '16px', ...getTextAreaStyle(selected.q8_plus) }}
+  />
+  <Label>{questions[9]}</Label>
+  <TextArea
+    value={selected.q8_minus || ''}
+    readOnly
+    rows={2}
+    placeholder={t('Np. brak czasu wolnego, trudna komunikacja...')}
+    style={getTextAreaStyle(selected.q8_minus)}
+  />
+</QuestionGroup>
 
-  {/* Pytanie 5 */}
-  <QuestionGroup>
-    <Label>{questions[6]}</Label>
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))',
-      columnGap: '120px',
-      rowGap: '12px',
-      justifyContent: 'center',
-      marginTop: '12px',
-      maxWidth: '400px',
-      marginLeft: 'auto',
-      marginRight: 'auto'
-    }}>
-      {['Tak', 'Nie'].map(val => (
-        <OptionButton key={val} active={selected.q7 === val}>{t(val)}</OptionButton>
-      ))}
-    </div>
-    {selected.q7 === 'Nie' && (
-      <TextArea value={selected.q7_why || ''} readOnly placeholder={t('Dlaczego nie?')} rows={3} />
-    )}
-  </QuestionGroup>
-
-  {/* Pytanie 6 */}
-  <QuestionGroup>
-    <Label>{questions[8]}</Label>
-    <TextArea value={selected.q8_plus || ''} readOnly rows={2} placeholder={t('Np. dobra atmosfera, wsparcie rodziny...')} style={{ marginBottom: '16px' }} />
-    <Label>{questions[9]}</Label>
-    <TextArea value={selected.q8_minus || ''} readOnly rows={2} placeholder={t('Np. brak czasu wolnego, trudna komunikacja...')} />
-  </QuestionGroup>
-
-  {/* Notatka */}
-  <QuestionGroup>
-    <Label style={{ fontWeight: '600', fontSize: '16px' }}>{noteLabel}</Label>
-    <TextArea value={noteContent || ''} readOnly rows={4} placeholder={t('Dodatkowe uwagi...')} />
-  </QuestionGroup>
+{/* Notatka */}
+<QuestionGroup>
+  <Label style={{ fontWeight: '600', fontSize: '16px' }}>{noteLabel}</Label>
+  <TextArea
+    value={noteContent || ''}
+    readOnly
+    rows={4}
+    placeholder={t('Dodatkowe uwagi...')}
+    style={getTextAreaStyle(noteContent)}
+  />
+</QuestionGroup>
 </TabSection>
 
 
