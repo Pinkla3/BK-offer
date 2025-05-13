@@ -453,34 +453,45 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
     }
   };
 
-  const handleDynamicTranslate = async () => {
+    const handleDynamicTranslate = async () => {
     setTranslating(true);
     try {
-      let textsToTranslate = editing
+      const questionGroups = [
+        ['q1'],
+        ['q3', 'q4'],
+        ['q5'],
+        ['q6'],
+        ['q7', 'q7_why'],
+        ['q8_plus', 'q8_minus'],
+        ['q9'],
+        ['q10'],
+        ['q11'],
+        ['q12']
+      ];
+
+      const textsToTranslate = editing
         ? editedAnswers.concat(editedNote)
         : questionsPl.map((_, i) => selected[`q${i + 1}`] || '').concat(selected.notes || '');
 
-      const trimmed = textsToTranslate.map(t => t.trim());
-
-      // traktujemy każde pytanie jako jedno pole — z pominięciem inputowych pytań 1 (index 0), 2 (index 1), 5 (index 6)
-      const excludedIndexes = [1, 3, 7];
-      const groupedEmpty = [];
-      for (let i = 0; i < questionsPl.length; i++) {
-        if (excludedIndexes.includes(i)) continue;
-        const block = [trimmed[i]].filter(Boolean);
-        if (block.length === 0) groupedEmpty.push(i);
-      }
+      const groupedEmpty = questionGroups
+        .map((fields, idx) =>
+          fields.every(f => ((editing ? (editedAnswers[parseInt(f.replace('q', '')) - 1] || '') : (selected[f] || '')).trim() === ''))
+            ? idx
+            : -1
+        )
+        .filter(idx => idx !== -1);
 
       if (groupedEmpty.length > 0) {
         toast.warn(`Brak odpowiedzi w ${groupedEmpty.length} pytaniu/ach. Puste pola zostaną oznaczone.`);
       }
 
-      if (groupedEmpty.length === questionsPl.length - excludedIndexes.length) {
+      if (groupedEmpty.length === questionGroups.length) {
         toast.warn('Brak tekstu do tłumaczenia.');
         setTranslating(false);
         return;
       }
 
+      const trimmed = textsToTranslate.map(t => t.trim());
       const toSend = trimmed.filter(t => t.length > 0);
 
       const { data } = await axios.post(
