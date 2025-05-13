@@ -845,19 +845,19 @@ const handleToggleGerman = async () => {
       <TextArea
         value={selected.q6 || ''}
         readOnly
-        placeholder={t('Np. 50 €')}
+        placeholder={t('Np. 50')}
         rows={1}
         style={{
-          textAlign: 'left',
+          textAlign: 'center',
           fontSize: '16px',
-          paddingLeft: '28px',
+          paddingRight: '24px',
           ...getTextAreaStyle(selected.q6)
         }}
       />
       <span style={{
         position: 'absolute',
+        right: '8px',
         top: '50%',
-        left: '8px',
         transform: 'translateY(-50%)',
         color: '#666',
         fontSize: '16px'
