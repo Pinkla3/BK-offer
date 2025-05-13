@@ -738,7 +738,11 @@ const handleToggleGerman = async () => {
 {/* Pytanie 1 */}
 <QuestionGroup style={{ marginTop: '32px' }}>
   <Label>
-    {questions[0]} {getMissingTranslationMessage(selected.q1)}
+    {questions[0]} {showGerman && (!selected.q1 || selected.q1.trim() === '') && (
+      <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
+        Brak odpowiedzi do tłumaczenia
+      </span>
+    )}
   </Label>
   <div style={{
     display: 'grid',
