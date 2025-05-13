@@ -872,21 +872,40 @@ const handleToggleGerman = async () => {
 {/* Pytanie 3 */}
 <QuestionGroup>
   <Label>
-    {questions[4]} 
+    {questions[4]}
     {showGerman && (!selected.q5 || selected.q5.trim() === '') && (
       <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
         Brak odpowiedzi do tłumaczenia
       </span>
     )}
   </Label>
-  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))', columnGap: '120px', rowGap: '12px', justifyContent: 'center', marginTop: '12px', maxWidth: '400px', marginLeft: 'auto', marginRight: 'auto' }}>
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))',
+      columnGap: '120px',
+      rowGap: '12px',
+      justifyContent: 'center',
+      marginTop: '12px',
+      maxWidth: '400px',
+      marginLeft: 'auto',
+      marginRight: 'auto'
+    }}
+  >
     {['Tak', 'Nie'].map(val => {
       const translated = t(val);
+      const isActive = (editing ? editedAnswers[4] : selected.q5) === val;
       return (
         <OptionButton
           key={val}
-          active={selected.q5 === val}
-          warning={isMissingTranslation(translated) && selected.q5 === val}
+          type="button"
+          active={isActive}
+          onClick={() => editing && setEditedAnswers(prev => {
+            const updated = [...prev];
+            updated[4] = val;
+            return updated;
+          })}
+          warning={isMissingTranslation(translated) && isActive}
         >
           {translated}
         </OptionButton>
@@ -894,6 +913,7 @@ const handleToggleGerman = async () => {
     })}
   </div>
 </QuestionGroup>
+
 
 {/* Pytanie 4 */}
 <QuestionGroup>
