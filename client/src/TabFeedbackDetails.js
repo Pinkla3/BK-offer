@@ -737,15 +737,18 @@ const handleToggleGerman = async () => {
     marginLeft: 'auto',
     marginRight: 'auto'
   }}>
-    {['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map(val => (
-      <OptionButton
-        key={val}
-        active={selected.q1 === val}
-        warning={getOptionWarning(selected.q1)}
-      >
-        {t(val)}
-      </OptionButton>
-    ))}
+{['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map(val => {
+  const translated = t(val);
+  return (
+    <OptionButton
+      key={val}
+      active={selected.q1 === val}
+      warning={isMissingTranslation(translated) && selected.q1 === val}
+    >
+      {translated}
+    </OptionButton>
+  );
+})}
   </div>
   {(selected.q1 === 'średnio' || selected.q1 === 'mam zastrzeżenia') && (
     <TextArea
