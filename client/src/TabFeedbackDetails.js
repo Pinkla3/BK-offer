@@ -621,6 +621,14 @@ const handleToggleGerman = async () => {
         }
       };
 
+      const checkboxOptionsQ2 = [
+  'występują nocki',
+  'jest ciężki transfer',
+  'osoba jest trudna',
+  'brak',
+  'inne trudności'
+];
+
   return (
     <Wrapper>
      <TitleRow>
