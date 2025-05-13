@@ -649,7 +649,7 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
             <TabButton active={!showGerman} onClick={() => setShowGerman(false)} disabled={translating}>Polski</TabButton>
             <TabButton active={showGerman} onClick={handleToggleGerman} disabled={translating}>{translating ? 'Tłumaczę...' : 'Deutsch'}</TabButton>
           </TabsBar>
-              <QuestionGroup>
+              <QuestionGroup style={{ marginTop: '32px' }}>
         <Label>1. Jak ogólnie czuje się Pani/Pan z klientem?</Label>
   <div
     style={{
