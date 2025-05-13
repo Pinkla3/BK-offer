@@ -53,7 +53,7 @@ const Button = styled.button`
   &:hover { background: #0056b3; }
 `;
 
-const OptionButton = styled(({ active, ...rest }) => <button {...rest} />)`
+const OptionButton = styled(({ active, editing, ...rest }) => <button {...rest} />)`
   margin-top: 0;
   padding: 10px 20px;
   width: 100%;
@@ -62,9 +62,15 @@ const OptionButton = styled(({ active, ...rest }) => <button {...rest} />)`
   color: ${props => (props.active ? '#fff' : '#333')};
   border: 1px solid ${props => (props.active ? '#007bff' : '#ccc')};
   box-shadow: ${props => (props.active ? '0 0 6px rgba(0, 123, 255, 0.3)' : 'none')};
-  &:hover {
-    background-color: ${props => (props.active ? '#0056b3' : '#e0e0e0')};
-  }
+  
+  ${props =>
+    props.editing &&
+    `
+      &:hover {
+        background-color: ${props.active ? '#0056b3' : '#e0e0e0'};
+        cursor: pointer;
+      }
+    `}
 `;
 
 const DetailCard = styled.div`
@@ -793,6 +799,7 @@ const handleToggleGerman = async () => {
           key={val}
           type="button"
           active={isActive}
+          editing={editing}
           onClick={() => editing && setEditedAnswers(prev => {
             const updated = [...prev];
             updated[0] = val;
@@ -1027,6 +1034,7 @@ const handleToggleGerman = async () => {
           key={val}
           type="button"
           active={isActive}
+          editing={editing}
           onClick={() => editing && setEditedAnswers(prev => {
             const updated = [...prev];
             updated[4] = val;
@@ -1120,6 +1128,7 @@ const handleToggleGerman = async () => {
           key={val}
           type="button"
           active={isActive}
+          editing={editing}
           onClick={() => editing && setEditedAnswers(prev => {
             const updated = [...prev];
             updated[6] = val;
