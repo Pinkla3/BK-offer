@@ -561,6 +561,10 @@ const getOptionWarningStyle = (val, selectedVal) => {
     : {};
 };
 
+const getOptionWarning = (val) => {
+  return val?.trim() === '[brak tekstu do tłumaczenia]';
+};
+
 
 const handleToggleGerman = async () => {
   if (!showGerman) {
