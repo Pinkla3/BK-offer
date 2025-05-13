@@ -772,6 +772,22 @@ const handleToggleGerman = async () => {
             updated[0] = val;
             return updated;
           })}
+          style={{
+            backgroundColor: isActive ? '#007bff' : '#f0f0f0',
+            color: isActive ? '#fff' : '#333',
+            border: `1px solid ${isActive ? '#007bff' : '#ccc'}`,
+            padding: '10px 20px',
+            borderRadius: '6px',
+            fontWeight: 500,
+            fontSize: '14px',
+            cursor: editing ? 'pointer' : 'default',
+            transition: 'background-color 0.2s ease',
+            ...(editing && {
+              ':hover': {
+                backgroundColor: isActive ? '#0056b3' : '#e0e0e0'
+              }
+            })
+          }}
         >
           {translated}
         </OptionButton>
