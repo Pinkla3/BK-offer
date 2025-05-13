@@ -1178,6 +1178,7 @@ const handleToggleGerman = async () => {
 
 {/* Pytanie 6 */}
 <QuestionGroup>
+  {/* Pytanie q8_plus */}
   <Label>
     {questions[8]}
     {showGerman && (!selected.q8_plus || selected.q8_plus.trim() === '') && (
@@ -1185,8 +1186,19 @@ const handleToggleGerman = async () => {
     )}
   </Label>
   <TextArea
-    value={showGerman && (!selected.q8_plus || selected.q8_plus.trim() === '') ? '[brak tekstu do tłumaczenia]' : selected.q8_plus || ''}
-    readOnly
+    value={
+      editing
+        ? editedAnswers[8] || ''
+        : showGerman && (!selected.q8_plus || selected.q8_plus.trim() === '')
+          ? '[brak tekstu do tłumaczenia]'
+          : selected.q8_plus || ''
+    }
+    readOnly={!editing}
+    onChange={editing ? (e) => {
+      const updated = [...editedAnswers];
+      updated[8] = e.target.value;
+      setEditedAnswers(updated);
+    } : undefined}
     rows={2}
     placeholder={t('Np. dobra atmosfera, wsparcie rodziny...')}
     style={{
@@ -1196,6 +1208,8 @@ const handleToggleGerman = async () => {
       color: showGerman && (!selected.q8_plus || selected.q8_plus.trim() === '') ? '#721c24' : '#000'
     }}
   />
+
+  {/* Pytanie q8_minus */}
   <Label>
     {questions[9]}
     {showGerman && (!selected.q8_minus || selected.q8_minus.trim() === '') && (
@@ -1203,8 +1217,19 @@ const handleToggleGerman = async () => {
     )}
   </Label>
   <TextArea
-    value={showGerman && (!selected.q8_minus || selected.q8_minus.trim() === '') ? '[brak tekstu do tłumaczenia]' : selected.q8_minus || ''}
-    readOnly
+    value={
+      editing
+        ? editedAnswers[9] || ''
+        : showGerman && (!selected.q8_minus || selected.q8_minus.trim() === '')
+          ? '[brak tekstu do tłumaczenia]'
+          : selected.q8_minus || ''
+    }
+    readOnly={!editing}
+    onChange={editing ? (e) => {
+      const updated = [...editedAnswers];
+      updated[9] = e.target.value;
+      setEditedAnswers(updated);
+    } : undefined}
     rows={2}
     placeholder={t('Np. brak czasu wolnego, trudna komunikacja...')}
     style={{
@@ -1214,14 +1239,26 @@ const handleToggleGerman = async () => {
     }}
   />
 </QuestionGroup>
+
 {/* Notatka */}
 <QuestionGroup>
   <Label style={{ fontWeight: '600', fontSize: '16px' }}>
     {noteLabel} {getMissingTranslationMessage(noteContent)}
   </Label>
   <TextArea
-    value={noteContent?.trim() === '' && showGerman ? '[brak tekstu do tłumaczenia]' : noteContent || ''}
-    readOnly
+    value={
+      editing
+        ? editedAnswers[12] || ''
+        : noteContent?.trim() === '' && showGerman
+          ? '[brak tekstu do tłumaczenia]'
+          : noteContent || ''
+    }
+    readOnly={!editing}
+    onChange={editing ? (e) => {
+      const updated = [...editedAnswers];
+      updated[12] = e.target.value;
+      setEditedAnswers(updated);
+    } : undefined}
     rows={4}
     placeholder={t('Dodatkowe uwagi...')}
     style={{
