@@ -543,27 +543,19 @@ const handleDynamicTranslate = async () => {
   }
 };
 
-const getTextAreaStyle = (val) => {
-  return val?.trim() === '[brak tekstu do tłumaczenia]'
+const isMissingTranslation = (val) => val?.trim() === '[brak tekstu do tłumaczenia]';
+
+const getTextAreaStyle = (val) =>
+  isMissingTranslation(val)
     ? { backgroundColor: '#f8d7da', borderColor: '#f5c6cb', color: '#721c24' }
     : {};
-};
 
-const getInputStyle = (val) => {
-  return val?.trim() === '[brak tekstu do tłumaczenia]'
+const getInputStyle = (val) =>
+  isMissingTranslation(val)
     ? { backgroundColor: '#f8d7da', borderColor: '#f5c6cb', color: '#721c24' }
     : {};
-};
 
-const getOptionWarningStyle = (val, selectedVal) => {
-  return selectedVal?.trim() === '[brak tekstu do tłumaczenia]' && selectedVal === val
-    ? { backgroundColor: '#f8d7da', borderColor: '#f5c6cb', color: '#721c24' }
-    : {};
-};
-
-const getOptionWarning = (val) => {
-  return val?.trim() === '[brak tekstu do tłumaczenia]';
-};
+const getOptionWarning = (val) => isMissingTranslation(val);
 
 
 const handleToggleGerman = async () => {
