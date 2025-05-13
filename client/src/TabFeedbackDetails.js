@@ -453,7 +453,7 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
     }
   };
 
-  const handleDynamicTranslate = async () => {
+const handleDynamicTranslate = async () => {
     setTranslating(true);
     try {
       let textsToTranslate = editing
@@ -461,9 +461,15 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
         : questionsPl.map((_, i) => selected[`q${i + 1}`] || '').concat(selected.notes || '');
 
       const trimmed = textsToTranslate.map(t => t.trim());
-      const emptyCount = trimmed.filter(t => t.length === 0).length;
+      const emptyIndexes = trimmed
+        .map((t, idx) => (t.length === 0 ? idx : -1))
+        .filter(idx => idx !== -1);
 
-      if (emptyCount === textsToTranslate.length) {
+      if (emptyIndexes.length > 0) {
+        toast.warn(`Brak odpowiedzi w ${emptyIndexes.length} polu/ach. Puste pola zostaną oznaczone.`);
+      }
+
+      if (emptyIndexes.length === textsToTranslate.length) {
         toast.warn('Brak tekstu do tłumaczenia.');
         setTranslating(false);
         return;
@@ -481,7 +487,7 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
         const answersDe = [];
         let j = 0;
         for (let i = 0; i < textsToTranslate.length; i++) {
-          if (textsToTranslate[i].trim().length === 0) {
+          if (trimmed[i].length === 0) {
             answersDe.push('[brak tekstu do tłumaczenia]');
           } else {
             answersDe.push(data.translations[j++] || '');
