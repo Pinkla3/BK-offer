@@ -839,7 +839,7 @@ const handleToggleGerman = async () => {
     }}
   >
     {checkboxOptionsQ2.slice(0, 4).map(option => {
-      const isChecked = (editing ? editedAnswers[2] : selected.q3 || []).includes(option);
+     const isChecked = (editing ? editedAnswers[2] : (selected.q3 ? selected.q3.split(', ') : [])).includes(option);
       return (
         <label
           key={option}
