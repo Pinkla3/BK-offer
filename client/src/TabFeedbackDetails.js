@@ -447,50 +447,78 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
     setEditedPatientLastName(selected.patient_last_name || '');
   };
 
-  const handleSave = async () => {
-    try {
-      const payload = {
-        caregiver_first_name: editedCaregiverFirstName,
-        caregiver_last_name: editedCaregiverLastName,
-        caregiver_phone: editedCaregiverPhone,
-        patient_first_name: editedPatientFirstName,
-        patient_last_name: editedPatientLastName,
-      };
-  
-      editedAnswers.forEach((ans, i) => { payload[`q${i + 1}`] = ans; });
-      editedAnswersDe.forEach((ans, i) => { payload[`q${i + 1}_de`] = ans; });
-      payload.notes = editedNote;
-      payload.notes_de = editedNoteDe;
-  
-      // 🔁 Zapis do backendu
-      const res = await axios.patch(
-        `${API_BASE_URL}/api/tabResponses/${selected.id}`,
-        payload,
-        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
-      );
-  
-      const updated = res.data;
-  
-      const updatedSelected = {
-        ...selected,
-        ...payload,
-        user_name: updated.user_name || selected.user_name,
-        edit_history: updated.edit_history
-      };
-  
-      setSelected(updatedSelected);
-      setGermanAnswers(editedAnswersDe);
-      setTranslatedNote(editedNoteDe);
-      setEditing(false);
-      setIsTranslated(true);
-  
-      toast.success('Dane zapisane pomyślnie!');
-      window.dispatchEvent(new Event('feedbackUpdated')); // 🔔 odśwież listę w tle
-    } catch (err) {
-      console.error('Błąd zapisu:', err);
-      toast.error('Wystąpił błąd podczas zapisywania. Spróbuj ponownie.');
-    }
-  };
+ const handleSave = async () => {
+  try {
+    const payload = {
+      caregiver_first_name: editedCaregiverFirstName,
+      caregiver_last_name: editedCaregiverLastName,
+      caregiver_phone: editedCaregiverPhone,
+      patient_first_name: editedPatientFirstName,
+      patient_last_name: editedPatientLastName,
+    };
+
+    // 🔁 Wypełniamy wszystkie pola feedbacku PL
+    Object.assign(payload, {
+      q1: editedAnswers[0],
+      q2: editedAnswers[1],
+      q3: Array.isArray(editedAnswers[2]) ? editedAnswers[2].join(', ') : editedAnswers[2],
+      q4: editedAnswers[3],
+      q5: editedAnswers[4],
+      q6: editedAnswers[5],
+      q7: editedAnswers[6],
+      q7_why: editedAnswers[7],
+      q8_plus: editedAnswers[8],
+      q8_minus: editedAnswers[9],
+      q9: editedAnswers[10],
+      q10: editedAnswers[11],
+      notes: editedAnswers[12],
+    });
+
+    // 🔁 Wersja DE
+    Object.assign(payload, {
+      q1_de: editedAnswersDe[0],
+      q2_de: editedAnswersDe[1],
+      q3_de: editedAnswersDe[2],
+      q4_de: editedAnswersDe[3],
+      q5_de: editedAnswersDe[4],
+      q6_de: editedAnswersDe[5],
+      q7_de: editedAnswersDe[6],
+      q8_de: editedAnswersDe[7],
+      q9_de: editedAnswersDe[8],
+      q10_de: editedAnswersDe[9],
+      notes_de: editedAnswersDe[10],
+    });
+
+    // 🔁 Zapis do backendu
+    const res = await axios.patch(
+      `${API_BASE_URL}/api/tabResponses/${selected.id}`,
+      payload,
+      { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+    );
+
+    const updated = res.data;
+
+    // 🔄 odświeżenie danych w widoku szczegółowym
+    const updatedSelected = {
+      ...selected,
+      ...payload,
+      user_name: updated.user_name || selected.user_name,
+      edit_history: updated.edit_history
+    };
+
+    setSelected(updatedSelected);
+    setGermanAnswers(editedAnswersDe);
+    setTranslatedNote(editedAnswersDe[10]); // opcjonalnie, jeśli notes_de
+    setEditing(false);
+    setIsTranslated(true);
+
+    toast.success('Dane zapisane pomyślnie!');
+    window.dispatchEvent(new Event('feedbackUpdated')); // 🔔 odśwież listę w tle
+  } catch (err) {
+    console.error('Błąd zapisu:', err);
+    toast.error('Wystąpił błąd podczas zapisywania. Spróbuj ponownie.');
+  }
+};
 const handleDynamicTranslate = async () => {
   setTranslating(true);
   try {
