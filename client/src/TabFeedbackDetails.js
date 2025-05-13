@@ -998,14 +998,13 @@ const handleToggleGerman = async () => {
     }}
   />
 </QuestionGroup>
-
 {/* Notatka */}
 <QuestionGroup>
   <Label style={{ fontWeight: '600', fontSize: '16px' }}>
     {noteLabel} {getMissingTranslationMessage(noteContent)}
   </Label>
   <TextArea
-    value={noteContent || ''}
+    value={noteContent?.trim() === '' && showGerman ? '[brak tekstu do tłumaczenia]' : noteContent || ''}
     readOnly
     rows={4}
     placeholder={t('Dodatkowe uwagi...')}
