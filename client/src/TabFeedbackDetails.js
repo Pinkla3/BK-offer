@@ -1008,7 +1008,14 @@ const handleToggleGerman = async () => {
     readOnly
     rows={4}
     placeholder={t('Dodatkowe uwagi...')}
-    style={getTextAreaStyle(noteContent)}
+    style={{
+      ...getTextAreaStyle(noteContent),
+      ...(noteContent?.trim() === '[brak tekstu do tłumaczenia]' && showGerman && {
+        backgroundColor: '#f8d7da',
+        borderColor: '#f5c6cb',
+        color: '#721c24'
+      })
+    }}
   />
 </QuestionGroup>
 </TabSection>
