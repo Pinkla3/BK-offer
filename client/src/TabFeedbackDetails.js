@@ -802,37 +802,38 @@ const handleToggleGerman = async () => {
     marginRight: 'auto',
     alignItems: 'start'
   }}>
-    {[ 'występują nocki', 'jest ciężki transfer', 'inne trudności', 'osoba jest trudna', 'brak' ].map((val, index) => (
-      <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <input
-          type="checkbox"
-          checked={(selected.q3 || []).includes(val)}
-          readOnly
-          style={{ width: '20px', height: '20px', accentColor: '#007bff' }}
-        />
-        <span>{t(val)}</span>
-
-        {val === 'inne trudności' && (selected.q3 || []).includes('inne trudności') && selected.q4 && selected.q4.trim() !== '' && (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      {[ 'występują nocki', 'jest ciężki transfer', 'osoba jest trudna', 'brak', 'inne trudności' ].map((val, index) => (
+        <label key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <input
-            type="text"
-            value={selected.q4}
+            type="checkbox"
+            checked={(selected.q3 || []).includes(val)}
             readOnly
-            placeholder={t('Proszę podać szczegóły')}
-            style={{
-              marginLeft: '8px',
-              flex: 1,
-              padding: '6px 10px',
-              borderRadius: '6px',
-              border: '1px solid #ccc',
-              backgroundColor: '#fff',
-              color: '#000',
-              fontSize: '14px',
-              minWidth: '180px'
-            }}
+            style={{ width: '20px', height: '20px', accentColor: '#007bff' }}
           />
-        )}
-      </div>
-    ))}
+          <span>{t(val)}</span>
+        </label>
+      ))}
+    </div>
+    <div>
+      {(selected.q3 || []).includes('inne trudności') && selected.q4 && selected.q4.trim() !== '' && (
+        <input
+          type="text"
+          value={selected.q4}
+          readOnly
+          placeholder={t('Proszę podać szczegóły')}
+          style={{
+            width: '100%',
+            padding: '6px 10px',
+            borderRadius: '6px',
+            border: '1px solid #ccc',
+            backgroundColor: '#fff',
+            color: '#000',
+            fontSize: '14px'
+          }}
+        />
+      )}
+    </div>
   </div>
 </QuestionGroup>
 
