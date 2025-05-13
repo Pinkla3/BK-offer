@@ -761,18 +761,32 @@ const handleToggleGerman = async () => {
       const translated = t(val);
       const isActive = (editing ? editedAnswers[0] : selected.q1) === val;
       return (
-        <OptionButton
+        <button
           key={val}
-          active={isActive}
-          warning={isMissingTranslation(translated) && isActive}
+          type="button"
           onClick={() => editing && setEditedAnswers(prev => {
             const updated = [...prev];
             updated[0] = val;
             return updated;
           })}
+          style={{
+            marginTop: 0,
+            padding: '10px 20px',
+            width: '100%',
+            maxWidth: '300px',
+            backgroundColor: isActive ? '#007bff' : '#f0f0f0',
+            color: isActive ? '#fff' : '#333',
+            border: `1px solid ${isActive ? '#007bff' : '#ccc'}`,
+            boxShadow: isActive ? '0 0 6px rgba(0, 123, 255, 0.3)' : 'none',
+            cursor: 'pointer',
+            transition: 'background-color 0.2s ease',
+            ...(isActive
+              ? { ':hover': { backgroundColor: '#0056b3' } }
+              : { ':hover': { backgroundColor: '#e0e0e0' } })
+          }}
         >
           {translated}
-        </OptionButton>
+        </button>
       );
     })}
   </div>
@@ -797,6 +811,7 @@ const handleToggleGerman = async () => {
     </>
   ) : null}
 </QuestionGroup>
+
 
 {/* Pytanie 2 */}
 <QuestionGroup>
