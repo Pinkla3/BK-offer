@@ -545,7 +545,12 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
 
   const getTextAreaStyle = (val) =>
     val === '[brak tekstu do tłumaczenia]'
-      ? { background: '#f8d7da', borderColor: '#f5c6cb', color: '#721c24' }
+      ? { backgroundColor: '#f8d7da', borderColor: '#f5c6cb', color: '#721c24' }
+      : {};
+
+  const getInputStyle = (val) =>
+    val === '[brak tekstu do tłumaczenia]'
+      ? { backgroundColor: '#f8d7da', borderColor: '#f5c6cb', color: '#721c24' }
       : {};
 
   const getOptionWarning = (val) => val === '[brak tekstu do tłumaczenia]';
