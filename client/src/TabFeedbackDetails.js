@@ -621,15 +621,6 @@ const handleToggleGerman = async () => {
         }
       };
 
-
-const checkboxOptionsQ2 = [
-  'występują nocki',
-  'jest ciężki transfer',
-  'osoba jest trudna',
-  'brak',
-  'inne trudności'
-];
-
   return (
     <Wrapper>
      <TitleRow>
@@ -734,8 +725,6 @@ const checkboxOptionsQ2 = [
             <TabButton active={!showGerman} onClick={() => setShowGerman(false)} disabled={translating}>Polski</TabButton>
             <TabButton active={showGerman} onClick={handleToggleGerman} disabled={translating}>{translating ? 'Tłumaczę...' : 'Deutsch'}</TabButton>
           </TabsBar>
-
-          
 {/* Pytanie 1 */}
 <QuestionGroup style={{ marginTop: '32px' }}>
   <Label>
@@ -827,19 +816,17 @@ const checkboxOptionsQ2 = [
       </span>
     )}
   </Label>
-  <div
-    style={{
-      display: 'grid',
-      gridTemplateColumns: 'repeat(2, 1fr)',
-      columnGap: '32px',
-      rowGap: '12px',
-      marginTop: '10px',
-      maxWidth: '800px',
-      marginLeft: 'auto',
-      marginRight: 'auto',
-      alignItems: 'start'
-    }}
-  >
+  <div style={{
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, 1fr)',
+    columnGap: '32px',
+    rowGap: '12px',
+    marginTop: '10px',
+    maxWidth: '800px',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    alignItems: 'start'
+  }}>
     {checkboxOptionsQ2.map((val, index) => {
       const current = editing ? editedAnswers[2] || [] : selected.q3 || [];
       const isChecked = current.includes(val);
@@ -893,7 +880,6 @@ const checkboxOptionsQ2 = [
     </div>
   </div>
 </QuestionGroup>
-
 {/* Pytanie 3 */}
 <QuestionGroup>
   <Label>
