@@ -651,12 +651,23 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
           </TabsBar>
               <QuestionGroup>
         <Label>1. Jak ogólnie czuje się Pani/Pan z klientem?</Label>
-<div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', maxWidth: '400px' }}>
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))',
+      gap: '16px',
+      justifyContent: 'center',
+      marginTop: '12px',
+      width: '100%',
+      maxWidth: '500px',
+      marginLeft: 'auto',
+      marginRight: 'auto'
+    }}
+    >
           {['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map(val => (
             <OptionButton key={val} active={selected.q1 === val}>{val}</OptionButton>
           ))}
-        </div>
+     
         </div>
         {(selected.q1 === 'średnio' || selected.q1 === 'mam zastrzeżenia') && (
           <TextArea
