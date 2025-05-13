@@ -824,68 +824,115 @@ const handleToggleGerman = async () => {
       </span>
     )}
   </Label>
-  <div style={{
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, 1fr)',
-    columnGap: '32px',
-    rowGap: '12px',
-    marginTop: '10px',
-    maxWidth: '800px',
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    alignItems: 'start'
-  }}>
-    {checkboxOptionsQ2.map((val, index) => {
-      const current = editing ? editedAnswers[2] || [] : selected.q3 || [];
-      const isChecked = current.includes(val);
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: '250px 1fr',
+      columnGap: '30px',
+      rowGap: '12px',
+      marginTop: '10px',
+      maxWidth: '700px',
+      marginLeft: 'auto',
+      marginRight: 'auto'
+    }}
+  >
+    {checkboxOptionsQ2.slice(0, 4).map(option => {
+      const isChecked = (editing ? editedAnswers[2] : selected.q3 || []).includes(option);
       return (
-        <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <label
+          key={option}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            fontSize: '16px',
+            cursor: editing ? 'pointer' : 'default',
+            userSelect: 'none',
+            whiteSpace: 'nowrap'
+          }}
+        >
           <input
             type="checkbox"
             checked={isChecked}
             disabled={!editing}
-            onChange={(e) => {
+            onChange={() => {
               if (!editing) return;
               setEditedAnswers(prev => {
-                const currentValues = [...(prev[2] || [])];
-                const updated = e.target.checked
-                  ? [...currentValues, val]
-                  : currentValues.filter(v => v !== val);
+                const list = prev[2] || [];
+                const updated = list.includes(option)
+                  ? list.filter(i => i !== option)
+                  : [...list, option];
                 const newAnswers = [...prev];
                 newAnswers[2] = updated;
                 return newAnswers;
               });
             }}
-            style={{ width: '20px', height: '20px', accentColor: '#007bff' }}
+            style={{
+              width: '20px',
+              height: '20px',
+              accentColor: '#007bff'
+            }}
           />
-          <span>{t(val)}</span>
-        </div>
+          <span>{t(option)}</span>
+        </label>
       );
     })}
-    <div>
-      {(editing ? editedAnswers[2] : selected.q3)?.includes('inne trudności') && (
-        <input
-          type="text"
-          value={editing ? editedAnswers[3] || '' : selected.q4 || ''}
-          onChange={editing ? (e) => setEditedAnswers(prev => {
-            const updated = [...prev];
-            updated[3] = e.target.value;
-            return updated;
-          }) : undefined}
-          readOnly={!editing}
-          placeholder={t('Proszę podać szczegóły')}
-          style={{
-            width: '100%',
-            padding: '6px 10px',
-            borderRadius: '6px',
-            border: '1px solid #ccc',
-            backgroundColor: '#fff',
-            color: '#000',
-            fontSize: '14px'
-          }}
-        />
-      )}
-    </div>
+
+    {/* Checkbox "Inne trudności" */}
+    <label
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px',
+        fontSize: '16px',
+        cursor: editing ? 'pointer' : 'default',
+        userSelect: 'none',
+        whiteSpace: 'nowrap'
+      }}
+    >
+      <input
+        type="checkbox"
+        checked={(editing ? editedAnswers[2] : selected.q3 || []).includes('inne trudności')}
+        disabled={!editing}
+        onChange={() => {
+          if (!editing) return;
+          setEditedAnswers(prev => {
+            const list = prev[2] || [];
+            const updated = list.includes('inne trudności')
+              ? list.filter(i => i !== 'inne trudności')
+              : [...list, 'inne trudności'];
+            const newAnswers = [...prev];
+            newAnswers[2] = updated;
+            return newAnswers;
+          });
+        }}
+        style={{
+          width: '20px',
+          height: '20px',
+          accentColor: '#007bff'
+        }}
+      />
+      <span>{t('inne trudności')}</span>
+    </label>
+
+    {/* Input tekstowy obok checkboxów */}
+    <Input
+      type="text"
+      placeholder={t('Proszę podać szczegóły')}
+      value={editing ? editedAnswers[3] || '' : selected.q4 || ''}
+      onChange={editing ? (e) => setEditedAnswers(prev => {
+        const updated = [...prev];
+        updated[3] = e.target.value;
+        return updated;
+      }) : undefined}
+      readOnly={!editing}
+      style={{
+        width: '100%',
+        maxWidth: '300px',
+        visibility: (editing ? editedAnswers[2] : selected.q3 || []).includes('inne trudności') ? 'visible' : 'hidden',
+        pointerEvents: (editing ? editedAnswers[2] : selected.q3 || []).includes('inne trudności') ? 'auto' : 'none'
+      }}
+    />
   </div>
 </QuestionGroup>
 {/* Pytanie 3 */}

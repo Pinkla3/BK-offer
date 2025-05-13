@@ -351,124 +351,102 @@ const initialState = {
 
 {/* Pytanie 2 */}
 <QuestionGroup>
-  <Label>
-    {questions[2]}
-    {showGerman && (!selected.q3 || selected.q3.length === 0) && (
-      <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
-        Brak odpowiedzi do tłumaczenia
-      </span>
-    )}
-  </Label>
-  <div
+  <Label>2. Czy istnieją trudności w opiece nad pacjentem/pacjentką?</Label>
+<div
+  style={{
+    display: 'grid',
+    gridTemplateColumns: '250px 1fr', // lewa stała, prawa elastyczna
+    columnGap: '30px',
+    rowGap: '12px',
+    marginTop: '10px',
+    maxWidth: '700px',
+    marginLeft: 'auto',
+    marginRight: 'auto'
+  }}
+>
+  {/* Standardowe checkboxy */}
+  {['występują nocki', 'osoba jest trudna', 'jest ciężki transfer', 'brak'].map(option => {
+    const isChecked = form.q3?.includes(option);
+    return (
+      <label
+        key={option}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          fontSize: '16px',
+          cursor: 'pointer',
+          userSelect: 'none',
+          whiteSpace: 'nowrap'
+        }}
+      >
+        <input
+          type="checkbox"
+          checked={isChecked}
+          onChange={() => {
+            const list = form.q3 || [];
+            const updated = isChecked
+              ? list.filter(i => i !== option)
+              : [...list, option];
+            setForm(prev => ({ ...prev, q3: updated }));
+          }}
+          style={{
+            width: '20px',
+            height: '20px',
+            accentColor: '#007bff'
+          }}
+        />
+        <span>{option}</span>
+      </label>
+    );
+  })}
+
+  {/* Checkbox "Inne trudności" */}
+  <label
     style={{
-      display: 'grid',
-      gridTemplateColumns: '250px 1fr',
-      columnGap: '30px',
-      rowGap: '12px',
-      marginTop: '10px',
-      maxWidth: '700px',
-      marginLeft: 'auto',
-      marginRight: 'auto'
+      display: 'flex',
+      alignItems: 'center',
+      gap: '10px',
+      fontSize: '16px',
+      cursor: 'pointer',
+      userSelect: 'none',
+      whiteSpace: 'nowrap'
     }}
   >
-    {checkboxOptionsQ2.slice(0, 4).map(option => {
-      const isChecked = (editing ? editedAnswers[2] : selected.q3 || []).includes(option);
-      return (
-        <label
-          key={option}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            fontSize: '16px',
-            cursor: editing ? 'pointer' : 'default',
-            userSelect: 'none',
-            whiteSpace: 'nowrap'
-          }}
-        >
-          <input
-            type="checkbox"
-            checked={isChecked}
-            disabled={!editing}
-            onChange={() => {
-              if (!editing) return;
-              setEditedAnswers(prev => {
-                const list = prev[2] || [];
-                const updated = list.includes(option)
-                  ? list.filter(i => i !== option)
-                  : [...list, option];
-                const newAnswers = [...prev];
-                newAnswers[2] = updated;
-                return newAnswers;
-              });
-            }}
-            style={{
-              width: '20px',
-              height: '20px',
-              accentColor: '#007bff'
-            }}
-          />
-          <span>{t(option)}</span>
-        </label>
-      );
-    })}
-
-    {/* Checkbox "Inne trudności" */}
-    <label
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '10px',
-        fontSize: '16px',
-        cursor: editing ? 'pointer' : 'default',
-        userSelect: 'none',
-        whiteSpace: 'nowrap'
+    <input
+      type="checkbox"
+      checked={form.q3?.includes('inne trudności')}
+      onChange={() => {
+        const list = form.q3 || [];
+        const updated = form.q3?.includes('inne trudności')
+          ? list.filter(i => i !== 'inne trudności')
+          : [...list, 'inne trudności'];
+        setForm(prev => ({ ...prev, q3: updated }));
       }}
-    >
-      <input
-        type="checkbox"
-        checked={(editing ? editedAnswers[2] : selected.q3 || []).includes('inne trudności')}
-        disabled={!editing}
-        onChange={() => {
-          if (!editing) return;
-          setEditedAnswers(prev => {
-            const list = prev[2] || [];
-            const updated = list.includes('inne trudności')
-              ? list.filter(i => i !== 'inne trudności')
-              : [...list, 'inne trudności'];
-            const newAnswers = [...prev];
-            newAnswers[2] = updated;
-            return newAnswers;
-          });
-        }}
-        style={{
-          width: '20px',
-          height: '20px',
-          accentColor: '#007bff'
-        }}
-      />
-      <span>{t('inne trudności')}</span>
-    </label>
-
-    {/* Input tekstowy obok checkboxów */}
-    <Input
-      type="text"
-      placeholder={t('Proszę podać szczegóły')}
-      value={editing ? editedAnswers[3] || '' : selected.q4 || ''}
-      onChange={editing ? (e) => setEditedAnswers(prev => {
-        const updated = [...prev];
-        updated[3] = e.target.value;
-        return updated;
-      }) : undefined}
-      readOnly={!editing}
       style={{
-        width: '100%',
-        maxWidth: '300px',
-        visibility: (editing ? editedAnswers[2] : selected.q3 || []).includes('inne trudności') ? 'visible' : 'hidden',
-        pointerEvents: (editing ? editedAnswers[2] : selected.q3 || []).includes('inne trudności') ? 'auto' : 'none'
+        width: '20px',
+        height: '20px',
+        accentColor: '#007bff'
       }}
     />
-  </div>
+    <span>inne trudności</span>
+  </label>
+
+  {/* Kolumna 2: input pojawia się tylko jeśli zaznaczono */}
+<Input
+  type="text"
+  name="q4"
+  placeholder="Proszę podać szczegóły"
+  value={form.q4}
+  onChange={handleChange}
+  style={{
+    width: '100%',
+    maxWidth: '300px',
+    visibility: form.q3?.includes('inne trudności') ? 'visible' : 'hidden',
+    pointerEvents: form.q3?.includes('inne trudności') ? 'auto' : 'none',
+  }}
+/>
+</div>
 </QuestionGroup>
 
  {/* Pytanie 3 */}
