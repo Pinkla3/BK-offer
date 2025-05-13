@@ -706,7 +706,13 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
           type="checkbox"
           checked={(selected.q3 || []).includes(option)}
           readOnly
+                    style={{
+            width: '20px',
+            height: '20px',
+            accentColor: '#007bff'
+          }}
         />
+        
         <span>{option}</span>
       </label>
     ))}
