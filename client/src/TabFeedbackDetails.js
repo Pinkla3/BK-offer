@@ -494,8 +494,6 @@ const handleSave = async () => {
   }
 };
 
-
-
 const handleDynamicTranslate = async () => {
   setTranslating(true);
   try {
@@ -563,36 +561,26 @@ const handleDynamicTranslate = async () => {
       }
     }
 
-    // 🔁 Zapis przetłumaczonej wersji DE na backend
-    await axios.patch(
-      `${API_BASE_URL}/api/tabResponses/${selected.id}`,
-      {
-        q1_de: answersDe[0],
-        q2_de: '[brak tekstu do tłumaczenia]', // jeśli nie tłumaczysz q2
-        q3_de: answersDe[1],
-        q4_de: answersDe[2],
-        q5_de: answersDe[3],
-        q6_de: answersDe[4],
-        q7_de: answersDe[5],
-        q7_why_de: answersDe[6],
-        q8_de: answersDe[7],
-        q8_plus_de: answersDe[7],
-        q8_minus_de: answersDe[8],
-        q9_de: answersDe[9],
-        q10_de: answersDe[10],
-        notes_de: answersDe[11]
-      },
-      { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
-    );
+    // ✅ Pełny payload: wersja PL + tłumaczenia DE
+    const fullPayload = {
+      // wersja PL – z aktualnego `selected`
+      q1: selected.q1,
+      q2: selected.q2,
+      q3: selected.q3,
+      q4: selected.q4,
+      q5: selected.q5,
+      q6: selected.q6,
+      q7: selected.q7,
+      q7_why: selected.q7_why,
+      q8_plus: selected.q8_plus,
+      q8_minus: selected.q8_minus,
+      q9: selected.q9,
+      q10: selected.q10,
+      notes: selected.notes,
 
-    // 🔁 Aktualizacja lokalnych danych
-    setGermanAnswers(answersDe.slice(0, 11));
-    setTranslatedNote(answersDe[11]);
-
-    setSelected(prev => ({
-      ...prev,
+      // wersja DE – nowo przetłumaczona
       q1_de: answersDe[0],
-      q2_de: '[brak tekstu do tłumaczenia]', // analogicznie
+      q2_de: '[brak tekstu do tłumaczenia]', // jeśli pomijasz q2
       q3_de: answersDe[1],
       q4_de: answersDe[2],
       q5_de: answersDe[3],
@@ -605,6 +593,23 @@ const handleDynamicTranslate = async () => {
       q9_de: answersDe[9],
       q10_de: answersDe[10],
       notes_de: answersDe[11]
+    };
+
+    // 🔁 Zapis
+    const res = await axios.patch(
+      `${API_BASE_URL}/api/tabResponses/${selected.id}`,
+      fullPayload,
+      { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+    );
+
+    // 🔄 Aktualizacja lokalnych danych
+    setGermanAnswers(answersDe.slice(0, 11));
+    setTranslatedNote(answersDe[11]);
+
+    setSelected(prev => ({
+      ...prev,
+      ...fullPayload,
+      edit_history: res.data.edit_history || prev.edit_history
     }));
 
     setIsTranslated(true);
