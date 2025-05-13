@@ -688,17 +688,20 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
 
       <QuestionGroup>
   <Label>3. Czy ma Pani/Pan czas wolny?</Label>
+ <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', maxWidth: '400px' }}>
     {['Tak', 'Nie'].map(val => (
       <OptionButton key={val} active={selected.q5 === val}>{val}</OptionButton>
     ))}
+  </div>
   </div>
 </QuestionGroup>
 
 {/* Pytanie 4: budżet tygodniowy */}
 <QuestionGroup>
   <Label>4. Ile wynosi budżet na tydzień? (w Euro)</Label>
-  <div style={{ maxWidth: '300px' }}>
+  <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', maxWidth: '400px' }}>
     <TextArea
       value={selected.q6 || ''}
       readOnly
@@ -710,15 +713,18 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
       }}
     />
   </div>
+  </div>
 </QuestionGroup>
 
       {/* Pytanie 5: powrót */}
       <QuestionGroup>
         <Label>5. Czy chciałabyś wrócić do rodziny?</Label>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', maxWidth: '400px' }}>
+    <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', maxWidth: '400px' }}>
           {['Tak', 'Nie'].map(val => (
             <OptionButton key={val} active={selected.q7 === val}>{val}</OptionButton>
           ))}
+        </div>
         </div>
         {selected.q7 === 'Nie' && (
           <TextArea
