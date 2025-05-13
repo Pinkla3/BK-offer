@@ -960,24 +960,39 @@ const handleToggleGerman = async () => {
 {/* Pytanie 6 */}
 <QuestionGroup>
   <Label>
-    {questions[8]} {getMissingTranslationMessage(answers[8])}
+    {questions[8]}
+    {showGerman && (!selected.q8_plus || selected.q8_plus.trim() === '') && (
+      <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>Brak odpowiedzi do tłumaczenia</span>
+    )}
   </Label>
   <TextArea
-    value={selected.q8_plus || ''}
+    value={showGerman && (!selected.q8_plus || selected.q8_plus.trim() === '') ? '[brak tekstu do tłumaczenia]' : selected.q8_plus || ''}
     readOnly
     rows={2}
     placeholder={t('Np. dobra atmosfera, wsparcie rodziny...')}
-    style={{ marginBottom: '16px', ...getTextAreaStyle(selected.q8_plus) }}
+    style={{
+      marginBottom: '16px',
+      backgroundColor: showGerman && (!selected.q8_plus || selected.q8_plus.trim() === '') ? '#f8d7da' : '#fff',
+      borderColor: showGerman && (!selected.q8_plus || selected.q8_plus.trim() === '') ? '#f5c6cb' : '#ccc',
+      color: showGerman && (!selected.q8_plus || selected.q8_plus.trim() === '') ? '#721c24' : '#000'
+    }}
   />
   <Label>
-    {questions[9]} {getMissingTranslationMessage(answers[9])}
+    {questions[9]}
+    {showGerman && (!selected.q8_minus || selected.q8_minus.trim() === '') && (
+      <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>Brak odpowiedzi do tłumaczenia</span>
+    )}
   </Label>
   <TextArea
-    value={selected.q8_minus || ''}
+    value={showGerman && (!selected.q8_minus || selected.q8_minus.trim() === '') ? '[brak tekstu do tłumaczenia]' : selected.q8_minus || ''}
     readOnly
     rows={2}
     placeholder={t('Np. brak czasu wolnego, trudna komunikacja...')}
-    style={getTextAreaStyle(selected.q8_minus)}
+    style={{
+      backgroundColor: showGerman && (!selected.q8_minus || selected.q8_minus.trim() === '') ? '#f8d7da' : '#fff',
+      borderColor: showGerman && (!selected.q8_minus || selected.q8_minus.trim() === '') ? '#f5c6cb' : '#ccc',
+      color: showGerman && (!selected.q8_minus || selected.q8_minus.trim() === '') ? '#721c24' : '#000'
+    }}
   />
 </QuestionGroup>
 
