@@ -96,7 +96,6 @@ const Label = styled.label`
   margin-bottom: 8px;
 `;
 
-
 const TextArea = styled('textarea')`
   width: 100%;
   min-height: 60px;
@@ -241,6 +240,7 @@ const SmallButtonRefresh = styled(Button)`
   align-items: center;
   justify-content: center;
   gap: 8px;
+  max-width: 160px; 
   padding: 8px 16px;
   font-size: 14px;
   transition: all 0.3s ease;
