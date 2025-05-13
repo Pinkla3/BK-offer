@@ -730,20 +730,43 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
 
       <QuestionGroup>
   <Label>3. Czy ma Pani/Pan czas wolny?</Label>
- <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', maxWidth: '400px' }}>
+ <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))',
+          columnGap: '120px',
+    rowGap: '12px',
+      justifyContent: 'center',
+      marginTop: '12px',
+      maxWidth: '400px',
+      marginLeft: 'auto',
+      marginRight: 'auto'
+    }}
+  >
     {['Tak', 'Nie'].map(val => (
       <OptionButton key={val} active={selected.q5 === val}>{val}</OptionButton>
     ))}
-  </div>
   </div>
 </QuestionGroup>
 
 {/* Pytanie 4: budżet tygodniowy */}
 <QuestionGroup>
   <Label>4. Ile wynosi budżet na tydzień? (w Euro)</Label>
-  <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', maxWidth: '400px' }}>
+  <div
+    style={{
+      display: 'flex',
+      justifyContent: 'center',
+      marginTop: '12px',
+      width: '100%'
+    }}
+  >
+        <div
+      style={{
+        position: 'relative',
+        maxWidth: '220px', // większa szerokość pola
+        width: '100%'
+      }}
+    >
     <TextArea
       value={selected.q6 || ''}
       readOnly
@@ -761,12 +784,22 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
       {/* Pytanie 5: powrót */}
       <QuestionGroup>
         <Label>5. Czy chciałabyś wrócić do rodziny?</Label>
-    <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', maxWidth: '400px' }}>
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))',
+                columnGap: '120px',
+    rowGap: '12px',
+      justifyContent: 'center',
+      marginTop: '12px',
+      maxWidth: '400px',
+      marginLeft: 'auto',
+      marginRight: 'auto'
+    }}
+  >
           {['Tak', 'Nie'].map(val => (
             <OptionButton key={val} active={selected.q7 === val}>{val}</OptionButton>
           ))}
-        </div>
         </div>
         {selected.q7 === 'Nie' && (
           <TextArea
