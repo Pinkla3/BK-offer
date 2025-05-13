@@ -310,25 +310,6 @@ const questionsDe = [
   '6a. ...und 2 Minuspunkte (falls vorhanden):'
 ];
 
-const translationMapPlToDe = {
-  // Pytanie 1
-  'bardzo dobrze': 'sehr gut',
-  'dobrze': 'gut',
-  'średnio': 'mittelmäßig',
-  'mam zastrzeżenia': 'ich habe Bedenken',
-
-  // Pytanie 2 (checkboxy)
-  'występują nocki': 'es gibt Nachtdienste',
-  'osoba jest trudna': 'die Person ist schwierig',
-  'jest ciężki transfer': 'es gibt schwierige Transfers',
-  'brak': 'keine',
-  'inne trudności': 'andere Schwierigkeiten',
-
-  // Pytanie 3 i 5
-  'Tak': 'Ja',
-  'Nie': 'Nein'
-};
-
 const noteLabelPl = 'Notatka:';
 const noteLabelDe = 'Anmerkung:';
 
@@ -354,6 +335,29 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
   const [editedPatientFirstName, setEditedPatientFirstName] = useState('');
   const [editedPatientLastName, setEditedPatientLastName] = useState('');
   const [showHistoryModal, setShowHistoryModal] = useState(false);
+
+const translationMapPlToDe = {
+  'bardzo dobrze': 'sehr gut',
+  'dobrze': 'gut',
+  'średnio': 'mittelmäßig',
+  'mam zastrzeżenia': 'ich habe Bedenken',
+  'występują nocki': 'es gibt Nachtdienste',
+  'osoba jest trudna': 'die Person ist schwierig',
+  'jest ciężki transfer': 'es gibt schwierige Transfers',
+  'brak': 'keine',
+  'inne trudności': 'andere Schwierigkeiten',
+  'Tak': 'Ja',
+  'Nie': 'Nein',
+  'Dlaczego?': 'Warum?',
+  'Szczegóły dotyczące trudności': 'Details zu den Schwierigkeiten',
+  'Dlaczego nie?': 'Warum nicht?',
+  'Np. 50 €': 'z. B. 50 €',
+  'Np. dobra atmosfera, wsparcie rodziny...': 'z. B. gute Atmosphäre, Unterstützung der Familie...',
+  'Np. brak czasu wolnego, trudna komunikacja...': 'z. B. wenig Freizeit, schwierige Kommunikation...',
+  'Dodatkowe uwagi...': 'Weitere Hinweise...'
+};
+
+const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
 
   useEffect(() => {
 
