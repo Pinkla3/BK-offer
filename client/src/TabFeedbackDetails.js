@@ -356,25 +356,24 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
 useEffect(() => {
   if (editing && selected) {
     setEditedAnswers([
-      selected.q1 || '',
-      selected.q2 || '',
+      selected.q1 || '',         // 0
+      selected.q2 || '',         // 1
       Array.isArray(selected.q3)
         ? selected.q3
         : typeof selected.q3 === 'string'
           ? selected.q3.split(', ')
-          : [],
-      selected.q4 || '',
-      selected.q5 || '',
-      selected.q6 || '',
-      selected.q7 || '',
-      selected.q7_why || '',
-      selected.q8_plus || '',
-      selected.q8_minus || '',
-      selected.notes || ''
+          : [],                  // 2
+      selected.q4 || '',         // 3
+      selected.q5 || '',         // 4
+      selected.q6 || '',         // 5
+      selected.q7 || '',         // 6
+      selected.q7_why || '',     // 7
+      selected.q8_plus || '',    // 8 ✅
+      selected.q8_minus || '',   // 9 ✅
+      selected.notes || ''       // 10 ✅
     ]);
-
-    }
-  }, [editing, selected]);
+  }
+}, [editing, selected]);
 
 const translationMapPlToDe = {
   'bardzo dobrze': 'sehr gut',
@@ -1248,7 +1247,7 @@ const handleToggleGerman = async () => {
   <TextArea
     value={
       editing
-        ? editedAnswers[12] || ''
+        ? editedAnswers[10] || ''
         : noteContent?.trim() === '' && showGerman
           ? '[brak tekstu do tłumaczenia]'
           : noteContent || ''
@@ -1256,7 +1255,7 @@ const handleToggleGerman = async () => {
     readOnly={!editing}
     onChange={editing ? (e) => {
       const updated = [...editedAnswers];
-      updated[12] = e.target.value;
+      updated[10] = e.target.value;
       setEditedAnswers(updated);
     } : undefined}
     rows={4}

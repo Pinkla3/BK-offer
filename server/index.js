@@ -629,14 +629,14 @@ app.post('/api/translate', authenticate, async (req, res) => {
 app.patch('/api/tabResponses/:id', authenticate, async (req, res) => {
   const { id } = req.params;
   const updates = req.body;
-if (Array.isArray(updates.q3)) {
-  updates.q3 = updates.q3.join(', ');
-}
+
+  if (Array.isArray(updates.q3)) {
+    updates.q3 = updates.q3.join(', ');
+  }
+
   try {
     const now = new Date();
-
-    // Ręczne formatowanie daty i godziny
-    const formattedDateTime = new Date().toLocaleString('pl-PL', {
+    const formattedDateTime = now.toLocaleString('pl-PL', {
       timeZone: 'Europe/Warsaw',
       hour12: false,
       day: '2-digit',
@@ -646,6 +646,7 @@ if (Array.isArray(updates.q3)) {
       minute: '2-digit',
       second: '2-digit'
     });
+
     const [[userRow]] = await pool.query('SELECT name FROM users WHERE id = ?', [req.user.id]);
     const userName = userRow ? userRow.name : 'nieznany użytkownik';
     const historyEntry = `Edytowano przez ${userName} dnia ${formattedDateTime}`;
@@ -674,8 +675,9 @@ if (Array.isArray(updates.q3)) {
         caregiver_first_name = ?, caregiver_last_name = ?, caregiver_phone = ?,
         patient_first_name = ?, patient_last_name = ?,
         q1 = ?, q2 = ?, q3 = ?, q4 = ?, q5 = ?,
-        q6 = ?, q7 = ?, q8 = ?, q9 = ?, q10 = ?,
-        notes = ?, q1_de = ?, q2_de = ?, q3_de = ?, q4_de = ?, q5_de = ?,
+        q6 = ?, q7 = ?, q7_why = ?, q8_plus = ?, q8_minus = ?, q9 = ?, q10 = ?,
+        notes = ?,
+        q1_de = ?, q2_de = ?, q3_de = ?, q4_de = ?, q5_de = ?,
         q6_de = ?, q7_de = ?, q8_de = ?, q9_de = ?, q10_de = ?,
         notes_de = ?, user_name = ?, edit_history = ?
       WHERE id = ?
@@ -683,7 +685,7 @@ if (Array.isArray(updates.q3)) {
       updates.caregiver_first_name, updates.caregiver_last_name, updates.caregiver_phone,
       updates.patient_first_name, updates.patient_last_name,
       updates.q1, updates.q2, updates.q3, updates.q4, updates.q5,
-      updates.q6, updates.q7, updates.q8, updates.q9, updates.q10,
+      updates.q6, updates.q7, updates.q7_why, updates.q8_plus, updates.q8_minus, updates.q9, updates.q10,
       updates.notes,
       updates.q1_de, updates.q2_de, updates.q3_de, updates.q4_de, updates.q5_de,
       updates.q6_de, updates.q7_de, updates.q8_de, updates.q9_de, updates.q10_de,
