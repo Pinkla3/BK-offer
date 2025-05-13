@@ -671,6 +671,7 @@ const handleToggleGerman = async () => {
     setEditedNote(value);
     setIsPolishChangedSinceTranslation(true);
   };
+  
 
   if (loading) return <Wrapper><p>Ładowanie...</p></Wrapper>;
   if (error) return <Wrapper><p>{error}</p></Wrapper>;
@@ -825,7 +826,12 @@ const handleToggleGerman = async () => {
 {/* Pytanie 1 */}
 <QuestionGroup style={{ marginTop: '32px' }}>
   <Label>
-    {questions[0]} {getMissingTranslationMessage(answers[0])}
+    {questions[0]}
+    {showGerman && isMissingTranslation(selected.q1, selected.q1_de) && (
+      <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
+        Brak odpowiedzi do tłumaczenia
+      </span>
+    )}
   </Label>
   <div
     style={{
@@ -860,50 +866,7 @@ const handleToggleGerman = async () => {
       );
     })}
   </div>
-
-  <div
-    style={{
-      marginTop: '16px',
-      overflow: 'hidden',
-      maxHeight:
-        (editing ? editedAnswers[0] : selected.q1) === 'średnio' ||
-        (editing ? editedAnswers[0] : selected.q1) === 'mam zastrzeżenia'
-          ? '200px'
-          : '0px',
-      opacity:
-        (editing ? editedAnswers[0] : selected.q1) === 'średnio' ||
-        (editing ? editedAnswers[0] : selected.q1) === 'mam zastrzeżenia'
-          ? 1
-          : 0,
-      transition: 'all 0.4s ease',
-      width: '100%'
-    }}
-  >
-    <TextArea
-      value={editing ? editedAnswers[1] || '' : selected.q2 || ''}
-      onChange={editing ? (e) => setEditedAnswers(prev => {
-        const updated = [...prev];
-        updated[1] = e.target.value;
-        return updated;
-      }) : undefined}
-      readOnly={!editing}
-      placeholder={t('Dlaczego?')}
-      rows={3}
-      style={{
-        width: '100%',
-        border: '1px solid #ccc',
-        borderRadius: '8px',
-        padding: '10px',
-        fontSize: '14px',
-        boxSizing: 'border-box',
-        transition: 'opacity 0.3s ease',
-        resize: 'vertical',
-        backgroundColor: '#fff'
-      }}
-    />
-  </div>
 </QuestionGroup>
-
 {/* Pytanie 2 */}
 <QuestionGroup>
   <Label>{questions[2]}</Label>
