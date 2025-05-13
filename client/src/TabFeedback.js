@@ -108,19 +108,6 @@ const OptionButton = styled(({ active, ...rest }) => <button {...rest} />)`
   }
 `;
 
-const questions = [
-  '1. Jak BK ogólnie czuje się z klientem?',
-  '2. Jak została przyjęta przez pacjenta?',
-  '3. Jak wygląda współpraca z członkami rodziny?',
-  '4. Czy istnieją trudności w opiece nad pacjentem/pacjentką? (czy występują noce, transfer, inkontynencja, forma poruszania się)',
-  '5. Czy dyżuruje służba pielęgniarska (Pflegedienst)?',
-  '6. Czy BK ma przerwy i czas wolny?',
-  '7. Czy wszystko jest dobrze zorganizowane (budżet domowy, osoba kontaktowa dostępna, produkty pielęgnacyjne na miejscu, wsparcie przy zakupach hurtowych, czy przestrzegane są warunki pracy)?',
-  '8. Czy BK chciałby wrócić? Jeśli tak, w jakim rytmie? Jeśli nie, dlaczego nie? Jak wygląda rytm dnia.',
-  '9. W jaki sposób aktywizujesz seniora? Jakie są zainteresowania seniora?',
-  '10. Czy jest coś, co klient lub firma Berlin Opieka może zoptymalizować?'
-];
-
 const TabFeedback = ({ onSuccess, onClose }) => {
 const initialState = {
   caregiverFirstName: '',

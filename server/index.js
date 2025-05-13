@@ -485,6 +485,7 @@ app.post('/api/update-password', async (req, res) => {
     res.status(500).json({ error: 'Błąd serwera' });
   }
 });
+
 app.post('/api/tabResponses', authenticate, async (req, res) => {
   const {
     caregiverFirstName, caregiverLastName, caregiverPhone,
@@ -499,23 +500,27 @@ app.post('/api/tabResponses', authenticate, async (req, res) => {
     const userId = req.user.id;
     const publicToken = crypto.randomBytes(16).toString('hex');
 
-    const sql = `
-  INSERT INTO tab_responses (
-    caregiver_first_name, caregiver_last_name, caregiver_phone,
-    patient_first_name, patient_last_name,
-    q1, q2, q3, q4, q5, q6, q7, q7_why,
-    q8_plus, q8_minus, q9, q10,
-    notes, user_id, public_token
-  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-`;
+    // ✅ Zamień tablicę na string (jeśli checkboxy w q3 są tablicą)
+    const serializedQ3 = Array.isArray(q3) ? q3.join(', ') : q3;
 
-  const params = [
-  caregiverFirstName, caregiverLastName, caregiverPhone,
-  patientFirstName, patientLastName,
-  q1, q2, q3, q4, q5, q6, q7, q7_why,
-  q8_plus, q8_minus, q9, q10,
-  notes, userId, publicToken
-];
+    const sql = `
+      INSERT INTO tab_responses (
+        caregiver_first_name, caregiver_last_name, caregiver_phone,
+        patient_first_name, patient_last_name,
+        q1, q2, q3, q4, q5, q6, q7, q7_why,
+        q8_plus, q8_minus, q9, q10,
+        notes, user_id, public_token
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const params = [
+      caregiverFirstName, caregiverLastName, caregiverPhone,
+      patientFirstName, patientLastName,
+      q1, q2, serializedQ3, q4, q5, q6, q7, q7_why,
+      q8_plus, q8_minus, q9, q10,
+      notes, userId, publicToken
+    ];
+
     const [result] = await pool.query(sql, params);
     const insertedId = result.insertId;
 
