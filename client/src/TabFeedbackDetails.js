@@ -654,7 +654,7 @@ const handleToggleGerman = async () => {
             <TabButton active={!showGerman} onClick={() => setShowGerman(false)} disabled={translating}>Polski</TabButton>
             <TabButton active={showGerman} onClick={handleToggleGerman} disabled={translating}>{translating ? 'Tłumaczę...' : 'Deutsch'}</TabButton>
           </TabsBar>
-  {/* Pytanie 1 */}
+   {/* Pytanie 1 */}
   <QuestionGroup style={{ marginTop: '32px' }}>
     <Label>{questions[0]}</Label>
     <div style={{
@@ -669,11 +669,11 @@ const handleToggleGerman = async () => {
       marginRight: 'auto'
     }}>
       {['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map(val => (
-        <OptionButton key={val} active={answers[0] === val}>{t(val)}</OptionButton>
+        <OptionButton key={val} active={selected.q1 === val}>{t(val)}</OptionButton>
       ))}
     </div>
-    {(answers[0] === 'średnio' || answers[0] === 'mam zastrzeżenia') && (
-      <TextArea value={answers[1] || ''} readOnly placeholder={t('Dlaczego?')} rows={3} />
+    {(selected.q1 === 'średnio' || selected.q1 === 'mam zastrzeżenia') && (
+      <TextArea value={selected.q2 || ''} readOnly placeholder={t('Dlaczego?')} rows={3} />
     )}
   </QuestionGroup>
 
@@ -690,23 +690,15 @@ const handleToggleGerman = async () => {
       marginLeft: 'auto',
       marginRight: 'auto'
     }}>
-      {(() => {
-        const parsedQ3 = answers[2]?.split(',').map(s => s.trim()) || [];
-        return [
-          'występują nocki', 'osoba jest trudna', 'jest ciężki transfer', 'brak'
-        ].map((option, index) => (
-          <label key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <input type="checkbox" checked={parsedQ3.includes(option)} readOnly style={{ width: '20px', height: '20px', accentColor: '#007bff' }} />
-            <span>{t(option)}</span>
-          </label>
-        )).concat([
-          <label key="inne" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <input type="checkbox" checked={parsedQ3.includes('inne trudności')} readOnly style={{ width: '20px', height: '20px', accentColor: '#007bff' }} />
-            <span>{t('inne trudności')}</span>
-          </label>,
-          <TextArea key="textarea" value={answers[3] || ''} readOnly placeholder={t('Szczegóły dotyczące trudności')} rows={2} />
-        ]);
-      })()}
+      {[ 'występują nocki', 'osoba jest trudna', 'jest ciężki transfer', 'brak', 'inne trudności' ].map((val, index) => (
+        <label key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <input type="checkbox" checked={(selected.q3 || []).includes(val)} readOnly style={{ width: '20px', height: '20px', accentColor: '#007bff' }} />
+          <span>{t(val)}</span>
+        </label>
+      ))}
+      {(selected.q3 || []).includes('inne trudności') && (
+        <TextArea key="textarea" value={selected.q4 || ''} readOnly placeholder={t('Szczegóły dotyczące trudności')} rows={2} />
+      )}
     </div>
   </QuestionGroup>
 
@@ -725,7 +717,7 @@ const handleToggleGerman = async () => {
       marginRight: 'auto'
     }}>
       {['Tak', 'Nie'].map(val => (
-        <OptionButton key={val} active={answers[4] === val}>{t(val)}</OptionButton>
+        <OptionButton key={val} active={selected.q5 === val}>{t(val)}</OptionButton>
       ))}
     </div>
   </QuestionGroup>
@@ -735,7 +727,7 @@ const handleToggleGerman = async () => {
     <Label>{questions[5]}</Label>
     <div style={{ display: 'flex', justifyContent: 'center', marginTop: '12px', width: '100%' }}>
       <div style={{ position: 'relative', maxWidth: '220px', width: '100%' }}>
-        <TextArea value={answers[5] || ''} readOnly placeholder={t('Np. 50 €')} rows={1} style={{ textAlign: 'center', fontSize: '16px' }} />
+        <TextArea value={selected.q6 || ''} readOnly placeholder={t('Np. 50 €')} rows={1} style={{ textAlign: 'center', fontSize: '16px' }} />
       </div>
     </div>
   </QuestionGroup>
@@ -755,20 +747,20 @@ const handleToggleGerman = async () => {
       marginRight: 'auto'
     }}>
       {['Tak', 'Nie'].map(val => (
-        <OptionButton key={val} active={answers[6] === val}>{t(val)}</OptionButton>
+        <OptionButton key={val} active={selected.q7 === val}>{t(val)}</OptionButton>
       ))}
     </div>
-    {answers[6] === 'Nie' && (
-      <TextArea value={answers[7] || ''} readOnly placeholder={t('Dlaczego nie?')} rows={3} />
+    {selected.q7 === 'Nie' && (
+      <TextArea value={selected.q7_why || ''} readOnly placeholder={t('Dlaczego nie?')} rows={3} />
     )}
   </QuestionGroup>
 
   {/* Pytanie 6 */}
   <QuestionGroup>
     <Label>{questions[8]}</Label>
-    <TextArea value={answers[8] || ''} readOnly rows={2} placeholder={t('Np. dobra atmosfera, wsparcie rodziny...')} style={{ marginBottom: '16px' }} />
+    <TextArea value={selected.q8_plus || ''} readOnly rows={2} placeholder={t('Np. dobra atmosfera, wsparcie rodziny...')} style={{ marginBottom: '16px' }} />
     <Label>{questions[9]}</Label>
-    <TextArea value={answers[9] || ''} readOnly rows={2} placeholder={t('Np. brak czasu wolnego, trudna komunikacja...')} />
+    <TextArea value={selected.q8_minus || ''} readOnly rows={2} placeholder={t('Np. brak czasu wolnego, trudna komunikacja...')} />
   </QuestionGroup>
 
   {/* Notatka */}
