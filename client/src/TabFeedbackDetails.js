@@ -462,10 +462,12 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
 
       const trimmed = textsToTranslate.map(t => t.trim());
 
-      // traktujemy każde pytanie jako jedno pole — grupujemy po parach: q1/q2, q3/q4, itd.
+      // traktujemy każde pytanie jako jedno pole — z pominięciem inputowych pytań 1 (index 0), 2 (index 1), 5 (index 6)
+      const excludedIndexes = [1, 3, 7];
       const groupedEmpty = [];
       for (let i = 0; i < questionsPl.length; i++) {
-        const block = [trimmed[i]].filter(Boolean); // możemy rozszerzyć jeśli pytanie ma więcej niż 1 podpole
+        if (excludedIndexes.includes(i)) continue;
+        const block = [trimmed[i]].filter(Boolean);
         if (block.length === 0) groupedEmpty.push(i);
       }
 
@@ -473,7 +475,7 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
         toast.warn(`Brak odpowiedzi w ${groupedEmpty.length} pytaniu/ach. Puste pola zostaną oznaczone.`);
       }
 
-      if (groupedEmpty.length === questionsPl.length) {
+      if (groupedEmpty.length === questionsPl.length - excludedIndexes.length) {
         toast.warn('Brak tekstu do tłumaczenia.');
         setTranslating(false);
         return;
