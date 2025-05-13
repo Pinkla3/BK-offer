@@ -454,40 +454,55 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
   };
 
   const handleDynamicTranslate = async () => {
-  setTranslating(true);
-  try {
-    const textsToTranslate = questionsPl.map((_, i) => selected[`q${i+1}`] || '').concat(selected.notes || '');
-    const { data } = await axios.post(`${API_BASE_URL}/api/translate`, {
-      texts: textsToTranslate,
-      source: 'pl',
-      target: 'de'
-    }, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    });
+    setTranslating(true);
+    try {
+      let textsToTranslate = editing
+        ? editedAnswers.concat(editedNote)
+        : questionsPl.map((_, i) => selected[`q${i + 1}`] || '').concat(selected.notes || '');
 
-    if (data?.translations) {
-      const answersDe = data.translations;
-      const payload = {};
+      const trimmed = textsToTranslate.map(t => t.trim());
+      const emptyCount = trimmed.filter(t => t.length === 0).length;
 
-      answersDe.forEach((ans, i) => {
-        payload[`q${i + 1}_de`] = ans;
-      });
-      payload.notes_de = answersDe[questionsPl.length] || '';
+      if (emptyCount === textsToTranslate.length) {
+        toast.warn('Brak tekstu do tłumaczenia.');
+        setTranslating(false);
+        return;
+      }
 
-      await axios.patch(`${API_BASE_URL}/api/tabResponses/${selected.id}`, payload, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
+      const toSend = trimmed.filter(t => t.length > 0);
 
-      setGermanAnswers(answersDe.slice(0, questionsPl.length));
-      setTranslatedNote(answersDe[questionsPl.length] || '');
-      setIsTranslated(true);
+      const { data } = await axios.post(
+        `${API_BASE_URL}/api/translate`,
+        { texts: toSend, source: 'pl', target: 'de' },
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+      );
+
+      if (data && Array.isArray(data.translations)) {
+        const answersDe = [];
+        let j = 0;
+        for (let i = 0; i < textsToTranslate.length; i++) {
+          if (textsToTranslate[i].trim().length === 0) {
+            answersDe.push('[brak tekstu do tłumaczenia]');
+          } else {
+            answersDe.push(data.translations[j++] || '');
+          }
+        }
+
+        setGermanAnswers(answersDe.slice(0, questionsPl.length));
+        setTranslatedNote(answersDe[questionsPl.length] || '');
+        setIsTranslated(true);
+        setIsPolishChangedSinceTranslation(false);
+        toast.success('Tłumaczenie zakończone.');
+      } else {
+        throw new Error('Niepoprawny format danych z API');
+      }
+    } catch (err) {
+      console.error('🔴 Błąd tłumaczenia:', err.response?.data || err.message);
+      toast.error('Nie udało się przetłumaczyć.');
+    } finally {
+      setTranslating(false);
     }
-  } catch (err) {
-    console.error('Błąd tłumaczenia i zapisu:', err);
-  } finally {
-    setTranslating(false);
-  }
-};
+  };
 
 const handleToggleGerman = async () => {
   if (!showGerman) {
