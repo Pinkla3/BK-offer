@@ -347,23 +347,28 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
   const [editedPatientLastName, setEditedPatientLastName] = useState('');
   const [showHistoryModal, setShowHistoryModal] = useState(false);
 
-   useEffect(() => {
-    if (editing && selected) {
-      setEditedAnswers([
-        selected.q1 || '',
-        selected.q2 || '',
-        selected.q3 ? selected.q3.split(', ') : [],
-        selected.q4 || '',
-        selected.q5 || '',
-        selected.q6 || '',
-        selected.q7 || '',
-        selected.q7_why || '',
-        selected.q8_plus || '',
-        selected.q8_minus || '',
-        selected.q9 || '',
-        selected.q10 || '',
-        selected.notes || ''
-      ]);
+useEffect(() => {
+  if (editing && selected) {
+    setEditedAnswers([
+      selected.q1 || '',
+      selected.q2 || '',
+      Array.isArray(selected.q3)
+        ? selected.q3
+        : typeof selected.q3 === 'string'
+          ? selected.q3.split(', ')
+          : [],
+      selected.q4 || '',
+      selected.q5 || '',
+      selected.q6 || '',
+      selected.q7 || '',
+      selected.q7_why || '',
+      selected.q8_plus || '',
+      selected.q8_minus || '',
+      selected.q9 || '',
+      selected.q10 || '',
+      selected.notes || ''
+    ]);
+
     }
   }, [editing, selected]);
 
