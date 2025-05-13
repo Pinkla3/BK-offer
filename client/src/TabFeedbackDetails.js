@@ -32,16 +32,30 @@ const TopInfoRow = styled.div`
 
 
 const Button = styled.button`
-  background: #007bff;
+  width: 100%;
+  padding: 12px;
+  background-color: #007bff;
   color: #fff;
   border: none;
-  border-radius: 4px;
-  padding: 8px 16px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 14px;
-  margin-top: 16px;
+  margin-top: 10px;
+  transition: background .2s;
   &:hover { background: #0056b3; }
-  &:disabled { background: #999; cursor: not-allowed; }
+`;
+
+const OptionButton = styled(({ active, ...rest }) => <button {...rest} />)`
+  margin-top: 0;
+  padding: 10px 20px;
+  width: 100%;
+  max-width: 300px;
+  background-color: ${props => (props.active ? '#007bff' : '#f0f0f0')};
+  color: ${props => (props.active ? '#fff' : '#333')};
+  border: 1px solid ${props => (props.active ? '#007bff' : '#ccc')};
+  box-shadow: ${props => (props.active ? '0 0 6px rgba(0, 123, 255, 0.3)' : 'none')};
+  &:hover {
+    background-color: ${props => (props.active ? '#0056b3' : '#e0e0e0')};
+  }
 `;
 
 const DetailCard = styled.div`
@@ -82,36 +96,6 @@ const Label = styled.label`
   margin-bottom: 8px;
 `;
 
-const OptionButton = styled.button`
-  background-color: ${props =>
-    props.active
-      ? '#007bff'
-      : props.warning
-      ? '#f8d7da'
-      : '#f0f0f0'};
-  color: ${props =>
-    props.active
-      ? '#fff'
-      : props.warning
-      ? '#721c24'
-      : '#333'};
-  border: 1px solid ${props =>
-    props.active
-      ? '#007bff'
-      : props.warning
-      ? '#f5c6cb'
-      : '#ccc'};
-  box-shadow: ${props =>
-    props.active
-      ? '0 0 6px rgba(0, 123, 255, 0.3)'
-      : 'none'};
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: default;
-  margin: 4px 0;
-  width: 100%;
-  max-width: 300px;
-`;
 
 const TextArea = styled('textarea')`
   width: 100%;
@@ -772,22 +756,6 @@ const handleToggleGerman = async () => {
             updated[0] = val;
             return updated;
           })}
-          style={{
-            backgroundColor: isActive ? '#007bff' : '#f0f0f0',
-            color: isActive ? '#fff' : '#333',
-            border: `1px solid ${isActive ? '#007bff' : '#ccc'}`,
-            padding: '10px 20px',
-            borderRadius: '6px',
-            fontWeight: 500,
-            fontSize: '14px',
-            cursor: editing ? 'pointer' : 'default',
-            transition: 'background-color 0.2s ease',
-            ...(editing && {
-              ':hover': {
-                backgroundColor: isActive ? '#0056b3' : '#e0e0e0'
-              }
-            })
-          }}
         >
           {translated}
         </OptionButton>
