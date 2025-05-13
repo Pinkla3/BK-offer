@@ -682,50 +682,75 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
 {/* Pytanie 2: trudności */}  
 <QuestionGroup>
   <Label>2. Czy istnieją trudności w opiece nad pacjentem/pacjentką?</Label>
-<div
-  style={{
-    display: 'grid',
-    gridTemplateColumns: '250px 1fr', // lewa stała, prawa elastyczna
-    columnGap: '30px',
-    rowGap: '12px',
-    marginTop: '10px',
-    maxWidth: '700px',
-    marginLeft: 'auto',
-    marginRight: 'auto'
-  }}
->
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: '250px 1fr', // lewa kolumna z checkboxem, prawa z tekstem
+      columnGap: '30px',
+      rowGap: '12px',
+      marginTop: '10px',
+      maxWidth: '700px',
+      marginLeft: 'auto',
+      marginRight: 'auto'
+    }}
+  >
     {[
       'występują nocki',
       'osoba jest trudna',
       'jest ciężki transfer',
-      'brak',
-      'inne trudności'
+      'brak'
     ].map((option, index) => (
-      <label key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <label
+        key={index}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px'
+        }}
+      >
         <input
           type="checkbox"
           checked={(selected.q3 || []).includes(option)}
           readOnly
-                    style={{
+          style={{
             width: '20px',
             height: '20px',
             accentColor: '#007bff'
           }}
         />
-        
         <span>{option}</span>
       </label>
     ))}
-  </div>
 
-  {(selected.q3 || []).includes('inne trudności') && (
+    {/* Inne trudności – checkbox */}
+    <label
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px'
+      }}
+    >
+      <input
+        type="checkbox"
+        checked={(selected.q3 || []).includes('inne trudności')}
+        readOnly
+        style={{
+          width: '20px',
+          height: '20px',
+          accentColor: '#007bff'
+        }}
+      />
+      <span>inne trudności</span>
+    </label>
+
+    {/* Inne trudności – pole tekstowe obok */}
     <TextArea
       value={selected.q4 || ''}
       readOnly
       placeholder="Szczegóły dotyczące trudności"
-      rows={3}
+      rows={2}
     />
-  )}
+  </div>
 </QuestionGroup>
 
       <QuestionGroup>
