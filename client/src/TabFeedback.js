@@ -94,7 +94,7 @@ const Button = styled.button`
   &:hover { background: #0056b3; }
 `;
 
-const OptionButton = styled(Button)`
+const OptionButton = styled(({ active, ...rest }) => <button {...rest} />)`
   margin-top: 0;
   padding: 10px 20px;
   width: 100%;
