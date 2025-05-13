@@ -470,7 +470,6 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
       toast.error('Wystąpił błąd podczas zapisywania. Spróbuj ponownie.');
     }
   };
-
 const handleDynamicTranslate = async () => {
   setTranslating(true);
   try {
@@ -498,7 +497,7 @@ const handleDynamicTranslate = async () => {
       .filter(idx => idx !== -1);
 
     if (groupedEmpty.length > 0) {
-      toast.warn(`Brak odpowiedzi w ${groupedEmpty.length} pytaniu/ach.`);
+      toast.warn(`Brak odpowiedzi w ${groupedEmpty.length} pytaniu/ach. Puste pola zostaną oznaczone.`);
     }
 
     if (groupedEmpty.length === questionGroups.length) {
@@ -521,7 +520,7 @@ const handleDynamicTranslate = async () => {
       let j = 0;
       for (let i = 0; i < textsToTranslate.length; i++) {
         if (trimmed[i].length === 0) {
-          answersDe.push('');
+          answersDe.push('[brak tekstu do tłumaczenia]');
         } else {
           answersDe.push(data.translations[j++] || '');
         }
@@ -543,12 +542,31 @@ const handleDynamicTranslate = async () => {
   }
 };
 
-const getMissingTranslationMessage = (val) => {
-  return val?.trim() === '' ? (
-    <div style={{ color: '#cc0000', marginTop: '8px', fontSize: '14px' }}>
-      Brak odpowiedzi do tłumaczenia.
-    </div>
+const isMissingTranslation = (val) => val?.trim() === '[brak tekstu do tłumaczenia]';
+
+const getMissingTranslationMessage = (val) =>
+  isMissingTranslation(val) ? (
+    <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
+      Brak odpowiedzi do tłumaczenia
+    </span>
   ) : null;
+
+const getTextAreaStyle = (val) => {
+  return val?.trim() === '[brak tekstu do tłumaczenia]'
+    ? { backgroundColor: '#f8d7da', borderColor: '#f5c6cb', color: '#721c24' }
+    : {};
+};
+
+const getInputStyle = (val) => {
+  return val?.trim() === '[brak tekstu do tłumaczenia]'
+    ? { backgroundColor: '#f8d7da', borderColor: '#f5c6cb', color: '#721c24' }
+    : {};
+};
+
+const getOptionWarningStyle = (val) => {
+  return val?.trim() === '[brak tekstu do tłumaczenia]'
+    ? { backgroundColor: '#f8d7da', borderColor: '#f5c6cb', color: '#721c24' }
+    : {};
 };
 
 
@@ -719,7 +737,10 @@ const handleToggleGerman = async () => {
           </TabsBar>
 {/* Pytanie 1 */}
 <QuestionGroup style={{ marginTop: '32px' }}>
-  <Label>{questions[0]}</Label>
+  <Label>
+    {questions[0]}
+    {getMissingTranslationMessage(answers[0])}
+  </Label>
   <div style={{
     display: 'grid',
     gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))',
@@ -731,27 +752,33 @@ const handleToggleGerman = async () => {
     marginLeft: 'auto',
     marginRight: 'auto'
   }}>
-{['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map(val => {
-  const translated = t(val);
-  return (
-    <OptionButton
-      key={val}
-      active={selected.q1 === val}
-      warning={isMissingTranslation(translated) && selected.q1 === val}
-    >
-      {translated}
-    </OptionButton>
-  );
-})}
+    {['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map(val => {
+      const translated = t(val);
+      return (
+        <OptionButton
+          key={val}
+          active={selected.q1 === val}
+          warning={isMissingTranslation(translated) && selected.q1 === val}
+        >
+          {translated}
+        </OptionButton>
+      );
+    })}
   </div>
   {(selected.q1 === 'średnio' || selected.q1 === 'mam zastrzeżenia') && (
-    <TextArea
-      value={selected.q2 || ''}
-      readOnly
-      placeholder={t('Dlaczego?')}
-      rows={3}
-      style={getTextAreaStyle(selected.q2)}
-    />
+    <>
+      <Label>
+        {questions[1]}
+        {getMissingTranslationMessage(answers[1])}
+      </Label>
+      <TextArea
+        value={selected.q2 || ''}
+        readOnly
+        placeholder={t('Dlaczego?')}
+        rows={3}
+        style={getTextAreaStyle(selected.q2)}
+      />
+    </>
   )}
 </QuestionGroup>
 
