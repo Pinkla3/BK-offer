@@ -649,10 +649,10 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
             <TabButton active={!showGerman} onClick={() => setShowGerman(false)} disabled={translating}>Polski</TabButton>
             <TabButton active={showGerman} onClick={handleToggleGerman} disabled={translating}>{translating ? 'Tłumaczę...' : 'Deutsch'}</TabButton>
           </TabsBar>
-              <QuestionGroup style={{ marginTop: '32px' }}>
-        <Label>1. Jak ogólnie czuje się Pani/Pan z klientem?</Label>
-  <div
-    style={{
+  {/* Pytanie 1 */}
+  <QuestionGroup style={{ marginTop: '32px' }}>
+    <Label>{questions[0]}</Label>
+    <div style={{
       display: 'grid',
       gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))',
       gap: '16px',
@@ -662,208 +662,115 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
       maxWidth: '500px',
       marginLeft: 'auto',
       marginRight: 'auto'
-    }}
-    >
-          {['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map(val => (
-            <OptionButton key={val} active={selected.q1 === val}>{val}</OptionButton>
-          ))}
-     
-        </div>
-        {(selected.q1 === 'średnio' || selected.q1 === 'mam zastrzeżenia') && (
-          <TextArea
-            value={selected.q2 || ''}
-            readOnly
-            placeholder="Dlaczego?"
-            rows={3}
-          />
-        )}
-      </QuestionGroup>
+    }}>
+      {['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map(val => (
+        <OptionButton key={val} active={answers[0] === val}>{val}</OptionButton>
+      ))}
+    </div>
+    {(answers[0] === 'średnio' || answers[0] === 'mam zastrzeżenia') && (
+      <TextArea value={answers[1] || ''} readOnly placeholder="Dlaczego?" rows={3} />
+    )}
+  </QuestionGroup>
 
-{/* Pytanie 2: trudności */}  
-<QuestionGroup>
-  <Label>2. Czy istnieją trudności w opiece nad pacjentem/pacjentką?</Label>
-  <div
-    style={{
+  {/* Pytanie 2 */}  
+  <QuestionGroup>
+    <Label>{questions[2]}</Label>
+    <div style={{
       display: 'grid',
-      gridTemplateColumns: '250px 1fr', // lewa kolumna z checkboxem, prawa z tekstem
+      gridTemplateColumns: '250px 1fr',
       columnGap: '30px',
       rowGap: '12px',
       marginTop: '10px',
       maxWidth: '700px',
       marginLeft: 'auto',
       marginRight: 'auto'
-    }}
-  >
-    {[
-      'występują nocki',
-      'osoba jest trudna',
-      'jest ciężki transfer',
-      'brak'
-    ].map((option, index) => (
-      <label
-        key={index}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px'
-        }}
-      >
-        <input
-          type="checkbox"
-          checked={(selected.q3 || []).includes(option)}
-          readOnly
-          style={{
-            width: '20px',
-            height: '20px',
-            accentColor: '#007bff'
-          }}
-        />
-        <span>{option}</span>
-      </label>
-    ))}
+    }}>
+      {(() => {
+        const parsedQ3 = answers[2]?.split(',').map(s => s.trim()) || [];
+        return [
+          'występują nocki', 'osoba jest trudna', 'jest ciężki transfer', 'brak'
+        ].map((option, index) => (
+          <label key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <input type="checkbox" checked={parsedQ3.includes(option)} readOnly style={{ width: '20px', height: '20px', accentColor: '#007bff' }} />
+            <span>{option}</span>
+          </label>
+        )).concat([
+          <label key="inne" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <input type="checkbox" checked={parsedQ3.includes('inne trudności')} readOnly style={{ width: '20px', height: '20px', accentColor: '#007bff' }} />
+            <span>inne trudności</span>
+          </label>,
+          <TextArea key="textarea" value={answers[3] || ''} readOnly placeholder="Szczegóły dotyczące trudności" rows={2} />
+        ]);
+      })()}
+    </div>
+  </QuestionGroup>
 
-    {/* Inne trudności – checkbox */}
-    <label
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px'
-      }}
-    >
-      <input
-        type="checkbox"
-        checked={(selected.q3 || []).includes('inne trudności')}
-        readOnly
-        style={{
-          width: '20px',
-          height: '20px',
-          accentColor: '#007bff'
-        }}
-      />
-      <span>inne trudności</span>
-    </label>
-
-    {/* Inne trudności – pole tekstowe obok */}
-    <TextArea
-      value={selected.q4 || ''}
-      readOnly
-      placeholder="Szczegóły dotyczące trudności"
-      rows={2}
-    />
-  </div>
-</QuestionGroup>
-
-      <QuestionGroup>
-  <Label>3. Czy ma Pani/Pan czas wolny?</Label>
- <div
-    style={{
+  {/* Pytanie 3 */}
+  <QuestionGroup>
+    <Label>{questions[4]}</Label>
+    <div style={{
       display: 'grid',
       gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))',
-          columnGap: '120px',
-    rowGap: '12px',
+      columnGap: '120px',
+      rowGap: '12px',
       justifyContent: 'center',
       marginTop: '12px',
       maxWidth: '400px',
       marginLeft: 'auto',
       marginRight: 'auto'
-    }}
-  >
-    {['Tak', 'Nie'].map(val => (
-      <OptionButton key={val} active={selected.q5 === val}>{val}</OptionButton>
-    ))}
-  </div>
-</QuestionGroup>
+    }}>
+      {['Tak', 'Nie'].map(val => (
+        <OptionButton key={val} active={answers[4] === val}>{val}</OptionButton>
+      ))}
+    </div>
+  </QuestionGroup>
 
-{/* Pytanie 4: budżet tygodniowy */}
-<QuestionGroup>
-  <Label>4. Ile wynosi budżet na tydzień? (w Euro)</Label>
-  <div
-    style={{
-      display: 'flex',
-      justifyContent: 'center',
-      marginTop: '12px',
-      width: '100%'
-    }}
-  >
-        <div
-      style={{
-        position: 'relative',
-        maxWidth: '220px', // większa szerokość pola
-        width: '100%'
-      }}
-    >
-    <TextArea
-      value={selected.q6 || ''}
-      readOnly
-      placeholder="Np. 50 €"
-      rows={1}
-      style={{
-        textAlign: 'center',
-        fontSize: '16px'
-      }}
-    />
-  </div>
-  </div>
-</QuestionGroup>
+  {/* Pytanie 4 */}
+  <QuestionGroup>
+    <Label>{questions[5]}</Label>
+    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '12px', width: '100%' }}>
+      <div style={{ position: 'relative', maxWidth: '220px', width: '100%' }}>
+        <TextArea value={answers[5] || ''} readOnly placeholder="Np. 50 €" rows={1} style={{ textAlign: 'center', fontSize: '16px' }} />
+      </div>
+    </div>
+  </QuestionGroup>
 
-      {/* Pytanie 5: powrót */}
-      <QuestionGroup>
-        <Label>5. Czy chciałabyś wrócić do rodziny?</Label>
-  <div
-    style={{
+  {/* Pytanie 5 */}
+  <QuestionGroup>
+    <Label>{questions[6]}</Label>
+    <div style={{
       display: 'grid',
       gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))',
-                columnGap: '120px',
-    rowGap: '12px',
+      columnGap: '120px',
+      rowGap: '12px',
       justifyContent: 'center',
       marginTop: '12px',
       maxWidth: '400px',
       marginLeft: 'auto',
       marginRight: 'auto'
-    }}
-  >
-          {['Tak', 'Nie'].map(val => (
-            <OptionButton key={val} active={selected.q7 === val}>{val}</OptionButton>
-          ))}
-        </div>
-        {selected.q7 === 'Nie' && (
-          <TextArea
-            value={selected.q7_why || ''}
-            readOnly
-            placeholder="Dlaczego nie?"
-            rows={3}
-          />
-        )}
-      </QuestionGroup>
-      {/* Pytanie 6: plusy i minusy */}
-<QuestionGroup>
-  <Label>6. Napisz 2 plusy:</Label>
-  <TextArea
-    value={selected.q8_plus || ''}
-    readOnly
-    rows={2}
-    placeholder="Np. dobra atmosfera, wsparcie rodziny..."
-    style={{ marginBottom: '16px' }}
-  />
+    }}>
+      {['Tak', 'Nie'].map(val => (
+        <OptionButton key={val} active={answers[6] === val}>{val}</OptionButton>
+      ))}
+    </div>
+    {answers[6] === 'Nie' && (
+      <TextArea value={answers[7] || ''} readOnly placeholder="Dlaczego nie?" rows={3} />
+    )}
+  </QuestionGroup>
 
-  <Label>...i 2 minusy zlecenia (jeśli są):</Label>
-  <TextArea
-    value={selected.q8_minus || ''}
-    readOnly
-    rows={2}
-    placeholder="Np. brak czasu wolnego, trudna komunikacja..."
-  />
-</QuestionGroup>
-{/* Notatka końcowa */}
-<QuestionGroup>
-  <Label style={{ fontWeight: '600', fontSize: '16px' }}>Notatka</Label>
-  <TextArea
-    value={noteContent || ''}
-    readOnly
-    rows={4}
-    placeholder="Dodatkowe uwagi, komentarze, spostrzeżenia..."
-  />
-</QuestionGroup>
+  {/* Pytanie 6 */}
+  <QuestionGroup>
+    <Label>{questions[8]}</Label>
+    <TextArea value={answers[8] || ''} readOnly rows={2} placeholder="Np. dobra atmosfera, wsparcie rodziny..." style={{ marginBottom: '16px' }} />
+    <Label>{questions[9]}</Label>
+    <TextArea value={answers[9] || ''} readOnly rows={2} placeholder="Np. brak czasu wolnego, trudna komunikacja..." />
+  </QuestionGroup>
+
+  {/* Notatka */}
+  <QuestionGroup>
+    <Label style={{ fontWeight: '600', fontSize: '16px' }}>{noteLabel}</Label>
+    <TextArea value={noteContent || ''} readOnly rows={4} placeholder="Dodatkowe uwagi..." />
+  </QuestionGroup>
 </TabSection>
 
 
