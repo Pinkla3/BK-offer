@@ -347,6 +347,26 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
   const [editedPatientLastName, setEditedPatientLastName] = useState('');
   const [showHistoryModal, setShowHistoryModal] = useState(false);
 
+   useEffect(() => {
+    if (editing && selected) {
+      setEditedAnswers([
+        selected.q1 || '',
+        selected.q2 || '',
+        selected.q3 ? selected.q3.split(', ') : [],
+        selected.q4 || '',
+        selected.q5 || '',
+        selected.q6 || '',
+        selected.q7 || '',
+        selected.q7_why || '',
+        selected.q8_plus || '',
+        selected.q8_minus || '',
+        selected.q9 || '',
+        selected.q10 || '',
+        selected.notes || ''
+      ]);
+    }
+  }, [editing, selected]);
+
 const translationMapPlToDe = {
   'bardzo dobrze': 'sehr gut',
   'dobrze': 'gut',
@@ -838,8 +858,15 @@ const handleToggleGerman = async () => {
       marginRight: 'auto'
     }}
   >
-    {checkboxOptionsQ2.slice(0, 4).map(option => {
-     const isChecked = (editing ? editedAnswers[2] : (selected.q3 ? selected.q3.split(', ') : [])).includes(option);
+    {[
+      'występują nocki',
+      'osoba jest trudna',
+      'jest ciężki transfer',
+      'brak'
+    ].map(option => {
+      const current = editing ? editedAnswers[2] : selected.q3?.split(', ') || [];
+      const isChecked = current.includes(option);
+
       return (
         <label
           key={option}
@@ -875,12 +902,12 @@ const handleToggleGerman = async () => {
               accentColor: '#007bff'
             }}
           />
-          <span>{t(option)}</span>
+          <span>{option}</span>
         </label>
       );
     })}
 
-    {/* Checkbox "inne trudności" */}
+    {/* Checkbox „inne trudności” */}
     <label
       style={{
         display: 'flex',
@@ -894,7 +921,7 @@ const handleToggleGerman = async () => {
     >
       <input
         type="checkbox"
-        checked={(editing ? editedAnswers[2] : selected.q3 || []).includes('inne trudności')}
+        checked={(editing ? editedAnswers[2] : selected.q3?.split(', ') || []).includes('inne trudności')}
         disabled={!editing}
         onChange={() => {
           if (!editing) return;
@@ -914,25 +941,29 @@ const handleToggleGerman = async () => {
           accentColor: '#007bff'
         }}
       />
-      <span>{t('inne trudności')}</span>
+      <span>inne trudności</span>
     </label>
 
-    {/* Input tekstowy */}
+    {/* Input tekstowy obok checkboxów */}
     <Input
       type="text"
-      placeholder={t('Proszę podać szczegóły')}
+      placeholder="Proszę podać szczegóły"
       value={editing ? editedAnswers[3] || '' : selected.q4 || ''}
-      onChange={editing ? (e) => setEditedAnswers(prev => {
-        const updated = [...prev];
-        updated[3] = e.target.value;
-        return updated;
-      }) : undefined}
+      onChange={
+        editing
+          ? e => setEditedAnswers(prev => {
+              const updated = [...prev];
+              updated[3] = e.target.value;
+              return updated;
+            })
+          : undefined
+      }
       readOnly={!editing}
       style={{
         width: '100%',
         maxWidth: '300px',
-        visibility: (editing ? editedAnswers[2] : selected.q3 || []).includes('inne trudności') ? 'visible' : 'hidden',
-        pointerEvents: (editing ? editedAnswers[2] : selected.q3 || []).includes('inne trudności') ? 'auto' : 'none'
+        visibility: (editing ? editedAnswers[2] : selected.q3?.split(', ') || []).includes('inne trudności') ? 'visible' : 'hidden',
+        pointerEvents: (editing ? editedAnswers[2] : selected.q3?.split(', ') || []).includes('inne trudności') ? 'auto' : 'none'
       }}
     />
   </div>
