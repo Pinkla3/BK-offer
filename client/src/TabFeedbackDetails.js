@@ -838,7 +838,7 @@ const handleToggleGerman = async () => {
 {/* Pytanie 4 */}
 <QuestionGroup>
   <Label>
-    {questions[5]} {getMissingTranslationMessage(answers[5])}
+    {questions[5]} {getMissingTranslationMessage(showGerman ? answers[5] : selected.q6)}
   </Label>
   <div style={{ display: 'flex', justifyContent: 'center', marginTop: '12px', width: '100%' }}>
     <div style={{ position: 'relative', maxWidth: '220px', width: '100%' }}>
@@ -847,8 +847,23 @@ const handleToggleGerman = async () => {
         readOnly
         placeholder={t('Np. 50 €')}
         rows={1}
-        style={{ textAlign: 'center', fontSize: '16px', ...getTextAreaStyle(selected.q6) }}
+        style={{
+          textAlign: 'left',
+          fontSize: '16px',
+          paddingLeft: '28px',
+          ...getTextAreaStyle(selected.q6)
+        }}
       />
+      <span style={{
+        position: 'absolute',
+        top: '50%',
+        left: '8px',
+        transform: 'translateY(-50%)',
+        color: '#666',
+        fontSize: '16px'
+      }}>
+        €
+      </span>
     </div>
   </div>
 </QuestionGroup>
