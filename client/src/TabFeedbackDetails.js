@@ -498,7 +498,7 @@ const handleDynamicTranslate = async () => {
       .filter(idx => idx !== -1);
 
     if (groupedEmpty.length > 0) {
-      toast.warn(`Brak odpowiedzi w ${groupedEmpty.length} pytaniu/ach. Puste pola zostaną oznaczone.`);
+      toast.warn(`Brak odpowiedzi w ${groupedEmpty.length} pytaniu/ach.`);
     }
 
     if (groupedEmpty.length === questionGroups.length) {
@@ -521,7 +521,7 @@ const handleDynamicTranslate = async () => {
       let j = 0;
       for (let i = 0; i < textsToTranslate.length; i++) {
         if (trimmed[i].length === 0) {
-          answersDe.push('[brak tekstu do tłumaczenia]');
+          answersDe.push('');
         } else {
           answersDe.push(data.translations[j++] || '');
         }
@@ -543,19 +543,13 @@ const handleDynamicTranslate = async () => {
   }
 };
 
-const isMissingTranslation = (val) => val?.trim() === '[brak tekstu do tłumaczenia]';
-
-const getTextAreaStyle = (val) =>
-  isMissingTranslation(val)
-    ? { backgroundColor: '#f8d7da', borderColor: '#f5c6cb', color: '#721c24' }
-    : {};
-
-const getInputStyle = (val) =>
-  isMissingTranslation(val)
-    ? { backgroundColor: '#f8d7da', borderColor: '#f5c6cb', color: '#721c24' }
-    : {};
-
-const getOptionWarning = (val) => isMissingTranslation(val);
+const getMissingTranslationMessage = (val) => {
+  return val?.trim() === '' ? (
+    <div style={{ color: '#cc0000', marginTop: '8px', fontSize: '14px' }}>
+      Brak odpowiedzi do tłumaczenia.
+    </div>
+  ) : null;
+};
 
 
 const handleToggleGerman = async () => {
