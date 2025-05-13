@@ -738,20 +738,9 @@ const handleToggleGerman = async () => {
 {/* Pytanie 1 */}
 <QuestionGroup style={{ marginTop: '32px' }}>
   <Label>
-    {questions[0]}
-    {getMissingTranslationMessage(answers[0])}
+    {questions[0]} {getMissingTranslationMessage(answers[0])}
   </Label>
-  <div style={{
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))',
-    gap: '16px',
-    justifyContent: 'center',
-    marginTop: '12px',
-    width: '100%',
-    maxWidth: '500px',
-    marginLeft: 'auto',
-    marginRight: 'auto'
-  }}>
+  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))', gap: '16px', justifyContent: 'center', marginTop: '12px', width: '100%', maxWidth: '500px', marginLeft: 'auto', marginRight: 'auto' }}>
     {['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map(val => {
       const translated = t(val);
       return (
@@ -767,10 +756,7 @@ const handleToggleGerman = async () => {
   </div>
   {(selected.q1 === 'średnio' || selected.q1 === 'mam zastrzeżenia') && (
     <>
-      <Label>
-        {questions[1]}
-        {getMissingTranslationMessage(answers[1])}
-      </Label>
+      <Label>{questions[1]} {getMissingTranslationMessage(answers[1])}</Label>
       <TextArea
         value={selected.q2 || ''}
         readOnly
@@ -784,76 +770,58 @@ const handleToggleGerman = async () => {
 
 {/* Pytanie 2 */}
 <QuestionGroup>
-  <Label>{questions[2]}</Label>
-  <div style={{
-    display: 'grid',
-    gridTemplateColumns: '250px 1fr',
-    columnGap: '30px',
-    rowGap: '12px',
-    marginTop: '10px',
-    maxWidth: '700px',
-    marginLeft: 'auto',
-    marginRight: 'auto'
-  }}>
-    {[
-      'występują nocki',
-      'osoba jest trudna',
-      'jest ciężki transfer',
-      'brak',
-      'inne trudności'
-    ].map((val, index) => (
+  <Label>
+    {questions[2]} {getMissingTranslationMessage(answers[2])}
+  </Label>
+  <div style={{ display: 'grid', gridTemplateColumns: '250px 1fr', columnGap: '30px', rowGap: '12px', marginTop: '10px', maxWidth: '700px', marginLeft: 'auto', marginRight: 'auto' }}>
+    {['występują nocki', 'osoba jest trudna', 'jest ciężki transfer', 'brak', 'inne trudności'].map((val, index) => (
       <label key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <input
-          type="checkbox"
-          checked={(selected.q3 || []).includes(val)}
-          readOnly
-          style={{ width: '20px', height: '20px', accentColor: '#007bff' }}
-        />
+        <input type="checkbox" checked={(selected.q3 || []).includes(val)} readOnly style={{ width: '20px', height: '20px', accentColor: '#007bff' }} />
         <span>{t(val)}</span>
       </label>
     ))}
     {(selected.q3 || []).includes('inne trudności') && (
-      <TextArea
-        key="textarea"
-        value={selected.q4 || ''}
-        readOnly
-        placeholder={t('Szczegóły dotyczące trudności')}
-        rows={2}
-        style={getTextAreaStyle(selected.q4)}
-      />
+      <>
+        <Label>{questions[3]} {getMissingTranslationMessage(answers[3])}</Label>
+        <TextArea
+          key="textarea"
+          value={selected.q4 || ''}
+          readOnly
+          placeholder={t('Szczegóły dotyczące trudności')}
+          rows={2}
+          style={getTextAreaStyle(selected.q4)}
+        />
+      </>
     )}
   </div>
 </QuestionGroup>
 
 {/* Pytanie 3 */}
 <QuestionGroup>
-  <Label>{questions[4]}</Label>
-  <div style={{
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))',
-    columnGap: '120px',
-    rowGap: '12px',
-    justifyContent: 'center',
-    marginTop: '12px',
-    maxWidth: '400px',
-    marginLeft: 'auto',
-    marginRight: 'auto'
-  }}>
-    {['Tak', 'Nie'].map(val => (
-      <OptionButton
-        key={val}
-        active={selected.q5 === val}
-        warning={getOptionWarning(selected.q5)}
-      >
-        {t(val)}
-      </OptionButton>
-    ))}
+  <Label>
+    {questions[4]} {getMissingTranslationMessage(answers[4])}
+  </Label>
+  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))', columnGap: '120px', rowGap: '12px', justifyContent: 'center', marginTop: '12px', maxWidth: '400px', marginLeft: 'auto', marginRight: 'auto' }}>
+    {['Tak', 'Nie'].map(val => {
+      const translated = t(val);
+      return (
+        <OptionButton
+          key={val}
+          active={selected.q5 === val}
+          warning={isMissingTranslation(translated) && selected.q5 === val}
+        >
+          {translated}
+        </OptionButton>
+      );
+    })}
   </div>
 </QuestionGroup>
 
 {/* Pytanie 4 */}
 <QuestionGroup>
-  <Label>{questions[5]}</Label>
+  <Label>
+    {questions[5]} {getMissingTranslationMessage(answers[5])}
+  </Label>
   <div style={{ display: 'flex', justifyContent: 'center', marginTop: '12px', width: '100%' }}>
     <div style={{ position: 'relative', maxWidth: '220px', width: '100%' }}>
       <TextArea
@@ -861,11 +829,7 @@ const handleToggleGerman = async () => {
         readOnly
         placeholder={t('Np. 50 €')}
         rows={1}
-        style={{
-          textAlign: 'center',
-          fontSize: '16px',
-          ...getTextAreaStyle(selected.q6)
-        }}
+        style={{ textAlign: 'center', fontSize: '16px', ...getTextAreaStyle(selected.q6) }}
       />
     </div>
   </div>
@@ -873,42 +837,42 @@ const handleToggleGerman = async () => {
 
 {/* Pytanie 5 */}
 <QuestionGroup>
-  <Label>{questions[6]}</Label>
-  <div style={{
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))',
-    columnGap: '120px',
-    rowGap: '12px',
-    justifyContent: 'center',
-    marginTop: '12px',
-    maxWidth: '400px',
-    marginLeft: 'auto',
-    marginRight: 'auto'
-  }}>
-    {['Tak', 'Nie'].map(val => (
-      <OptionButton
-        key={val}
-        active={selected.q7 === val}
-        warning={getOptionWarning(selected.q7)}
-      >
-        {t(val)}
-      </OptionButton>
-    ))}
+  <Label>
+    {questions[6]} {getMissingTranslationMessage(answers[6])}
+  </Label>
+  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))', columnGap: '120px', rowGap: '12px', justifyContent: 'center', marginTop: '12px', maxWidth: '400px', marginLeft: 'auto', marginRight: 'auto' }}>
+    {['Tak', 'Nie'].map(val => {
+      const translated = t(val);
+      return (
+        <OptionButton
+          key={val}
+          active={selected.q7 === val}
+          warning={isMissingTranslation(translated) && selected.q7 === val}
+        >
+          {translated}
+        </OptionButton>
+      );
+    })}
   </div>
   {selected.q7 === 'Nie' && (
-    <TextArea
-      value={selected.q7_why || ''}
-      readOnly
-      placeholder={t('Dlaczego nie?')}
-      rows={3}
-      style={getTextAreaStyle(selected.q7_why)}
-    />
+    <>
+      <Label>{questions[7]} {getMissingTranslationMessage(answers[7])}</Label>
+      <TextArea
+        value={selected.q7_why || ''}
+        readOnly
+        placeholder={t('Dlaczego nie?')}
+        rows={3}
+        style={getTextAreaStyle(selected.q7_why)}
+      />
+    </>
   )}
 </QuestionGroup>
 
 {/* Pytanie 6 */}
 <QuestionGroup>
-  <Label>{questions[8]}</Label>
+  <Label>
+    {questions[8]} {getMissingTranslationMessage(answers[8])}
+  </Label>
   <TextArea
     value={selected.q8_plus || ''}
     readOnly
@@ -916,7 +880,9 @@ const handleToggleGerman = async () => {
     placeholder={t('Np. dobra atmosfera, wsparcie rodziny...')}
     style={{ marginBottom: '16px', ...getTextAreaStyle(selected.q8_plus) }}
   />
-  <Label>{questions[9]}</Label>
+  <Label>
+    {questions[9]} {getMissingTranslationMessage(answers[9])}
+  </Label>
   <TextArea
     value={selected.q8_minus || ''}
     readOnly
@@ -928,7 +894,9 @@ const handleToggleGerman = async () => {
 
 {/* Notatka */}
 <QuestionGroup>
-  <Label style={{ fontWeight: '600', fontSize: '16px' }}>{noteLabel}</Label>
+  <Label style={{ fontWeight: '600', fontSize: '16px' }}>
+    {noteLabel} {getMissingTranslationMessage(noteContent)}
+  </Label>
   <TextArea
     value={noteContent || ''}
     readOnly
