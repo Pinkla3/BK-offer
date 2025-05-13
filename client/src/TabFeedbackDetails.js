@@ -825,14 +825,7 @@ const handleToggleGerman = async () => {
 
 {/* Pytanie 2 */}
 <QuestionGroup>
-  <Label>
-    {questions[2]}
-    {showGerman && (!selected.q3 || selected.q3.length === 0) && (
-      <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
-        Brak odpowiedzi do tłumaczenia
-      </span>
-    )}
-  </Label>
+  <Label>{questions[2]}</Label>
   <div
     style={{
       display: 'grid',
@@ -887,7 +880,7 @@ const handleToggleGerman = async () => {
       );
     })}
 
-    {/* Checkbox "Inne trudności" */}
+    {/* Checkbox "inne trudności" */}
     <label
       style={{
         display: 'flex',
@@ -924,7 +917,7 @@ const handleToggleGerman = async () => {
       <span>{t('inne trudności')}</span>
     </label>
 
-    {/* Input tekstowy obok checkboxów */}
+    {/* Input tekstowy */}
     <Input
       type="text"
       placeholder={t('Proszę podać szczegóły')}
