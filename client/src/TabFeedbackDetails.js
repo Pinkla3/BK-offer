@@ -453,7 +453,7 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
     }
   };
 
-const handleDynamicTranslate = async () => {
+  const handleDynamicTranslate = async () => {
     setTranslating(true);
     try {
       let textsToTranslate = editing
@@ -461,15 +461,19 @@ const handleDynamicTranslate = async () => {
         : questionsPl.map((_, i) => selected[`q${i + 1}`] || '').concat(selected.notes || '');
 
       const trimmed = textsToTranslate.map(t => t.trim());
-      const emptyIndexes = trimmed
-        .map((t, idx) => (t.length === 0 ? idx : -1))
-        .filter(idx => idx !== -1);
 
-      if (emptyIndexes.length > 0) {
-        toast.warn(`Brak odpowiedzi w ${emptyIndexes.length} polu/ach. Puste pola zostaną oznaczone.`);
+      // traktujemy każde pytanie jako jedno pole — grupujemy po parach: q1/q2, q3/q4, itd.
+      const groupedEmpty = [];
+      for (let i = 0; i < questionsPl.length; i++) {
+        const block = [trimmed[i]].filter(Boolean); // możemy rozszerzyć jeśli pytanie ma więcej niż 1 podpole
+        if (block.length === 0) groupedEmpty.push(i);
       }
 
-      if (emptyIndexes.length === textsToTranslate.length) {
+      if (groupedEmpty.length > 0) {
+        toast.warn(`Brak odpowiedzi w ${groupedEmpty.length} pytaniu/ach. Puste pola zostaną oznaczone.`);
+      }
+
+      if (groupedEmpty.length === questionsPl.length) {
         toast.warn('Brak tekstu do tłumaczenia.');
         setTranslating(false);
         return;
