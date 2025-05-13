@@ -682,15 +682,18 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
 {/* Pytanie 2: trudności */}  
 <QuestionGroup>
   <Label>2. Czy istnieją trudności w opiece nad pacjentem/pacjentką?</Label>
-  <div
-    style={{
-      display: 'grid',
-      gridTemplateColumns: 'repeat(2, minmax(200px, 1fr))',
-      gap: '8px 24px',
-      marginBottom: '8px',
-      maxWidth: '500px'
-    }}
-  >
+<div
+  style={{
+    display: 'grid',
+    gridTemplateColumns: '250px 1fr', // lewa stała, prawa elastyczna
+    columnGap: '30px',
+    rowGap: '12px',
+    marginTop: '10px',
+    maxWidth: '700px',
+    marginLeft: 'auto',
+    marginRight: 'auto'
+  }}
+>
     {[
       'występują nocki',
       'osoba jest trudna',
