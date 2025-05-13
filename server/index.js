@@ -489,7 +489,10 @@ app.post('/api/tabResponses', authenticate, async (req, res) => {
   const {
     caregiverFirstName, caregiverLastName, caregiverPhone,
     patientFirstName, patientLastName,
-    q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, notes
+    q1, q2, q3, q4, q5, q6, q7, q7_why,
+    q8_plus, q8_minus,
+    q9, q10,
+    notes
   } = req.body;
 
   try {
@@ -500,15 +503,17 @@ app.post('/api/tabResponses', authenticate, async (req, res) => {
       INSERT INTO tab_responses (
         caregiver_first_name, caregiver_last_name, caregiver_phone,
         patient_first_name, patient_last_name,
-        q1, q2, q3, q4, q5, q6, q7, q8, q9, q10,
+        q1, q2, q3, q4, q5, q6, q7, q7_why,
+        q8_plus, q8_minus, q9, q10,
         notes, user_id, public_token
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const params = [
       caregiverFirstName, caregiverLastName, caregiverPhone,
       patientFirstName, patientLastName,
-      q1, q2, q3, q4, q5, q6, q7, q8, q9, q10,
+      q1, q2, q3, q4, q5, q6, q7, q7_why,
+      q8_plus, q8_minus, q9, q10,
       notes, userId, publicToken
     ];
 
