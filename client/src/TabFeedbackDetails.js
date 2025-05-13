@@ -453,7 +453,7 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
     }
   };
 
-    const handleDynamicTranslate = async () => {
+      const handleDynamicTranslate = async () => {
     setTranslating(true);
     try {
       const questionGroups = [
@@ -462,16 +462,18 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
         ['q5'],
         ['q6'],
         ['q7', 'q7_why'],
-        ['q8_plus', 'q8_minus'],
+        ['q8_plus', 'q8_minus']
       ];
 
+      const fieldsToTranslate = ['q1', 'q3', 'q4', 'q5', 'q6', 'q7', 'q7_why', 'q8_plus', 'q8_minus'];
+
       const textsToTranslate = editing
-        ? editedAnswers.concat(editedNote)
-        : questionsPl.map((_, i) => selected[`q${i + 1}`] || '').concat(selected.notes || '');
+        ? fieldsToTranslate.map((key, idx) => editedAnswers[idx] || '').concat(editedNote)
+        : fieldsToTranslate.map(key => selected[key] || '').concat(selected.notes || '');
 
       const groupedEmpty = questionGroups
         .map((fields, idx) =>
-          fields.every(f => ((editing ? (editedAnswers[parseInt(f.replace('q', '')) - 1] || '') : (selected[f] || '')).trim() === ''))
+          fields.every(f => ((editing ? (editedAnswers[fieldsToTranslate.indexOf(f)] || '') : (selected[f] || '')).trim() === ''))
             ? idx
             : -1
         )
@@ -507,8 +509,8 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
           }
         }
 
-        setGermanAnswers(answersDe.slice(0, questionsPl.length));
-        setTranslatedNote(answersDe[questionsPl.length] || '');
+        setGermanAnswers(answersDe.slice(0, fieldsToTranslate.length));
+        setTranslatedNote(answersDe[fieldsToTranslate.length] || '');
         setIsTranslated(true);
         setIsPolishChangedSinceTranslation(false);
         toast.success('Tłumaczenie zakończone.');
@@ -522,6 +524,11 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
       setTranslating(false);
     }
   };
+
+  const getTextAreaStyle = (val) =>
+    val === '[brak tekstu do tłumaczenia]'
+      ? { background: '#f8d7da', borderColor: '#f5c6cb', color: '#721c24' }
+      : {};
 
 const handleToggleGerman = async () => {
   if (!showGerman) {
