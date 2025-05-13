@@ -784,8 +784,13 @@ const handleToggleGerman = async () => {
 {/* Pytanie 2 */}
 <QuestionGroup>
   <Label>
-    {questions[2]} {getMissingTranslationMessage(answers[2])}
-  </Label>
+  {questions[2]} 
+  {Array.isArray(selected.q3) && selected.q3.length === 0 && (
+    <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
+      Brak odpowiedzi do tłumaczenia
+    </span>
+  )}
+</Label>
   <div style={{ display: 'grid', gridTemplateColumns: '250px 1fr', columnGap: '30px', rowGap: '12px', marginTop: '10px', maxWidth: '700px', marginLeft: 'auto', marginRight: 'auto' }}>
     {['występują nocki', 'osoba jest trudna', 'jest ciężki transfer', 'brak', 'inne trudności'].map((val, index) => (
       <label key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
