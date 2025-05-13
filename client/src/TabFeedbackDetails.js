@@ -746,72 +746,81 @@ const handleToggleGerman = async () => {
   <Label>
     {questions[0]} {getMissingTranslationMessage(answers[0])}
   </Label>
-  <div style={{
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))',
-    gap: '16px',
-    justifyContent: 'center',
-    marginTop: '12px',
-    width: '100%',
-    maxWidth: '500px',
-    marginLeft: 'auto',
-    marginRight: 'auto'
-  }}>
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))',
+      gap: '16px',
+      justifyContent: 'center',
+      marginTop: '12px',
+      width: '100%',
+      maxWidth: '500px',
+      marginLeft: 'auto',
+      marginRight: 'auto'
+    }}
+  >
     {['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map(val => {
       const translated = t(val);
       const isActive = (editing ? editedAnswers[0] : selected.q1) === val;
       return (
-        <button
+        <OptionButton
           key={val}
           type="button"
+          active={isActive}
           onClick={() => editing && setEditedAnswers(prev => {
             const updated = [...prev];
             updated[0] = val;
             return updated;
           })}
-          style={{
-            marginTop: 0,
-            padding: '10px 20px',
-            width: '100%',
-            maxWidth: '300px',
-            backgroundColor: isActive ? '#007bff' : '#f0f0f0',
-            color: isActive ? '#fff' : '#333',
-            border: `1px solid ${isActive ? '#007bff' : '#ccc'}`,
-            boxShadow: isActive ? '0 0 6px rgba(0, 123, 255, 0.3)' : 'none',
-            cursor: 'pointer',
-            transition: 'background-color 0.2s ease',
-            ...(isActive
-              ? { ':hover': { backgroundColor: '#0056b3' } }
-              : { ':hover': { backgroundColor: '#e0e0e0' } })
-          }}
         >
           {translated}
-        </button>
+        </OptionButton>
       );
     })}
   </div>
 
-  {(editing ? editedAnswers[0] : selected.q1) === 'średnio' || (editing ? editedAnswers[0] : selected.q1) === 'mam zastrzeżenia' ? (
-    <>
-      <Label>
-        {questions[1]}
-      </Label>
-      <TextArea
-        value={editing ? editedAnswers[1] || '' : selected.q2 || ''}
-        onChange={editing ? (e) => setEditedAnswers(prev => {
-          const updated = [...prev];
-          updated[1] = e.target.value;
-          return updated;
-        }) : undefined}
-        readOnly={!editing}
-        placeholder={t('Dlaczego?')}
-        rows={3}
-        style={getTextAreaStyle(editing ? editedAnswers[1] : selected.q2)}
-      />
-    </>
-  ) : null}
+  <div
+    style={{
+      marginTop: '16px',
+      overflow: 'hidden',
+      maxHeight:
+        (editing ? editedAnswers[0] : selected.q1) === 'średnio' ||
+        (editing ? editedAnswers[0] : selected.q1) === 'mam zastrzeżenia'
+          ? '200px'
+          : '0px',
+      opacity:
+        (editing ? editedAnswers[0] : selected.q1) === 'średnio' ||
+        (editing ? editedAnswers[0] : selected.q1) === 'mam zastrzeżenia'
+          ? 1
+          : 0,
+      transition: 'all 0.4s ease',
+      width: '100%'
+    }}
+  >
+    <TextArea
+      value={editing ? editedAnswers[1] || '' : selected.q2 || ''}
+      onChange={editing ? (e) => setEditedAnswers(prev => {
+        const updated = [...prev];
+        updated[1] = e.target.value;
+        return updated;
+      }) : undefined}
+      readOnly={!editing}
+      placeholder={t('Dlaczego?')}
+      rows={3}
+      style={{
+        width: '100%',
+        border: '1px solid #ccc',
+        borderRadius: '8px',
+        padding: '10px',
+        fontSize: '14px',
+        boxSizing: 'border-box',
+        transition: 'opacity 0.3s ease',
+        resize: 'vertical',
+        backgroundColor: '#fff'
+      }}
+    />
+  </div>
 </QuestionGroup>
-
 
 {/* Pytanie 2 */}
 <QuestionGroup>
