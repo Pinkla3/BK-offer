@@ -305,27 +305,27 @@ const RightButtons = styled.div`
 // Questions
 const questionsPl = [
   '1. Jak ogólnie czuje się Pani/Pan z klientem?',
-  '1a. Dlaczego?',
+  '',
   '2. Czy istnieją trudności w opiece nad pacjentem/pacjentką?',
   '2a. Szczegóły dotyczące trudności',
-  '3. Czy ma Pani/Pan czas wolny?',
+  '3. Czy ma pani/pan czas wolny?',
   '4. Ile wynosi budżet na tydzień? (w Euro)',
-  '5. Czy chciałabyś wrócić do rodziny?',
-  '5a. Dlaczego nie?',
+  '5. Czy chciałby/chciałaby pan/pani wrócić do rodziny?',
+  '',
   '6. Napisz 2 plusy:',
-  '6a. ...i 2 minusy zlecenia (jeśli są):'
+  ' ...i 2 minusy zlecenia (jeśli są):'
 ];
 const questionsDe = [
   '1. Wie steht BK generell zum Kunden?',
-  '1a. Warum?',
+  '',
   '2. Gibt es Schwierigkeiten bei der Pflege des Patienten/der Patientin?',
   '2a. Details zu den Schwierigkeiten',
-  '3. Hat BK freie Zeit?',
+  '3. Hat Sie freie Zeit?',
   '4. Wie hoch ist das Wochenbudget? (in Euro)',
-  '5. Möchte BK zur Familie zurückkehren?',
-  '5a. Warum nicht?',
+  '5. Möchte Sie zur Familie zurückkehren?',
+  '',
   '6. Nennen Sie 2 Pluspunkte:',
-  '6a. ...und 2 Minuspunkte (falls vorhanden):'
+  ' ...und 2 Minuspunkte (falls vorhanden):'
 ];
 
 const noteLabelPl = 'Notatka:';
@@ -835,20 +835,16 @@ const handleToggleGerman = async () => {
   </div>
 </QuestionGroup>
 
-/* Pytanie 4 */
+{/* Pytanie 4 */}
 <QuestionGroup>
   <Label>
-    {questions[5]} {showGerman && (!selected.q6 || selected.q6 === '0') && (
-      <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
-        Brak odpowiedzi do tłumaczenia
-      </span>
-    )}
+    {questions[5]}
   </Label>
   <div style={{ display: 'flex', justifyContent: 'center', marginTop: '12px', width: '100%' }}>
     <div style={{ position: 'relative', maxWidth: '300px', width: '100%' }}>
       <input
-        type="number"
-        value={selected.q6 || ''}
+        type="text"
+        value={showGerman && (!selected.q6 || selected.q6 === '0') ? '[brak tekstu do tłumaczenia]' : selected.q6 || ''}
         readOnly
         placeholder="np. 50"
         style={{
@@ -880,6 +876,7 @@ const handleToggleGerman = async () => {
     </div>
   </div>
 </QuestionGroup>
+
 
 {/* Pytanie 5 */}
 <QuestionGroup>
