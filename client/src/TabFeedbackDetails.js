@@ -684,6 +684,32 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
         )}
       </QuestionGroup>
 
+      <QuestionGroup>
+  <Label>3. Czy ma Pani/Pan czas wolny?</Label>
+  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', maxWidth: '400px' }}>
+    {['Tak', 'Nie'].map(val => (
+      <OptionButton key={val} active={selected.q5 === val}>{val}</OptionButton>
+    ))}
+  </div>
+</QuestionGroup>
+
+{/* Pytanie 4: budżet tygodniowy */}
+<QuestionGroup>
+  <Label>4. Ile wynosi budżet na tydzień? (w Euro)</Label>
+  <div style={{ maxWidth: '300px' }}>
+    <TextArea
+      value={selected.q6 || ''}
+      readOnly
+      placeholder="Np. 50 €"
+      rows={1}
+      style={{
+        textAlign: 'center',
+        fontSize: '16px'
+      }}
+    />
+  </div>
+</QuestionGroup>
+
       {/* Pytanie 5: powrót */}
       <QuestionGroup>
         <Label>5. Czy chciałabyś wrócić do rodziny?</Label>
@@ -701,36 +727,7 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
           />
         )}
       </QuestionGroup>
-
-      {/* Pytanie 6: plusy i minusy */}
-      <QuestionGroup>
-        <Label>6. Napisz 2 plusy:</Label>
-        <TextArea
-          value={selected.q8_plus || ''}
-          readOnly
-          rows={2}
-          placeholder="Plusy"
-        />
-        <Label style={{ marginTop: '12px' }}>...i 2 minusy:</Label>
-        <TextArea
-          value={selected.q8_minus || ''}
-          readOnly
-          rows={2}
-          placeholder="Minusy"
-        />
-      </QuestionGroup>
-
-      {/* Notatka końcowa */}
-      <QuestionGroup>
-        <Label>Notatka</Label>
-        <TextArea
-          value={selected.notes || ''}
-          readOnly
-          rows={4}
-          placeholder="Dodatkowe uwagi"
-        />
-      </QuestionGroup>
-        </TabSection>
+</TabSection>
 
 
 {/* Sekcja historia edycji */}
