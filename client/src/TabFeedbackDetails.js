@@ -727,6 +727,35 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
           />
         )}
       </QuestionGroup>
+      {/* Pytanie 6: plusy i minusy */}
+<QuestionGroup>
+  <Label>6. Napisz 2 plusy:</Label>
+  <TextArea
+    value={selected.q8_plus || ''}
+    readOnly
+    rows={2}
+    placeholder="Np. dobra atmosfera, wsparcie rodziny..."
+    style={{ marginBottom: '16px' }}
+  />
+
+  <Label>...i 2 minusy zlecenia (jeśli są):</Label>
+  <TextArea
+    value={selected.q8_minus || ''}
+    readOnly
+    rows={2}
+    placeholder="Np. brak czasu wolnego, trudna komunikacja..."
+  />
+</QuestionGroup>
+{/* Notatka końcowa */}
+<QuestionGroup>
+  <Label style={{ fontWeight: '600', fontSize: '16px' }}>Notatka</Label>
+  <TextArea
+    value={noteContent || ''}
+    readOnly
+    rows={4}
+    placeholder="Dodatkowe uwagi, komentarze, spostrzeżenia..."
+  />
+</QuestionGroup>
 </TabSection>
 
 
