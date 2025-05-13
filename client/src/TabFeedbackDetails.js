@@ -738,9 +738,19 @@ const handleToggleGerman = async () => {
 {/* Pytanie 1 */}
 <QuestionGroup style={{ marginTop: '32px' }}>
   <Label>
-    {questions[0]} {getMissingTranslationMessage(answers[0])}
+    {questions[0]} {getMissingTranslationMessage(showGerman ? answers[0] : selected.q1)}
   </Label>
-  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))', gap: '16px', justifyContent: 'center', marginTop: '12px', width: '100%', maxWidth: '500px', marginLeft: 'auto', marginRight: 'auto' }}>
+  <div style={{
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))',
+    gap: '16px',
+    justifyContent: 'center',
+    marginTop: '12px',
+    width: '100%',
+    maxWidth: '500px',
+    marginLeft: 'auto',
+    marginRight: 'auto'
+  }}>
     {['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map(val => {
       const translated = t(val);
       return (
@@ -754,9 +764,12 @@ const handleToggleGerman = async () => {
       );
     })}
   </div>
+
   {(selected.q1 === 'średnio' || selected.q1 === 'mam zastrzeżenia') && (
     <>
-      <Label>{questions[1]} {getMissingTranslationMessage(answers[1])}</Label>
+      <Label>
+        {questions[1]} {getMissingTranslationMessage(showGerman ? answers[1] : selected.q2)}
+      </Label>
       <TextArea
         value={selected.q2 || ''}
         readOnly
