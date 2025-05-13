@@ -471,7 +471,7 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
     }
   };
 
- const handleDynamicTranslate = async () => {
+const handleDynamicTranslate = async () => {
   setTranslating(true);
   try {
     const questionGroups = [
@@ -545,22 +545,17 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
 
 const getTextAreaStyle = (val) =>
   val === '[brak tekstu do tłumaczenia]'
-    ? {
-        backgroundColor: '#f8d7da',
-        borderColor: '#f5c6cb',
-        color: '#721c24',
-        fontStyle: 'italic'
-      }
+    ? { backgroundColor: '#f8d7da', borderColor: '#f5c6cb', color: '#721c24' }
     : {};
 
 const getInputStyle = (val) =>
   val === '[brak tekstu do tłumaczenia]'
-    ? {
-        backgroundColor: '#f8d7da',
-        borderColor: '#f5c6cb',
-        color: '#721c24',
-        fontStyle: 'italic'
-      }
+    ? { backgroundColor: '#f8d7da', borderColor: '#f5c6cb', color: '#721c24' }
+    : {};
+
+const getOptionWarningStyle = (val, selectedVal) =>
+  selectedVal === '[brak tekstu do tłumaczenia]' && selectedVal === val
+    ? { backgroundColor: '#f8d7da', borderColor: '#f5c6cb', color: '#721c24' }
     : {};
 
 const getOptionWarning = (val) => val === '[brak tekstu do tłumaczenia]';
