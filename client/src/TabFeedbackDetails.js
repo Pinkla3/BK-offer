@@ -863,18 +863,78 @@ const handleToggleGerman = async () => {
       marginRight: 'auto'
     }}
   >
-    {[
-      'występują nocki',
-      'osoba jest trudna',
-      'jest ciężki transfer',
-      'brak'
-    ].map(option => {
-      const current = editing ? editedAnswers[2] : selected.q3?.split(', ') || [];
-      const isChecked = current.includes(option);
+    {(() => {
+      const currentQ3 = editing
+        ? editedAnswers[2]
+        : Array.isArray(selected.q3)
+          ? selected.q3
+          : typeof selected.q3 === 'string'
+            ? selected.q3.split(', ')
+            : [];
+
+      return [
+        'występują nocki',
+        'osoba jest trudna',
+        'jest ciężki transfer',
+        'brak'
+      ].map(option => {
+        const isChecked = currentQ3.includes(option);
+
+        return (
+          <label
+            key={option}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              fontSize: '16px',
+              cursor: editing ? 'pointer' : 'default',
+              userSelect: 'none',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={isChecked}
+              disabled={!editing}
+              onChange={() => {
+                if (!editing) return;
+                setEditedAnswers(prev => {
+                  const list = prev[2] || [];
+                  const updated = list.includes(option)
+                    ? list.filter(i => i !== option)
+                    : [...list, option];
+                  const newAnswers = [...prev];
+                  newAnswers[2] = updated;
+                  return newAnswers;
+                });
+              }}
+              style={{
+                width: '20px',
+                height: '20px',
+                accentColor: '#007bff'
+              }}
+            />
+            <span>{option}</span>
+          </label>
+        );
+      });
+    })()}
+
+    {/* Checkbox „inne trudności” */}
+    {(() => {
+      const currentQ3 = editing
+        ? editedAnswers[2]
+        : Array.isArray(selected.q3)
+          ? selected.q3
+          : typeof selected.q3 === 'string'
+            ? selected.q3.split(', ')
+            : [];
+
+      const isChecked = currentQ3.includes('inne trudności');
 
       return (
         <label
-          key={option}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -893,9 +953,9 @@ const handleToggleGerman = async () => {
               if (!editing) return;
               setEditedAnswers(prev => {
                 const list = prev[2] || [];
-                const updated = list.includes(option)
-                  ? list.filter(i => i !== option)
-                  : [...list, option];
+                const updated = list.includes('inne trudności')
+                  ? list.filter(i => i !== 'inne trudności')
+                  : [...list, 'inne trudności'];
                 const newAnswers = [...prev];
                 newAnswers[2] = updated;
                 return newAnswers;
@@ -907,47 +967,10 @@ const handleToggleGerman = async () => {
               accentColor: '#007bff'
             }}
           />
-          <span>{option}</span>
+          <span>inne trudności</span>
         </label>
       );
-    })}
-
-    {/* Checkbox „inne trudności” */}
-    <label
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '10px',
-        fontSize: '16px',
-        cursor: editing ? 'pointer' : 'default',
-        userSelect: 'none',
-        whiteSpace: 'nowrap'
-      }}
-    >
-      <input
-        type="checkbox"
-        checked={(editing ? editedAnswers[2] : selected.q3?.split(', ') || []).includes('inne trudności')}
-        disabled={!editing}
-        onChange={() => {
-          if (!editing) return;
-          setEditedAnswers(prev => {
-            const list = prev[2] || [];
-            const updated = list.includes('inne trudności')
-              ? list.filter(i => i !== 'inne trudności')
-              : [...list, 'inne trudności'];
-            const newAnswers = [...prev];
-            newAnswers[2] = updated;
-            return newAnswers;
-          });
-        }}
-        style={{
-          width: '20px',
-          height: '20px',
-          accentColor: '#007bff'
-        }}
-      />
-      <span>inne trudności</span>
-    </label>
+    })()}
 
     {/* Input tekstowy obok checkboxów */}
     <Input
@@ -967,8 +990,8 @@ const handleToggleGerman = async () => {
       style={{
         width: '100%',
         maxWidth: '300px',
-        visibility: (editing ? editedAnswers[2] : selected.q3?.split(', ') || []).includes('inne trudności') ? 'visible' : 'hidden',
-        pointerEvents: (editing ? editedAnswers[2] : selected.q3?.split(', ') || []).includes('inne trudności') ? 'auto' : 'none'
+        visibility: (editing ? editedAnswers[2] : Array.isArray(selected.q3) ? selected.q3 : typeof selected.q3 === 'string' ? selected.q3.split(', ') : []).includes('inne trudności') ? 'visible' : 'hidden',
+        pointerEvents: (editing ? editedAnswers[2] : Array.isArray(selected.q3) ? selected.q3 : typeof selected.q3 === 'string' ? selected.q3.split(', ') : []).includes('inne trudności') ? 'auto' : 'none'
       }}
     />
   </div>
