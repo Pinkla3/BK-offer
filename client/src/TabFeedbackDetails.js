@@ -827,21 +827,22 @@ const checkboxOptionsQ2 = [
       </span>
     )}
   </Label>
-  <div style={{
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, 1fr)',
-    columnGap: '32px',
-    rowGap: '12px',
-    marginTop: '10px',
-    maxWidth: '800px',
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    alignItems: 'start'
-  }}>
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(2, 1fr)',
+      columnGap: '32px',
+      rowGap: '12px',
+      marginTop: '10px',
+      maxWidth: '800px',
+      marginLeft: 'auto',
+      marginRight: 'auto',
+      alignItems: 'start'
+    }}
+  >
     {checkboxOptionsQ2.map((val, index) => {
-      const isChecked = editing
-        ? (editedAnswers[2] || '').split('|').includes(val)
-        : (selected.q3 || '').split('|').includes(val);
+      const current = editing ? editedAnswers[2] || [] : selected.q3 || [];
+      const isChecked = current.includes(val);
       return (
         <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <input
@@ -851,12 +852,12 @@ const checkboxOptionsQ2 = [
             onChange={(e) => {
               if (!editing) return;
               setEditedAnswers(prev => {
-                const current = (prev[2] || '').split('|').filter(Boolean);
+                const currentValues = [...(prev[2] || [])];
                 const updated = e.target.checked
-                  ? [...current, val]
-                  : current.filter(v => v !== val);
+                  ? [...currentValues, val]
+                  : currentValues.filter(v => v !== val);
                 const newAnswers = [...prev];
-                newAnswers[2] = updated.join('|');
+                newAnswers[2] = updated;
                 return newAnswers;
               });
             }}
@@ -867,7 +868,7 @@ const checkboxOptionsQ2 = [
       );
     })}
     <div>
-      {(editing ? editedAnswers[2] : selected.q3)?.split('|').includes('inne trudności') && (
+      {(editing ? editedAnswers[2] : selected.q3)?.includes('inne trudności') && (
         <input
           type="text"
           value={editing ? editedAnswers[3] || '' : selected.q4 || ''}
