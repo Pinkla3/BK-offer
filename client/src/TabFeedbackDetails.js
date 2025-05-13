@@ -840,8 +840,8 @@ const checkboxOptionsQ2 = [
   }}>
     {checkboxOptionsQ2.map((val, index) => {
       const isChecked = editing
-        ? (editedAnswers[2] || []).includes(val)
-        : (selected.q3 || []).includes(val);
+        ? (editedAnswers[2] || '').split('|').includes(val)
+        : (selected.q3 || '').split('|').includes(val);
       return (
         <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <input
@@ -851,15 +851,12 @@ const checkboxOptionsQ2 = [
             onChange={(e) => {
               if (!editing) return;
               setEditedAnswers(prev => {
-                const updated = [...(prev[2] || [])];
-                if (e.target.checked) {
-                  updated.push(val);
-                } else {
-                  const idx = updated.indexOf(val);
-                  if (idx !== -1) updated.splice(idx, 1);
-                }
+                const current = (prev[2] || '').split('|').filter(Boolean);
+                const updated = e.target.checked
+                  ? [...current, val]
+                  : current.filter(v => v !== val);
                 const newAnswers = [...prev];
-                newAnswers[2] = updated;
+                newAnswers[2] = updated.join('|');
                 return newAnswers;
               });
             }}
@@ -870,7 +867,7 @@ const checkboxOptionsQ2 = [
       );
     })}
     <div>
-      {(editing ? editedAnswers[2] : selected.q3)?.includes('inne trudności') && (
+      {(editing ? editedAnswers[2] : selected.q3)?.split('|').includes('inne trudności') && (
         <input
           type="text"
           value={editing ? editedAnswers[3] || '' : selected.q4 || ''}
