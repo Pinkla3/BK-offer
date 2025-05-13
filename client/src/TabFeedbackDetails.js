@@ -802,18 +802,25 @@ const handleToggleGerman = async () => {
     marginRight: 'auto',
     alignItems: 'start'
   }}>
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-      {[ 'występują nocki', 'jest ciężki transfer', 'osoba jest trudna', 'brak', 'inne trudności' ].map((val, index) => (
-        <label key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <input
-            type="checkbox"
-            checked={(selected.q3 || []).includes(val)}
-            readOnly
-            style={{ width: '20px', height: '20px', accentColor: '#007bff' }}
-          />
-          <span>{t(val)}</span>
-        </label>
-      ))}
+    {[ 'występują nocki', 'jest ciężki transfer', 'osoba jest trudna', 'brak' ].map((val, index) => (
+      <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <input
+          type="checkbox"
+          checked={(selected.q3 || []).includes(val)}
+          readOnly
+          style={{ width: '20px', height: '20px', accentColor: '#007bff' }}
+        />
+        <span>{t(val)}</span>
+      </div>
+    ))}
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <input
+        type="checkbox"
+        checked={(selected.q3 || []).includes('inne trudności')}
+        readOnly
+        style={{ width: '20px', height: '20px', accentColor: '#007bff' }}
+      />
+      <span>{t('inne trudności')}</span>
     </div>
     <div>
       {(selected.q3 || []).includes('inne trudności') && selected.q4 && selected.q4.trim() !== '' && (
