@@ -519,7 +519,7 @@ const handleDynamicTranslate = async () => {
       const idx = fieldMap[key];
       const val = editedAnswers[idx];
       return Array.isArray(val) ? val.join(', ') : val || '';
-    }).concat(editedNote || ''); // notes
+    }).concat(editedAnswers[12] || ''); // notes
 
     const trimmed = textsToTranslate.map(t => t.trim());
     const toSend = trimmed.filter(t => t.length > 0);
@@ -561,7 +561,7 @@ const handleDynamicTranslate = async () => {
       q8_minus: editedAnswers[9],
       q9: editedAnswers[10],
       q10: editedAnswers[11],
-      notes: editedNote,
+      notes: editedAnswers[12],
 
       // DE
       q1_de: answersDe[0],
@@ -1238,7 +1238,7 @@ const handleToggleGerman = async () => {
   <TextArea
     value={
       editing
-        ? editedNote || ''
+        ? editedAnswers[12] || ''
         : showGerman
           ? selected.notes_de || '[brak tłumaczenia]'
           : noteContent || ''
