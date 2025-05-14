@@ -1125,15 +1125,18 @@ const handleToggleGerman = async () => {
     <>
       <Label>
         {questions[7]}
+        {showGerman && (!selected.q7_why || selected.q7_why.trim() === '') && (
+          <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
+            Brak odpowiedzi do tłumaczenia
+          </span>
+        )}
       </Label>
-  <TextArea
+     <TextArea
   value={
     editing
       ? editedAnswers[7] || ''
       : showGerman
-        ? (selected.q7_why_de && selected.q7_why_de.trim() !== ''
-            ? selected.q7_why_de
-            : '[brak tekstu do tłumaczenia]')
+        ? selected.q7_why_de?.trim() || '[brak tekstu do tłumaczenia]'
         : selected.q7_why || ''
   }
   onChange={editing ? (e) => {
@@ -1144,12 +1147,6 @@ const handleToggleGerman = async () => {
   readOnly={!editing}
   placeholder={t('Dlaczego nie?')}
   rows={3}
-  style={{
-    width: '100%',
-    maxWidth: '300px',
-    resize: 'vertical',
-    boxSizing: 'border-box'
-  }}
 />
     </>
   )}

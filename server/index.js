@@ -679,9 +679,8 @@ app.patch('/api/tabResponses/:id', authenticate, async (req, res) => {
         q6 = ?, q7 = ?, q7_why = ?, q8_plus = ?, q8_minus = ?, q9 = ?, q10 = ?,
         notes = ?,
         q1_de = ?, q2_de = ?, q3_de = ?, q4_de = ?, q5_de = ?,
-        q6_de = ?, q7_de = ?, q8_de = ?, q9_de = ?, q10_de = ?,
-        q8_plus_de = ?, q8_minus_de = ?, -- 🔥 nowe pola
-        notes_de = ?, user_name = ?, edit_history = ?
+        q6_de = ?, q7_de = ?, q7_why_de = ?, q8_de = ?, q9_de = ?, q10_de = ?,
+        q8_plus_de = ?, q8_minus_de = ?, notes_de = ?, user_name = ?, edit_history = ?
       WHERE id = ?
     `, [
       updates.caregiver_first_name, updates.caregiver_last_name, updates.caregiver_phone,
@@ -690,9 +689,8 @@ app.patch('/api/tabResponses/:id', authenticate, async (req, res) => {
       updates.q6, updates.q7, updates.q7_why, updates.q8_plus, updates.q8_minus, updates.q9, updates.q10,
       updates.notes,
       updates.q1_de, updates.q2_de, updates.q3_de, updates.q4_de, updates.q5_de,
-      updates.q6_de, updates.q7_de, updates.q8_de, updates.q9_de, updates.q10_de,
-      updates.q8_plus_de, updates.q8_minus_de, // 🔥
-      updates.notes_de,
+      updates.q6_de, updates.q7_de, updates.q7_why_de, updates.q8_de, updates.q9_de, updates.q10_de,
+      updates.q8_plus_de, updates.q8_minus_de, updates.notes_de,
       updates.user_name,
       JSON.stringify(updatedHistory),
       id
