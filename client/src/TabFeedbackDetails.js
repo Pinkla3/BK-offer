@@ -476,14 +476,11 @@ const handleSave = async () => {
       { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
     );
 
-    const updated = res.data;
+setSelected(res.data);
 
-    setSelected(prev => ({
-      ...prev,
-      ...payload,
-      user_name: updated.user_name || prev.user_name,
-      edit_history: updated.edit_history
-    }));
+// Ustawiamy tłumaczenia (po stronie klienta)
+setEditedAnswersDe(questionsPl.map((_, i) => res.data[`q${i + 1}_de`] || ''));
+setEditedNoteDe(res.data.notes_de || '');
 
     setEditing(false);
     setIsTranslated(false);
