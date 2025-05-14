@@ -971,7 +971,9 @@ const handleToggleGerman = async () => {
     editing
       ? editedAnswers[3] || ''
       : showGerman
-        ? selected.q4_de || '[brak tekstu do tłumaczenia]'
+        ? (selected.q4 && selected.q4.trim() !== ''
+            ? (selected.q4_de || '[brak tłumaczenia]')
+            : '[brak tekstu do tłumaczenia]')
         : selected.q4 || ''
   }
   onChange={editing ? (e) => {
@@ -983,11 +985,11 @@ const handleToggleGerman = async () => {
   style={{
     width: '100%',
     maxWidth: '300px',
-    visibility: (editing ? editedAnswers[2] : selected.q3 || []).includes('inne trudności') ? 'visible' : 'hidden',
-    pointerEvents: (editing ? editedAnswers[2] : selected.q3 || []).includes('inne trudności') ? 'auto' : 'none',
-    backgroundColor: showGerman && !selected.q4_de ? '#f8d7da' : '#fff',
-    borderColor: showGerman && !selected.q4_de ? '#f5c6cb' : '#ccc',
-    color: showGerman && !selected.q4_de ? '#721c24' : '#000'
+    visibility: (editing ? editedAnswers[2] : selected.q3?.split(', ') || []).includes('inne trudności') ? 'visible' : 'hidden',
+    pointerEvents: (editing ? editedAnswers[2] : selected.q3?.split(', ') || []).includes('inne trudności') ? 'auto' : 'none',
+    backgroundColor: showGerman && (!selected.q4 || selected.q4.trim() === '') ? '#f8d7da' : '#fff',
+    borderColor: showGerman && (!selected.q4 || selected.q4.trim() === '') ? '#f5c6cb' : '#ccc',
+    color: showGerman && (!selected.q4 || selected.q4.trim() === '') ? '#721c24' : '#000'
   }}
 />
   </div>
