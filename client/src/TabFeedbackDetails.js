@@ -1086,6 +1086,7 @@ const handleToggleGerman = async () => {
       </span>
     )}
   </Label>
+
   <div
     style={{
       display: 'grid',
@@ -1100,7 +1101,6 @@ const handleToggleGerman = async () => {
     }}
   >
     {['Tak', 'Nie'].map(val => {
-      const translated = t(val);
       const isActive = (editing ? editedAnswers[6] : selected.q7) === val;
       return (
         <OptionButton
@@ -1113,33 +1113,50 @@ const handleToggleGerman = async () => {
             updated[6] = val;
             return updated;
           })}
-          warning={isMissingTranslation(translated) && isActive}
         >
-          {translated}
+          {t(val)}
         </OptionButton>
       );
     })}
   </div>
+
+  {/* Pole tekstowe tylko jeśli zaznaczone "Nie" */}
   {(editing ? editedAnswers[6] : selected.q7) === 'Nie' && (
     <>
-      <Label>{questions[7]}</Label>
-<TextArea
-  value={
-    editing
-      ? editedAnswers[7] || ''
-      : showGerman
-        ? selected.q7_why_de || ''
-        : selected.q7_why || ''
-  }
-  onChange={editing ? (e) => {
-    const updated = [...editedAnswers];
-    updated[7] = e.target.value;
-    setEditedAnswers(updated);
-  } : undefined}
-  readOnly={!editing}
-  placeholder={t('Dlaczego nie?')}
-  rows={3}
-/>
+      <Label>
+        {questions[7]}
+        {showGerman && (!selected.q7_why || selected.q7_why.trim() === '') && (
+          <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
+            Brak odpowiedzi do tłumaczenia
+          </span>
+        )}
+      </Label>
+      <TextArea
+        value={
+          editing
+            ? editedAnswers[7] || ''
+            : showGerman
+              ? selected.q7_why_de || '[brak tekstu do tłumaczenia]'
+              : selected.q7_why || ''
+        }
+        onChange={editing ? (e) => {
+          const updated = [...editedAnswers];
+          updated[7] = e.target.value;
+          setEditedAnswers(updated);
+        } : undefined}
+        readOnly={!editing}
+        placeholder={t('Dlaczego nie?')}
+        rows={3}
+        style={{
+          width: '100%',
+          border: '1px solid #ccc',
+          borderRadius: '8px',
+          padding: '10px',
+          fontSize: '14px',
+          boxSizing: 'border-box',
+          backgroundColor: '#fff'
+        }}
+      />
     </>
   )}
 </QuestionGroup>
