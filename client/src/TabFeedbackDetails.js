@@ -839,7 +839,14 @@ const handleToggleGerman = async () => {
 </QuestionGroup>
 {/* Pytanie 2 */}
 <QuestionGroup>
-  <Label>{questions[2]}</Label>
+ <Label>
+  {questions[2]}
+  {showGerman && (!selected.q3 || selected.q3.trim() === '') && (
+    <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
+      Brak odpowiedzi do tłumaczenia
+    </span>
+  )}
+</Label>
   <div
     style={{
       display: 'grid',
