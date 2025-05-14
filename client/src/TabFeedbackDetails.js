@@ -1128,7 +1128,7 @@ const handleToggleGerman = async () => {
     editing
       ? editedAnswers[7] || ''
       : showGerman
-        ? selected.q7_why_de 
+        ? selected.q7_why_de || ''
         : selected.q7_why || ''
   }
   onChange={editing ? (e) => {
@@ -1139,9 +1139,6 @@ const handleToggleGerman = async () => {
   readOnly={!editing}
   placeholder={t('Dlaczego nie?')}
   rows={3}
-  style={getTextAreaStyle(
-    showGerman ? selected.q7_why_de : selected.q7_why
-  )}
 />
     </>
   )}
@@ -1215,7 +1212,6 @@ const handleToggleGerman = async () => {
   />
 </QuestionGroup>
 
-{/* Notatka */}
 {/* Notatka */}
 <QuestionGroup>
   <Label style={{ fontWeight: '600', fontSize: '16px' }}>
