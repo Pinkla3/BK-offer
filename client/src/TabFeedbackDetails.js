@@ -428,50 +428,33 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
     }
   };
 
-const initEdit = () => {
-  const plTexts = questionsPl.map((_, i) => selected[`q${i + 1}`] || '');
+  const initEdit = () => {
+    const plTexts = questionsPl.map((_, i) => selected[`q${i+1}`] || '');
+    const deTexts = (germanAnswers.length > 0)
+      ? germanAnswers
+      : questionsPl.map((_, i) => selected[`q${i+1}_de`] || '');
 
-  const deTexts = questionsPl.map((_, i) => {
-    const fromGermanAnswers = germanAnswers[i];
-    const fromSelected = selected[`q${i + 1}_de`];
-    return fromGermanAnswers && fromGermanAnswers.trim().length > 0
-      ? fromGermanAnswers
-      : (fromSelected || '');
-  });
-
-  const useTranslatedNote = translatedNote && translatedNote.trim().length > 0;
-
-  setEditedAnswers(plTexts);
-  setEditedAnswersDe(deTexts);
-  setEditedNote(selected.notes || '');
-  setEditedNoteDe(useTranslatedNote ? translatedNote : (selected.notes_de || ''));
-  setEditing(true);
-  setIsPolishChangedSinceTranslation(false);
-  setEditedCaregiverFirstName(selected.caregiver_first_name || '');
-  setEditedCaregiverLastName(selected.caregiver_last_name || '');
-  setEditedCaregiverPhone(selected.caregiver_phone || '');
-  setEditedPatientFirstName(selected.patient_first_name || '');
-  setEditedPatientLastName(selected.patient_last_name || '');
-};
-
-  const initEditFrom = (source) => {
-  const plTexts = questionsPl.map((_, i) => source[`q${i+1}`] || '');
-  const deTexts = questionsPl.map((_, i) => source[`q${i+1}_de`] || '');
-
-  setEditedAnswers(plTexts);
-  setEditedAnswersDe(deTexts);
-  setEditedNote(source.notes || '');
-  setEditedNoteDe(source.notes_de || '');
-};
+    setEditedAnswers(plTexts);
+    setEditedAnswersDe(deTexts);
+    setEditedNote(selected.notes || '');
+    setEditedNoteDe(translatedNote || selected.notes_de || '');
+    setEditing(true);
+    setIsPolishChangedSinceTranslation(false);
+    setEditedCaregiverFirstName(selected.caregiver_first_name || '');
+    setEditedCaregiverLastName(selected.caregiver_last_name || '');
+    setEditedCaregiverPhone(selected.caregiver_phone || '');
+    setEditedPatientFirstName(selected.patient_first_name || '');
+    setEditedPatientLastName(selected.patient_last_name || '');
+  };
 
 const handleSave = async () => {
   try {
     const payload = {
-      caregiverFirstName: editedCaregiverFirstName,
-      caregiverLastName: editedCaregiverLastName,
-      caregiverPhone: editedCaregiverPhone,
-      patientFirstName: editedPatientFirstName,
-      patientLastName: editedPatientLastName,
+  caregiverFirstName: editedCaregiverFirstName,
+  caregiverLastName: editedCaregiverLastName,
+  caregiverPhone: editedCaregiverPhone,
+  patientFirstName: editedPatientFirstName,
+  patientLastName: editedPatientLastName,
       q1: editedAnswers[0],
       q2: editedAnswers[1],
       q3: Array.isArray(editedAnswers[2]) ? editedAnswers[2].join(', ') : editedAnswers[2],
@@ -484,21 +467,7 @@ const handleSave = async () => {
       q8_minus: editedAnswers[9],
       q9: editedAnswers[10],
       q10: editedAnswers[11],
-      notes: editedNote,
-      q1_de: editedAnswersDe[0],
-      q2_de: editedAnswersDe[1],
-      q3_de: editedAnswersDe[2],
-      q4_de: editedAnswersDe[3],
-      q5_de: editedAnswersDe[4],
-      q6_de: editedAnswersDe[5],
-      q7_de: editedAnswersDe[6],
-      q7_why_de: editedAnswersDe[7],
-      q8_de: editedAnswersDe[8],
-      q9_de: editedAnswersDe[9],
-      q10_de: editedAnswersDe[10],
-      q8_plus_de: '', // dodaj jeśli używasz
-      q8_minus_de: '',
-      notes_de: editedNoteDe
+      notes: editedAnswers[12]
     };
 
     const res = await axios.patch(
@@ -507,17 +476,23 @@ const handleSave = async () => {
       { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
     );
 
-    setSelected(res.data);
-    initEditFrom(res.data); // 💥 odśwież pola edycji na podstawie backendu
+    const updated = res.data;
+
+    setSelected(prev => ({
+      ...prev,
+      ...payload,
+      user_name: updated.user_name || prev.user_name,
+      edit_history: updated.edit_history
+    }));
 
     setEditing(false);
     setIsTranslated(false);
     setIsPolishChangedSinceTranslation(true);
-    toast.success('Zapisano pomyślnie.');
+    toast.success('Wersja polska zapisana.');
     window.dispatchEvent(new Event('feedbackUpdated'));
   } catch (err) {
-    console.error('❌ Błąd zapisu:', err);
-    toast.error('Nie udało się zapisać danych.');
+    console.error('Błąd zapisu wersji PL:', err);
+    toast.error('Nie udało się zapisać wersji polskiej.');
   }
 };
 
