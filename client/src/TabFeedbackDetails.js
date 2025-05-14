@@ -481,6 +481,11 @@ const handleSave = async () => {
     setSelected(prev => ({
       ...prev,
       ...payload,
+      caregiverFirstName: updated.caregiverFirstName,
+  caregiverLastName: updated.caregiverLastName,
+  caregiverPhone: updated.caregiverPhone,
+  patientFirstName: updated.patientFirstName,
+  patientLastName: updated.patientLastName,
       user_name: updated.user_name || prev.user_name,
       edit_history: updated.edit_history
     }));
