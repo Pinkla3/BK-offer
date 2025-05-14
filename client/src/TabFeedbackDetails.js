@@ -1239,10 +1239,9 @@ const handleToggleGerman = async () => {
   value={
     editing
       ? (showGerman ? editedNoteDe : editedNote)
-      : (showGerman
-          ? selected.notes_de || '[brak tłumaczenia]'
-          : selected.notes || ''
-        )
+:showGerman
+  ? (editedNoteDe || selected.notes_de || '[brak tłumaczenia]')
+  : (editedNote || selected.notes || '')
   }
   readOnly={!editing}
   onChange={editing ? (e) => {
