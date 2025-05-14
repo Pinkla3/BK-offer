@@ -964,34 +964,23 @@ const handleToggleGerman = async () => {
     </label>
 
     {/* Input tekstowy */}
-<Input
-  type="text"
-  placeholder={t('Proszę podać szczegóły')}
-  value={
-    editing
-      ? editedAnswers[3] || ''
-      : showGerman
-        ? (selected.q4 && selected.q4.trim() !== ''
-            ? (selected.q4_de || '[brak tłumaczenia]')
-            : '[brak tekstu do tłumaczenia]')
-        : selected.q4 || ''
-  }
-  onChange={editing ? (e) => {
-    const updated = [...editedAnswers];
-    updated[3] = e.target.value;
-    setEditedAnswers(updated);
-  } : undefined}
-  readOnly={!editing}
-  style={{
-    width: '100%',
-    maxWidth: '300px',
-    visibility: (editing ? editedAnswers[2] : selected.q3?.split(', ') || []).includes('inne trudności') ? 'visible' : 'hidden',
-    pointerEvents: (editing ? editedAnswers[2] : selected.q3?.split(', ') || []).includes('inne trudności') ? 'auto' : 'none',
-    backgroundColor: showGerman && (!selected.q4 || selected.q4.trim() === '') ? '#f8d7da' : '#fff',
-    borderColor: showGerman && (!selected.q4 || selected.q4.trim() === '') ? '#f5c6cb' : '#ccc',
-    color: showGerman && (!selected.q4 || selected.q4.trim() === '') ? '#721c24' : '#000'
-  }}
-/>
+    <Input
+      type="text"
+      placeholder={t('Proszę podać szczegóły')}
+      value={editing ? editedAnswers[3] || '' : selected.q4 || ''}
+      onChange={editing ? (e) => setEditedAnswers(prev => {
+        const updated = [...prev];
+        updated[3] = e.target.value;
+        return updated;
+      }) : undefined}
+      readOnly={!editing}
+      style={{
+        width: '100%',
+        maxWidth: '300px',
+        visibility: (editing ? editedAnswers[2] : selected.q3 || []).includes('inne trudności') ? 'visible' : 'hidden',
+        pointerEvents: (editing ? editedAnswers[2] : selected.q3 || []).includes('inne trudności') ? 'auto' : 'none'
+      }}
+    />
   </div>
 </QuestionGroup>
 {/* Pytanie 3 */}
