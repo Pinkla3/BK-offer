@@ -475,7 +475,7 @@ const handleSave = async () => {
       payload,
       { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
     );
-
+const updated = res.data;
    setSelected(updated);
 
     setEditing(false);
