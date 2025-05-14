@@ -1126,12 +1126,14 @@ const handleToggleGerman = async () => {
       <Label>
         {questions[7]}
       </Label>
-     <TextArea
+  <TextArea
   value={
     editing
       ? editedAnswers[7] || ''
       : showGerman
-        ? selected.q7_why_de?.trim() || '[brak tekstu do tłumaczenia]'
+        ? (selected.q7_why_de && selected.q7_why_de.trim() !== ''
+            ? selected.q7_why_de
+            : '[brak tekstu do tłumaczenia]')
         : selected.q7_why || ''
   }
   onChange={editing ? (e) => {
