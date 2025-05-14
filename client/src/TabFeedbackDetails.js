@@ -330,7 +330,7 @@ const questionsDe = [
 const noteLabelPl = 'Notatka:';
 const noteLabelDe = 'Anmerkung:';
 
-const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
+const TabFeedbackDetails = ({ initialSelected, setSelected, onBack }) => {
 
   const [responses, setResponses] = useState([]);
   const [loading, setLoading] = useState(true);
