@@ -468,7 +468,7 @@ const handleSave = async () => {
       q8_minus: editedAnswers[9],
       q9: editedAnswers[10],
       q10: editedAnswers[11],
-      notes: editedAnswers[12]
+      notes: editedNote,
     };
 
     const res = await axios.patch(
@@ -552,7 +552,7 @@ const handleDynamicTranslate = async () => {
       q8_minus: editedAnswers[9],
       q9: editedAnswers[10],
       q10: editedAnswers[11],
-      notes: editedAnswers[12],
+      notes: editedNote,
 
       // DE
       q1_de: answersDe[0],
@@ -567,7 +567,7 @@ const handleDynamicTranslate = async () => {
       q8_minus_de: answersDe[9],
       q9_de: answersDe[10],
       q10_de: answersDe[11],
-      notes_de: answersDe[12],
+      notes_de: editedNoteDe,
     };
 
     await axios.patch(`${API_BASE_URL}/api/tabResponses/${selected.id}`, payload, {
