@@ -450,11 +450,11 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
 const handleSave = async () => {
   try {
     const payload = {
-      caregiver_first_name: editedCaregiverFirstName,
-      caregiver_last_name: editedCaregiverLastName,
-      caregiver_phone: editedCaregiverPhone,
-      patient_first_name: editedPatientFirstName,
-      patient_last_name: editedPatientLastName,
+  caregiverFirstName: editedCaregiverFirstName,
+  caregiverLastName: editedCaregiverLastName,
+  caregiverPhone: editedCaregiverPhone,
+  patientFirstName: editedPatientFirstName,
+  patientLastName: editedPatientLastName,
       q1: editedAnswers[0],
       q2: editedAnswers[1],
       q3: Array.isArray(editedAnswers[2]) ? editedAnswers[2].join(', ') : editedAnswers[2],
