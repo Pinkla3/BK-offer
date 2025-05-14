@@ -579,20 +579,18 @@ const handleDynamicTranslate = async () => {
       notes: editedAnswers[12],
 
       // wersja DE — przetłumaczona
-      q1_de: answersDe[0],
-      q2_de: '[brak tekstu do tłumaczenia]', // jeśli nie tłumaczysz q2
-      q3_de: answersDe[1],
-      q4_de: answersDe[2],
-      q5_de: answersDe[3],
-      q6_de: answersDe[4],
-      q7_de: answersDe[5],
-      q7_why_de: answersDe[6],
-      q8_de: answersDe[7],
-      q8_plus_de: answersDe[7],
-      q8_minus_de: answersDe[8],
-      q9_de: answersDe[9],
-      q10_de: answersDe[10],
-      notes_de: answersDe[11]
+q2_de: answersDe[1],
+q3_de: answersDe[2],
+q4_de: answersDe[3],
+q5_de: answersDe[4],
+q6_de: answersDe[5],
+q7_de: answersDe[6],
+q7_why_de: answersDe[7],
+q8_plus_de: answersDe[8],
+q8_minus_de: answersDe[9],
+q9_de: answersDe[10],
+q10_de: answersDe[11],
+notes_de: answersDe[12]
     };
 
     // 🔁 Zapis do backendu
@@ -971,7 +969,7 @@ const handleToggleGerman = async () => {
     editing
       ? editedAnswers[3] || ''
       : showGerman
-        ? selected.q4_de || ''
+        ? selected.q4_de?.trim() || '[brak tekstu do tłumaczenia]'
         : selected.q4 || ''
   }
   onChange={editing ? (e) => {
