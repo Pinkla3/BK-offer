@@ -478,6 +478,13 @@ const handleSave = async () => {
     );
 
     const updated = res.data;
+const updatedSelected = {
+  ...selected,
+  ...payload,
+  user_name: updated.user_name || selected.user_name,
+  edit_history: updated.edit_history
+};
+setSelected(updatedSelected);
 
    setSelected(res.data);
 
