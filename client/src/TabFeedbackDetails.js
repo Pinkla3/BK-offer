@@ -331,7 +331,6 @@ const noteLabelPl = 'Notatka:';
 const noteLabelDe = 'Anmerkung:';
 
 const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
-
   const [responses, setResponses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -479,7 +478,12 @@ const handleSave = async () => {
 
     const updated = res.data;
 
-   setSelected(res.data);
+    setSelected(prev => ({
+      ...prev,
+      ...payload,
+      user_name: updated.user_name || prev.user_name,
+      edit_history: updated.edit_history
+    }));
 
     setEditing(false);
     setIsTranslated(false);
