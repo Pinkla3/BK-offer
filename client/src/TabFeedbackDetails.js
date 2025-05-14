@@ -447,14 +447,24 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
     setEditedPatientLastName(selected.patient_last_name || '');
   };
 
+  const initEditFrom = (source) => {
+  const plTexts = questionsPl.map((_, i) => source[`q${i+1}`] || '');
+  const deTexts = questionsPl.map((_, i) => source[`q${i+1}_de`] || '');
+
+  setEditedAnswers(plTexts);
+  setEditedAnswersDe(deTexts);
+  setEditedNote(source.notes || '');
+  setEditedNoteDe(source.notes_de || '');
+};
+
 const handleSave = async () => {
   try {
     const payload = {
-      caregiver_first_name: editedCaregiverFirstName,
-      caregiver_last_name: editedCaregiverLastName,
-      caregiver_phone: editedCaregiverPhone,
-      patient_first_name: editedPatientFirstName,
-      patient_last_name: editedPatientLastName,
+      caregiverFirstName: editedCaregiverFirstName,
+      caregiverLastName: editedCaregiverLastName,
+      caregiverPhone: editedCaregiverPhone,
+      patientFirstName: editedPatientFirstName,
+      patientLastName: editedPatientLastName,
       q1: editedAnswers[0],
       q2: editedAnswers[1],
       q3: Array.isArray(editedAnswers[2]) ? editedAnswers[2].join(', ') : editedAnswers[2],
@@ -467,7 +477,21 @@ const handleSave = async () => {
       q8_minus: editedAnswers[9],
       q9: editedAnswers[10],
       q10: editedAnswers[11],
-      notes: editedAnswers[12]
+      notes: editedNote,
+      q1_de: editedAnswersDe[0],
+      q2_de: editedAnswersDe[1],
+      q3_de: editedAnswersDe[2],
+      q4_de: editedAnswersDe[3],
+      q5_de: editedAnswersDe[4],
+      q6_de: editedAnswersDe[5],
+      q7_de: editedAnswersDe[6],
+      q7_why_de: editedAnswersDe[7],
+      q8_de: editedAnswersDe[8],
+      q9_de: editedAnswersDe[9],
+      q10_de: editedAnswersDe[10],
+      q8_plus_de: '', // dodaj jeśli używasz
+      q8_minus_de: '',
+      notes_de: editedNoteDe
     };
 
     const res = await axios.patch(
@@ -476,20 +500,17 @@ const handleSave = async () => {
       { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
     );
 
-setSelected(res.data);
-
-// Ustawiamy tłumaczenia (po stronie klienta)
-setEditedAnswersDe(questionsPl.map((_, i) => res.data[`q${i + 1}_de`] || ''));
-setEditedNoteDe(res.data.notes_de || '');
+    setSelected(res.data);
+    initEditFrom(res.data); // 💥 odśwież pola edycji na podstawie backendu
 
     setEditing(false);
     setIsTranslated(false);
     setIsPolishChangedSinceTranslation(true);
-    toast.success('Wersja polska zapisana.');
+    toast.success('Zapisano pomyślnie.');
     window.dispatchEvent(new Event('feedbackUpdated'));
   } catch (err) {
-    console.error('Błąd zapisu wersji PL:', err);
-    toast.error('Nie udało się zapisać wersji polskiej.');
+    console.error('❌ Błąd zapisu:', err);
+    toast.error('Nie udało się zapisać danych.');
   }
 };
 
