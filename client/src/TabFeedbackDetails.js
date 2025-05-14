@@ -561,9 +561,7 @@ const handleDynamicTranslate = async () => {
       }
     }
 
-    // ✅ Pełny payload — PL z editedAnswers + DE z tłumaczenia
     const fullPayload = {
-      // wersja PL (z aktualnych editedAnswers, NIE selected)
       q1: editedAnswers[0],
       q2: editedAnswers[1],
       q3: Array.isArray(editedAnswers[2]) ? editedAnswers[2].join(', ') : editedAnswers[2],
@@ -578,29 +576,27 @@ const handleDynamicTranslate = async () => {
       q10: editedAnswers[11],
       notes: editedAnswers[12],
 
-      // wersja DE — przetłumaczona
-q2_de: answersDe[1],
-q3_de: answersDe[2],
-q4_de: answersDe[3],
-q5_de: answersDe[4],
-q6_de: answersDe[5],
-q7_de: answersDe[6],
-q7_why_de: answersDe[7],
-q8_plus_de: answersDe[8],
-q8_minus_de: answersDe[9],
-q9_de: answersDe[10],
-q10_de: answersDe[11],
-notes_de: answersDe[12]
+      q1_de: answersDe[0],
+      q3_de: answersDe[1],
+      q4_de: answersDe[2],
+      q5_de: answersDe[3],
+      q6_de: answersDe[4],
+      q7_de: answersDe[5],
+      q7_why_de: answersDe[6],
+      q8_de: answersDe[7],
+      q8_plus_de: answersDe[7],
+      q8_minus_de: answersDe[8],
+      q9_de: answersDe[9],
+      q10_de: answersDe[10],
+      notes_de: answersDe[11]
     };
 
-    // 🔁 Zapis do backendu
     const res = await axios.patch(
       `${API_BASE_URL}/api/tabResponses/${selected.id}`,
       fullPayload,
       { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
     );
 
-    // 🔄 Aktualizacja lokalnego stanu
     setGermanAnswers(answersDe.slice(0, 11));
     setTranslatedNote(answersDe[11]);
 
