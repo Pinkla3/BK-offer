@@ -1116,18 +1116,26 @@ const handleToggleGerman = async () => {
   {(editing ? editedAnswers[6] : selected.q7) === 'Nie' && (
     <>
       <Label>{questions[7]}</Label>
-      <TextArea
-        value={editing ? editedAnswers[7] || '' : selected.q7_why || ''}
-        onChange={editing ? (e) => setEditedAnswers(prev => {
-          const updated = [...prev];
-          updated[7] = e.target.value;
-          return updated;
-        }) : undefined}
-        readOnly={!editing}
-        placeholder={t('Dlaczego nie?')}
-        rows={3}
-        style={getTextAreaStyle(editing ? editedAnswers[7] : selected.q7_why)}
-      />
+<TextArea
+  value={
+    editing
+      ? editedAnswers[7] || ''
+      : showGerman
+        ? selected.q7_why_de || '[brak tłumaczenia]'
+        : selected.q7_why || ''
+  }
+  onChange={editing ? (e) => {
+    const updated = [...editedAnswers];
+    updated[7] = e.target.value;
+    setEditedAnswers(updated);
+  } : undefined}
+  readOnly={!editing}
+  placeholder={t('Dlaczego nie?')}
+  rows={3}
+  style={getTextAreaStyle(
+    showGerman ? selected.q7_why_de : selected.q7_why
+  )}
+/>
     </>
   )}
 </QuestionGroup>
