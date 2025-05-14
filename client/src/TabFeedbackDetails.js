@@ -1150,7 +1150,7 @@ const handleToggleGerman = async () => {
   {/* q8_plus */}
   <Label>
     {questions[8]}
-    {showGerman && (!selected.q8_plus_de || selected.q8_plus_de.trim() === '') && (
+    {showGerman && !editing && (!selected.q8_plus_de || selected.q8_plus_de.trim() === '') && (
       <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
         Brak odpowiedzi do tłumaczenia
       </span>
@@ -1161,7 +1161,7 @@ const handleToggleGerman = async () => {
       editing
         ? editedAnswers[8] || ''
         : showGerman
-          ? selected.q8_plus_de || '[brak tekstu do tłumaczenia]'
+          ? (selected.q8_plus_de?.trim() || '')
           : selected.q8_plus || ''
     }
     readOnly={!editing}
@@ -1174,16 +1174,16 @@ const handleToggleGerman = async () => {
     placeholder={t('Np. dobra atmosfera, wsparcie rodziny...')}
     style={{
       marginBottom: '16px',
-      backgroundColor: showGerman && (!selected.q8_plus_de || selected.q8_plus_de.trim() === '') ? '#f8d7da' : '#fff',
-      borderColor: showGerman && (!selected.q8_plus_de || selected.q8_plus_de.trim() === '') ? '#f5c6cb' : '#ccc',
-      color: showGerman && (!selected.q8_plus_de || selected.q8_plus_de.trim() === '') ? '#721c24' : '#000'
+      backgroundColor: showGerman && !editing && (!selected.q8_plus_de || selected.q8_plus_de.trim() === '') ? '#f8d7da' : '#fff',
+      borderColor: showGerman && !editing && (!selected.q8_plus_de || selected.q8_plus_de.trim() === '') ? '#f5c6cb' : '#ccc',
+      color: showGerman && !editing && (!selected.q8_plus_de || selected.q8_plus_de.trim() === '') ? '#721c24' : '#000'
     }}
   />
 
   {/* q8_minus */}
   <Label>
     {questions[9]}
-    {showGerman && (!selected.q8_minus_de || selected.q8_minus_de.trim() === '') && (
+    {showGerman && !editing && (!selected.q8_minus_de || selected.q8_minus_de.trim() === '') && (
       <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
         Brak odpowiedzi do tłumaczenia
       </span>
@@ -1194,7 +1194,7 @@ const handleToggleGerman = async () => {
       editing
         ? editedAnswers[9] || ''
         : showGerman
-          ? selected.q8_minus_de || '[brak tekstu do tłumaczenia]'
+          ? (selected.q8_minus_de?.trim() || '')
           : selected.q8_minus || ''
     }
     readOnly={!editing}
@@ -1206,9 +1206,9 @@ const handleToggleGerman = async () => {
     rows={2}
     placeholder={t('Np. brak czasu wolnego, trudna komunikacja...')}
     style={{
-      backgroundColor: showGerman && (!selected.q8_minus_de || selected.q8_minus_de.trim() === '') ? '#f8d7da' : '#fff',
-      borderColor: showGerman && (!selected.q8_minus_de || selected.q8_minus_de.trim() === '') ? '#f5c6cb' : '#ccc',
-      color: showGerman && (!selected.q8_minus_de || selected.q8_minus_de.trim() === '') ? '#721c24' : '#000'
+      backgroundColor: showGerman && !editing && (!selected.q8_minus_de || selected.q8_minus_de.trim() === '') ? '#f8d7da' : '#fff',
+      borderColor: showGerman && !editing && (!selected.q8_minus_de || selected.q8_minus_de.trim() === '') ? '#f5c6cb' : '#ccc',
+      color: showGerman && !editing && (!selected.q8_minus_de || selected.q8_minus_de.trim() === '') ? '#721c24' : '#000'
     }}
   />
 </QuestionGroup>
