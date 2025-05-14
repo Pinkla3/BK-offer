@@ -1125,11 +1125,6 @@ const handleToggleGerman = async () => {
     <>
       <Label>
         {questions[7]}
-        {showGerman && (!selected.q7_why || selected.q7_why.trim() === '') && (
-          <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
-            Brak odpowiedzi do tłumaczenia
-          </span>
-        )}
       </Label>
      <TextArea
   value={
@@ -1147,6 +1142,12 @@ const handleToggleGerman = async () => {
   readOnly={!editing}
   placeholder={t('Dlaczego nie?')}
   rows={3}
+  style={{
+    width: '100%',
+    maxWidth: '300px',
+    resize: 'vertical',
+    boxSizing: 'border-box'
+  }}
 />
     </>
   )}
