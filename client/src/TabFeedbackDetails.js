@@ -967,13 +967,13 @@ const handleToggleGerman = async () => {
 <Input
   type="text"
   placeholder={t('Proszę podać szczegóły')}
- value={
-  editing
-    ? editedAnswers[3] || ''
-    : showGerman
-      ? selected.q4_de || '[brak tłumaczenia]'
-      : selected.q4 || ''
-}
+  value={
+    editing
+      ? editedAnswers[3] || ''
+      : showGerman
+        ? selected.q4_de || ''
+        : selected.q4 || ''
+  }
   onChange={editing ? (e) => {
     const updated = [...editedAnswers];
     updated[3] = e.target.value;
@@ -984,10 +984,7 @@ const handleToggleGerman = async () => {
     width: '100%',
     maxWidth: '300px',
     visibility: (editing ? editedAnswers[2] : selected.q3?.split(', ') || []).includes('inne trudności') ? 'visible' : 'hidden',
-    pointerEvents: (editing ? editedAnswers[2] : selected.q3?.split(', ') || []).includes('inne trudności') ? 'auto' : 'none',
-    backgroundColor: showGerman && (!selected.q4 || selected.q4.trim() === '') ? '#f8d7da' : '#fff',
-    borderColor: showGerman && (!selected.q4 || selected.q4.trim() === '') ? '#f5c6cb' : '#ccc',
-    color: showGerman && (!selected.q4 || selected.q4.trim() === '') ? '#721c24' : '#000'
+    pointerEvents: (editing ? editedAnswers[2] : selected.q3?.split(', ') || []).includes('inne trudności') ? 'auto' : 'none'
   }}
 />
   </div>
