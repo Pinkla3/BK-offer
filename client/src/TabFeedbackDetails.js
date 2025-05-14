@@ -1209,29 +1209,30 @@ const handleToggleGerman = async () => {
 </QuestionGroup>
 
 {/* Notatka */}
+{/* Notatka */}
 <QuestionGroup>
   <Label style={{ fontWeight: '600', fontSize: '16px' }}>
-    {noteLabel} {getMissingTranslationMessage(noteContent)}
+    {noteLabel} {getMissingTranslationMessage(showGerman ? selected.notes_de : noteContent)}
   </Label>
   <TextArea
     value={
       editing
-        ? editedAnswers[10] || ''
-        : noteContent?.trim() === '' && showGerman
-          ? '[brak tekstu do tłumaczenia]'
+        ? editedAnswers[12] || ''
+        : showGerman
+          ? selected.notes_de || '[brak tłumaczenia]'
           : noteContent || ''
     }
     readOnly={!editing}
     onChange={editing ? (e) => {
       const updated = [...editedAnswers];
-      updated[10] = e.target.value;
+      updated[12] = e.target.value;
       setEditedAnswers(updated);
     } : undefined}
     rows={4}
     placeholder={t('Dodatkowe uwagi...')}
     style={{
-      ...getTextAreaStyle(noteContent),
-      ...(noteContent?.trim() === '[brak tekstu do tłumaczenia]' && showGerman && {
+      ...getTextAreaStyle(showGerman ? selected.notes_de : noteContent),
+      ...(showGerman && (!selected.notes_de || selected.notes_de.trim() === '') && {
         backgroundColor: '#f8d7da',
         borderColor: '#f5c6cb',
         color: '#721c24'
