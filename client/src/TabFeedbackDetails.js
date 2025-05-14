@@ -330,7 +330,7 @@ const questionsDe = [
 const noteLabelPl = 'Notatka:';
 const noteLabelDe = 'Anmerkung:';
 
-const TabFeedbackDetails = ({ initialSelected, setSelected, onBack }) => {
+const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
 
   const [responses, setResponses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -353,7 +353,6 @@ const TabFeedbackDetails = ({ initialSelected, setSelected, onBack }) => {
   const [editedPatientFirstName, setEditedPatientFirstName] = useState('');
   const [editedPatientLastName, setEditedPatientLastName] = useState('');
   const [showHistoryModal, setShowHistoryModal] = useState(false);
-  const [selected, setLocalSelected] = useState(initialSelected);
 
 useEffect(() => {
   if (editing && selected) {
@@ -480,12 +479,7 @@ const handleSave = async () => {
 
     const updated = res.data;
 
-    setSelected(prev => ({
-      ...prev,
-      ...payload,
-      user_name: updated.user_name || prev.user_name,
-      edit_history: updated.edit_history
-    }));
+   setSelected(res.data);
 
     setEditing(false);
     setIsTranslated(false);

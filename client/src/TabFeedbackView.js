@@ -96,7 +96,7 @@ const TabFeedbackView = ({ resetSelected }) => {
         />
       ) : (
         <TabFeedbackDetails
-  initialSelected={selected}
+  selected={selected}
   setSelected={setSelected}
   onBack={handleFeedbackBack}
 />
