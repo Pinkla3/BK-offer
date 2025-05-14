@@ -1226,20 +1226,23 @@ const handleToggleGerman = async () => {
     </span>
   )}
 </Label>
-  <TextArea
-    value={
-      editing
-        ? editedAnswers[12] || ''
-        : showGerman
+<TextArea
+  value={
+    editing
+      ? (showGerman ? editedNoteDe : editedNote)
+      : (showGerman
           ? selected.notes_de || '[brak tłumaczenia]'
-          : noteContent || ''
+          : selected.notes || ''
+        )
+  }
+  readOnly={!editing}
+  onChange={editing ? (e) => {
+    if (showGerman) {
+      setEditedNoteDe(e.target.value);
+    } else {
+      setEditedNote(e.target.value);
     }
-    readOnly={!editing}
-    onChange={editing ? (e) => {
-      const updated = [...editedAnswers];
-      updated[12] = e.target.value;
-      setEditedAnswers(updated);
-    } : undefined}
+  } : undefined}
     rows={4}
     placeholder={t('Dodatkowe uwagi...')}
     style={{
