@@ -428,13 +428,16 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
     }
   };
 
-  const initEdit = () => {
+const initEdit = () => {
   const plTexts = questionsPl.map((_, i) => selected[`q${i + 1}`] || '');
 
-  const hasValidGermanAnswers = germanAnswers.some(ans => ans && ans.trim().length > 0);
-  const deTexts = hasValidGermanAnswers
-    ? germanAnswers
-    : questionsPl.map((_, i) => selected[`q${i + 1}_de`] || '');
+  const deTexts = questionsPl.map((_, i) => {
+    const fromGermanAnswers = germanAnswers[i];
+    const fromSelected = selected[`q${i + 1}_de`];
+    return fromGermanAnswers && fromGermanAnswers.trim().length > 0
+      ? fromGermanAnswers
+      : (fromSelected || '');
+  });
 
   const useTranslatedNote = translatedNote && translatedNote.trim().length > 0;
 
