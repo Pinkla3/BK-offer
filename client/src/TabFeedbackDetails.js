@@ -967,15 +967,13 @@ const handleToggleGerman = async () => {
 <Input
   type="text"
   placeholder={t('Proszę podać szczegóły')}
-  value={
-    editing
-      ? editedAnswers[3] || ''
-      : showGerman
-        ? (selected.q4 && selected.q4.trim() !== ''
-            ? (selected.q4_de || '[brak tłumaczenia]')
-            : '[brak tekstu do tłumaczenia]')
-        : selected.q4 || ''
-  }
+ value={
+  editing
+    ? editedAnswers[3] || ''
+    : showGerman
+      ? selected.q4_de || '[brak tłumaczenia]'
+      : selected.q4 || ''
+}
   onChange={editing ? (e) => {
     const updated = [...editedAnswers];
     updated[3] = e.target.value;
