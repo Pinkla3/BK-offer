@@ -845,14 +845,14 @@ const handleToggleGerman = async () => {
           </TabsBar>
 {/* Pytanie 1 */}
 <QuestionGroup style={{ marginTop: '32px' }}>
- <Label>
-  {questions[0]}
-  {showGerman && (!selected.q1 || selected.q1.trim() === '') && (
-    <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
-      Brak odpowiedzi do tłumaczenia
-    </span>
-  )}
-</Label>
+  <Label>
+    {questions[0]}
+    {showGerman && !editing && (!selected.q1_de || selected.q1_de.trim() === '') && (
+      <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
+        Brak odpowiedzi do tłumaczenia
+      </span>
+    )}
+  </Label>
   <div
     style={{
       display: 'grid',
@@ -866,20 +866,30 @@ const handleToggleGerman = async () => {
       marginRight: 'auto'
     }}
   >
-    {['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map(val => {
-      const translated = t(val);
-      const isActive = (editing ? editedAnswers[0] : selected.q1) === val;
+    {['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map((val, idx) => {
+      const translated = t(val); // lub użyj mapy PL → DE jeśli chcesz stałe tłumaczenia
+      const answer = editing
+        ? (showGerman ? editedAnswersDe[0] : editedAnswers[0])
+        : (showGerman ? selected.q1_de : selected.q1);
+
+      const isActive = answer === val || answer === translated;
+
       return (
         <OptionButton
           key={val}
           type="button"
           active={isActive}
           editing={editing}
-          onClick={() => editing && setEditedAnswers(prev => {
-            const updated = [...prev];
+          onClick={() => {
+            if (!editing) return;
+            const updated = [...(showGerman ? editedAnswersDe : editedAnswers)];
             updated[0] = val;
-            return updated;
-          })}
+            if (showGerman) {
+              setEditedAnswersDe(updated);
+            } else {
+              setEditedAnswers(updated);
+            }
+          }}
         >
           {translated}
         </OptionButton>
