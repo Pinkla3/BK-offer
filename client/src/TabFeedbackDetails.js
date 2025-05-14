@@ -499,52 +499,92 @@ const handleSave = async () => {
 const handleDynamicTranslate = async () => {
   setTranslating(true);
   try {
-    let textsToTranslate = editing
-      ? editedAnswers.concat(editedNote)
-      : questionsPl.map((_, i) => selected[`q${i + 1}`] || '').concat(selected.notes || '');
+    const fieldMap = {
+      q1: 0, q2: 1, q3: 2, q4: 3, q5: 4,
+      q6: 5, q7: 6, q7_why: 7, q8_plus: 8,
+      q8_minus: 9, q9: 10, q10: 11, notes: 12
+    };
+
+    const fieldsToTranslate = [
+      'q1', 'q2', 'q3', 'q4', 'q5', 'q6',
+      'q7', 'q7_why', 'q8_plus', 'q8_minus', 'q9', 'q10'
+    ];
+
+    const textsToTranslate = fieldsToTranslate.map(key => {
+      const idx = fieldMap[key];
+      const val = editedAnswers[idx];
+      return Array.isArray(val) ? val.join(', ') : val || '';
+    }).concat(editedAnswers[12] || ''); // notes
 
     const trimmed = textsToTranslate.map(t => t.trim());
-    const emptyCount = trimmed.filter(t => t.length === 0).length;
-
-    if (emptyCount > 0) {
-      toast.warn('Brakuje odpowiedzi w co najmniej jednym polu.');
-    }
-
     const toSend = trimmed.filter(t => t.length > 0);
+
     if (toSend.length === 0) {
-      setTranslating(false);
+      toast.warn('Brak tekstu do przetłumaczenia.');
       return;
     }
 
-    const { data } = await axios.post(
-      `${API_BASE_URL}/api/translate`,
-      { texts: toSend, source: 'pl', target: 'de' },
-      { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
-    );
+    const { data } = await axios.post(`${API_BASE_URL}/api/translate`, {
+      texts: toSend,
+      source: 'pl',
+      target: 'de'
+    }, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
 
-    if (data && Array.isArray(data.translations)) {
-      const answersDe = [];
-      let j = 0;
-      for (let i = 0; i < textsToTranslate.length; i++) {
-        if (textsToTranslate[i].trim().length === 0) {
-          answersDe.push('');
-        } else {
-          answersDe.push(data.translations[j++] || '');
-        }
-      }
-
-      setEditedAnswersDe(answersDe.slice(0, questionsPl.length));
-      setGermanAnswers(answersDe.slice(0, questionsPl.length));
-      setTranslatedNote(answersDe[questionsPl.length] || '');
-      setEditedNoteDe(answersDe[questionsPl.length] || '');
-      setIsTranslated(true);
-      setIsPolishChangedSinceTranslation(false);
-      toast.success('Tłumaczenie zakończone.');
-    } else {
-      throw new Error('Niepoprawny format danych z API');
+    if (!data?.translations || !Array.isArray(data.translations)) {
+      throw new Error('Błąd formatu odpowiedzi z API');
     }
+
+    const answersDe = [];
+    let j = 0;
+    for (let i = 0; i < textsToTranslate.length; i++) {
+      answersDe.push(trimmed[i] ? data.translations[j++] : '[brak tłumaczenia]');
+    }
+
+    const payload = {
+      // PL
+      q1: editedAnswers[0],
+      q2: editedAnswers[1],
+      q3: Array.isArray(editedAnswers[2]) ? editedAnswers[2].join(', ') : editedAnswers[2],
+      q4: editedAnswers[3],
+      q5: editedAnswers[4],
+      q6: editedAnswers[5],
+      q7: editedAnswers[6],
+      q7_why: editedAnswers[7],
+      q8_plus: editedAnswers[8],
+      q8_minus: editedAnswers[9],
+      q9: editedAnswers[10],
+      q10: editedAnswers[11],
+      notes: editedAnswers[12],
+
+      // DE
+      q1_de: answersDe[0],
+      q2_de: answersDe[1],
+      q3_de: answersDe[2],
+      q4_de: answersDe[3],
+      q5_de: answersDe[4],
+      q6_de: answersDe[5],
+      q7_de: answersDe[6],
+      q7_why_de: answersDe[7],
+      q8_plus_de: answersDe[8],
+      q8_minus_de: answersDe[9],
+      q9_de: answersDe[10],
+      q10_de: answersDe[11],
+      notes_de: answersDe[12],
+    };
+
+    await axios.patch(`${API_BASE_URL}/api/tabResponses/${selected.id}`, payload, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+
+    setGermanAnswers(answersDe.slice(0, 12));
+    setTranslatedNote(answersDe[12]);
+    setSelected(prev => ({ ...prev, ...payload }));
+    setIsTranslated(true);
+    toast.success('Tłumaczenie na niemiecki zakończone.');
   } catch (err) {
-    console.error('🔴 Błąd tłumaczenia:', err.response?.data || err.message);
+    console.error('Błąd tłumaczenia:', err);
     toast.error('Nie udało się przetłumaczyć.');
   } finally {
     setTranslating(false);
