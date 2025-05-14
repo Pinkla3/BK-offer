@@ -353,6 +353,7 @@ const TabFeedbackDetails = ({ initialSelected, setSelected, onBack }) => {
   const [editedPatientFirstName, setEditedPatientFirstName] = useState('');
   const [editedPatientLastName, setEditedPatientLastName] = useState('');
   const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [selected, setLocalSelected] = useState(initialSelected);
 
 useEffect(() => {
   if (editing && selected) {
