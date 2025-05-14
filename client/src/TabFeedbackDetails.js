@@ -500,25 +500,39 @@ const handleDynamicTranslate = async () => {
 
     const fieldsToTranslate = [
       'q1', 'q2', 'q3', 'q4', 'q5', 'q6',
-      'q7', 'q7_why', 'q8_plus', 'q8_minus', 'q9', 'q10'
+      'q7', 'q7_why', 'q8_plus', 'q8_minus', 'q9', 'q10', 'notes'
     ];
 
-    const textsToTranslate = fieldsToTranslate.map(key => {
+    // Przygotuj teksty i indeksy
+    const textsToTranslate = [];
+    const indexes = [];
+
+    fieldsToTranslate.forEach((key) => {
       const idx = fieldMap[key];
-      const val = editedAnswers[idx];
-      return Array.isArray(val) ? val.join(', ') : val || '';
-    }).concat(editedAnswers[12] || ''); // notes
+      let val;
 
-    const trimmed = textsToTranslate.map(t => t.trim());
-    const toSend = trimmed.filter(t => t.length > 0);
+      if (key === 'notes') {
+        val = editedNote;
+      } else {
+        const field = editedAnswers[idx];
+        val = Array.isArray(field) ? field.join(', ') : field || '';
+      }
 
-    if (toSend.length === 0) {
+      const trimmed = String(val).trim();
+      if (trimmed.length > 0) {
+        textsToTranslate.push(trimmed);
+        indexes.push(key); // zapamiętaj, do którego pola
+      }
+    });
+
+    if (textsToTranslate.length === 0) {
       toast.warn('Brak tekstu do przetłumaczenia.');
       return;
     }
 
+    // 🔁 Wyślij do tłumaczenia
     const { data } = await axios.post(`${API_BASE_URL}/api/translate`, {
-      texts: toSend,
+      texts: textsToTranslate,
       source: 'pl',
       target: 'de'
     }, {
@@ -529,50 +543,38 @@ const handleDynamicTranslate = async () => {
       throw new Error('Błąd formatu odpowiedzi z API');
     }
 
-    const answersDe = [];
-    let j = 0;
-    for (let i = 0; i < textsToTranslate.length; i++) {
-      answersDe.push(trimmed[i] ? data.translations[j++] : '[brak tłumaczenia]');
-    }
+    // 📥 Przypisz tłumaczenia na właściwe miejsca
+    const answersDe = Array(12).fill('');
+    let translatedNote = '';
 
+    indexes.forEach((key, i) => {
+      const translation = data.translations[i];
+      if (key === 'notes') {
+        translatedNote = translation;
+      } else {
+        const index = fieldMap[key];
+        answersDe[index] = translation;
+      }
+    });
+
+    // Zapisz do stanu
+    setEditedAnswersDe(answersDe);
+    setGermanAnswers(answersDe);
+    setEditedNoteDe(translatedNote);
+    setTranslatedNote(translatedNote);
+
+    // Zapisz do bazy
     const payload = {
-      // PL
-      q1: editedAnswers[0],
-      q2: editedAnswers[1],
-      q3: Array.isArray(editedAnswers[2]) ? editedAnswers[2].join(', ') : editedAnswers[2],
-      q4: editedAnswers[3],
-      q5: editedAnswers[4],
-      q6: editedAnswers[5],
-      q7: editedAnswers[6],
-      q7_why: editedAnswers[7],
-      q8_plus: editedAnswers[8],
-      q8_minus: editedAnswers[9],
-      q9: editedAnswers[10],
-      q10: editedAnswers[11],
+      ...Object.fromEntries(Object.entries(fieldMap).filter(([k]) => k !== 'notes').map(([k, i]) => [k, editedAnswers[i]])),
       notes: editedNote,
-
-      // DE
-      q1_de: answersDe[0],
-      q2_de: answersDe[1],
-      q3_de: answersDe[2],
-      q4_de: answersDe[3],
-      q5_de: answersDe[4],
-      q6_de: answersDe[5],
-      q7_de: answersDe[6],
-      q7_why_de: answersDe[7],
-      q8_plus_de: answersDe[8],
-      q8_minus_de: answersDe[9],
-      q9_de: answersDe[10],
-      q10_de: answersDe[11],
-      notes: editedNoteDe,
+      ...Object.fromEntries(Object.entries(fieldMap).filter(([k]) => k !== 'notes').map(([k, i]) => [`${k}_de`, answersDe[i]])),
+      notes_de: translatedNote
     };
 
     await axios.patch(`${API_BASE_URL}/api/tabResponses/${selected.id}`, payload, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
 
-    setGermanAnswers(answersDe.slice(0, 12));
-    setTranslatedNote(answersDe[12]);
     setSelected(prev => ({ ...prev, ...payload }));
     setIsTranslated(true);
     toast.success('Tłumaczenie na niemiecki zakończone.');
@@ -583,6 +585,7 @@ const handleDynamicTranslate = async () => {
     setTranslating(false);
   }
 };
+
 
 const isMissingTranslation = (val) => val?.trim() === '[brak tekstu do tłumaczenia]';
 
