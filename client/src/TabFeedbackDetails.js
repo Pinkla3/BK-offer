@@ -486,6 +486,7 @@ const handleSave = async () => {
     }));
 
     setEditing(false);
+    setIsTranslated(false);
     toast.success('Wersja polska zapisana.');
     window.dispatchEvent(new Event('feedbackUpdated'));
   } catch (err) {
