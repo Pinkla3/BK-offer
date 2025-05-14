@@ -53,7 +53,7 @@ const Button = styled.button`
   &:hover { background: #0056b3; }
 `;
 
-const OptionButton = styled(({ active, editing, ...rest }) => <button {...rest} />)`
+const OptionButton = styled(({ active, ...rest }) => <button {...rest} />)`
   margin-top: 0;
   padding: 10px 20px;
   width: 100%;
@@ -62,15 +62,9 @@ const OptionButton = styled(({ active, editing, ...rest }) => <button {...rest} 
   color: ${props => (props.active ? '#fff' : '#333')};
   border: 1px solid ${props => (props.active ? '#007bff' : '#ccc')};
   box-shadow: ${props => (props.active ? '0 0 6px rgba(0, 123, 255, 0.3)' : 'none')};
-  
-  ${props =>
-    props.editing &&
-    `
-      &:hover {
-        background-color: ${props.active ? '#0056b3' : '#e0e0e0'};
-        cursor: pointer;
-      }
-    `}
+  &:hover {
+    background-color: ${props => (props.active ? '#0056b3' : '#e0e0e0')};
+  }
 `;
 
 const DetailCard = styled.div`
@@ -356,24 +350,27 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
 useEffect(() => {
   if (editing && selected) {
     setEditedAnswers([
-      selected.q1 || '',         // 0
-      selected.q2 || '',         // 1
+      selected.q1 || '',
+      selected.q2 || '',
       Array.isArray(selected.q3)
         ? selected.q3
         : typeof selected.q3 === 'string'
           ? selected.q3.split(', ')
-          : [],                  // 2
-      selected.q4 || '',         // 3
-      selected.q5 || '',         // 4
-      selected.q6 || '',         // 5
-      selected.q7 || '',         // 6
-      selected.q7_why || '',     // 7
-      selected.q8_plus || '',    // 8 ✅
-      selected.q8_minus || '',   // 9 ✅
-      selected.notes || ''       // 10 ✅
+          : [],
+      selected.q4 || '',
+      selected.q5 || '',
+      selected.q6 || '',
+      selected.q7 || '',
+      selected.q7_why || '',
+      selected.q8_plus || '',
+      selected.q8_minus || '',
+      selected.q9 || '',
+      selected.q10 || '',
+      selected.notes || ''
     ]);
-  }
-}, [editing, selected]);
+
+    }
+  }, [editing, selected]);
 
 const translationMapPlToDe = {
   'bardzo dobrze': 'sehr gut',
@@ -796,7 +793,6 @@ const handleToggleGerman = async () => {
           key={val}
           type="button"
           active={isActive}
-          editing={editing}
           onClick={() => editing && setEditedAnswers(prev => {
             const updated = [...prev];
             updated[0] = val;
@@ -867,78 +863,18 @@ const handleToggleGerman = async () => {
       marginRight: 'auto'
     }}
   >
-    {(() => {
-      const currentQ3 = editing
-        ? editedAnswers[2]
-        : Array.isArray(selected.q3)
-          ? selected.q3
-          : typeof selected.q3 === 'string'
-            ? selected.q3.split(', ')
-            : [];
-
-      return [
-        'występują nocki',
-        'osoba jest trudna',
-        'jest ciężki transfer',
-        'brak'
-      ].map(option => {
-        const isChecked = currentQ3.includes(option);
-
-        return (
-          <label
-            key={option}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              fontSize: '16px',
-              cursor: editing ? 'pointer' : 'default',
-              userSelect: 'none',
-              whiteSpace: 'nowrap'
-            }}
-          >
-            <input
-              type="checkbox"
-              checked={isChecked}
-              disabled={!editing}
-              onChange={() => {
-                if (!editing) return;
-                setEditedAnswers(prev => {
-                  const list = prev[2] || [];
-                  const updated = list.includes(option)
-                    ? list.filter(i => i !== option)
-                    : [...list, option];
-                  const newAnswers = [...prev];
-                  newAnswers[2] = updated;
-                  return newAnswers;
-                });
-              }}
-              style={{
-                width: '20px',
-                height: '20px',
-                accentColor: '#007bff'
-              }}
-            />
-            <span>{option}</span>
-          </label>
-        );
-      });
-    })()}
-
-    {/* Checkbox „inne trudności” */}
-    {(() => {
-      const currentQ3 = editing
-        ? editedAnswers[2]
-        : Array.isArray(selected.q3)
-          ? selected.q3
-          : typeof selected.q3 === 'string'
-            ? selected.q3.split(', ')
-            : [];
-
-      const isChecked = currentQ3.includes('inne trudności');
+    {[
+      'występują nocki',
+      'osoba jest trudna',
+      'jest ciężki transfer',
+      'brak'
+    ].map(option => {
+      const current = editing ? editedAnswers[2] : selected.q3?.split(', ') || [];
+      const isChecked = current.includes(option);
 
       return (
         <label
+          key={option}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -957,9 +893,9 @@ const handleToggleGerman = async () => {
               if (!editing) return;
               setEditedAnswers(prev => {
                 const list = prev[2] || [];
-                const updated = list.includes('inne trudności')
-                  ? list.filter(i => i !== 'inne trudności')
-                  : [...list, 'inne trudności'];
+                const updated = list.includes(option)
+                  ? list.filter(i => i !== option)
+                  : [...list, option];
                 const newAnswers = [...prev];
                 newAnswers[2] = updated;
                 return newAnswers;
@@ -971,10 +907,47 @@ const handleToggleGerman = async () => {
               accentColor: '#007bff'
             }}
           />
-          <span>inne trudności</span>
+          <span>{option}</span>
         </label>
       );
-    })()}
+    })}
+
+    {/* Checkbox „inne trudności” */}
+    <label
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px',
+        fontSize: '16px',
+        cursor: editing ? 'pointer' : 'default',
+        userSelect: 'none',
+        whiteSpace: 'nowrap'
+      }}
+    >
+      <input
+        type="checkbox"
+        checked={(editing ? editedAnswers[2] : selected.q3?.split(', ') || []).includes('inne trudności')}
+        disabled={!editing}
+        onChange={() => {
+          if (!editing) return;
+          setEditedAnswers(prev => {
+            const list = prev[2] || [];
+            const updated = list.includes('inne trudności')
+              ? list.filter(i => i !== 'inne trudności')
+              : [...list, 'inne trudności'];
+            const newAnswers = [...prev];
+            newAnswers[2] = updated;
+            return newAnswers;
+          });
+        }}
+        style={{
+          width: '20px',
+          height: '20px',
+          accentColor: '#007bff'
+        }}
+      />
+      <span>inne trudności</span>
+    </label>
 
     {/* Input tekstowy obok checkboxów */}
     <Input
@@ -994,8 +967,8 @@ const handleToggleGerman = async () => {
       style={{
         width: '100%',
         maxWidth: '300px',
-        visibility: (editing ? editedAnswers[2] : Array.isArray(selected.q3) ? selected.q3 : typeof selected.q3 === 'string' ? selected.q3.split(', ') : []).includes('inne trudności') ? 'visible' : 'hidden',
-        pointerEvents: (editing ? editedAnswers[2] : Array.isArray(selected.q3) ? selected.q3 : typeof selected.q3 === 'string' ? selected.q3.split(', ') : []).includes('inne trudności') ? 'auto' : 'none'
+        visibility: (editing ? editedAnswers[2] : selected.q3?.split(', ') || []).includes('inne trudności') ? 'visible' : 'hidden',
+        pointerEvents: (editing ? editedAnswers[2] : selected.q3?.split(', ') || []).includes('inne trudności') ? 'auto' : 'none'
       }}
     />
   </div>
@@ -1031,7 +1004,6 @@ const handleToggleGerman = async () => {
           key={val}
           type="button"
           active={isActive}
-          editing={editing}
           onClick={() => editing && setEditedAnswers(prev => {
             const updated = [...prev];
             updated[4] = val;
@@ -1057,29 +1029,13 @@ const handleToggleGerman = async () => {
       </span>
     )}
   </Label>
-
   <div style={{ display: 'flex', justifyContent: 'center', marginTop: '12px', width: '100%' }}>
     <div style={{ position: 'relative', maxWidth: '300px', width: '100%' }}>
       <input
-        type="number"
-        value={
-          editing
-            ? editedAnswers[5] ?? ''
-            : showGerman && (!selected.q6 || selected.q6.trim() === '' || selected.q6 === '0')
-              ? '[brak tekstu do tłumaczenia]'
-              : selected.q6 || ''
-        }
+        type="text"
+        value={showGerman && (!selected.q6 || selected.q6.trim() === '' || selected.q6 === '0') ? '[brak tekstu do tłumaczenia]' : selected.q6 || ''}
+        readOnly
         placeholder="np. 50"
-        readOnly={!editing}
-        onChange={editing ? (e) => {
-          const val = e.target.value;
-          setEditedAnswers(prev => {
-            const updated = [...prev];
-            updated[5] = val;
-            return updated;
-          });
-        } : undefined}
-        onWheel={(e) => e.target.blur()} // zapobiega zmianie przez scroll
         style={{
           width: '100%',
           height: '48px',
@@ -1088,15 +1044,13 @@ const handleToggleGerman = async () => {
           padding: '8px 36px 8px 12px',
           border: '1px solid',
           borderRadius: '10px',
-          backgroundColor: showGerman && (!selected.q6 || selected.q6.trim() === '' || selected.q6 === '0')
-            ? '#f8d7da' : (editing ? '#fff' : '#f9f9f9'),
-          borderColor: showGerman && (!selected.q6 || selected.q6.trim() === '' || selected.q6 === '0')
-            ? '#f5c6cb' : '#ccc',
-          color: showGerman && (!selected.q6 || selected.q6.trim() === '' || selected.q6 === '0')
-            ? '#721c24' : '#000',
+          backgroundColor: showGerman && (!selected.q6 || selected.q6.trim() === '' || selected.q6 === '0') ? '#f8d7da' : '#fff',
+          borderColor: showGerman && (!selected.q6 || selected.q6.trim() === '' || selected.q6 === '0') ? '#f5c6cb' : '#ccc',
+          color: showGerman && (!selected.q6 || selected.q6.trim() === '' || selected.q6 === '0') ? '#721c24' : '#000',
           appearance: 'textfield',
           MozAppearance: 'textfield'
         }}
+        onWheel={(e) => e.target.blur()}
       />
       <span style={{
         position: 'absolute',
@@ -1143,7 +1097,6 @@ const handleToggleGerman = async () => {
           key={val}
           type="button"
           active={isActive}
-          editing={editing}
           onClick={() => editing && setEditedAnswers(prev => {
             const updated = [...prev];
             updated[6] = val;
@@ -1177,7 +1130,6 @@ const handleToggleGerman = async () => {
 
 {/* Pytanie 6 */}
 <QuestionGroup>
-  {/* Pytanie q8_plus */}
   <Label>
     {questions[8]}
     {showGerman && (!selected.q8_plus || selected.q8_plus.trim() === '') && (
@@ -1185,19 +1137,8 @@ const handleToggleGerman = async () => {
     )}
   </Label>
   <TextArea
-    value={
-      editing
-        ? editedAnswers[8] || ''
-        : showGerman && (!selected.q8_plus || selected.q8_plus.trim() === '')
-          ? '[brak tekstu do tłumaczenia]'
-          : selected.q8_plus || ''
-    }
-    readOnly={!editing}
-    onChange={editing ? (e) => {
-      const updated = [...editedAnswers];
-      updated[8] = e.target.value;
-      setEditedAnswers(updated);
-    } : undefined}
+    value={showGerman && (!selected.q8_plus || selected.q8_plus.trim() === '') ? '[brak tekstu do tłumaczenia]' : selected.q8_plus || ''}
+    readOnly
     rows={2}
     placeholder={t('Np. dobra atmosfera, wsparcie rodziny...')}
     style={{
@@ -1207,8 +1148,6 @@ const handleToggleGerman = async () => {
       color: showGerman && (!selected.q8_plus || selected.q8_plus.trim() === '') ? '#721c24' : '#000'
     }}
   />
-
-  {/* Pytanie q8_minus */}
   <Label>
     {questions[9]}
     {showGerman && (!selected.q8_minus || selected.q8_minus.trim() === '') && (
@@ -1216,19 +1155,8 @@ const handleToggleGerman = async () => {
     )}
   </Label>
   <TextArea
-    value={
-      editing
-        ? editedAnswers[9] || ''
-        : showGerman && (!selected.q8_minus || selected.q8_minus.trim() === '')
-          ? '[brak tekstu do tłumaczenia]'
-          : selected.q8_minus || ''
-    }
-    readOnly={!editing}
-    onChange={editing ? (e) => {
-      const updated = [...editedAnswers];
-      updated[9] = e.target.value;
-      setEditedAnswers(updated);
-    } : undefined}
+    value={showGerman && (!selected.q8_minus || selected.q8_minus.trim() === '') ? '[brak tekstu do tłumaczenia]' : selected.q8_minus || ''}
+    readOnly
     rows={2}
     placeholder={t('Np. brak czasu wolnego, trudna komunikacja...')}
     style={{
@@ -1238,26 +1166,14 @@ const handleToggleGerman = async () => {
     }}
   />
 </QuestionGroup>
-
 {/* Notatka */}
 <QuestionGroup>
   <Label style={{ fontWeight: '600', fontSize: '16px' }}>
     {noteLabel} {getMissingTranslationMessage(noteContent)}
   </Label>
   <TextArea
-    value={
-      editing
-        ? editedAnswers[10] || ''
-        : noteContent?.trim() === '' && showGerman
-          ? '[brak tekstu do tłumaczenia]'
-          : noteContent || ''
-    }
-    readOnly={!editing}
-    onChange={editing ? (e) => {
-      const updated = [...editedAnswers];
-      updated[10] = e.target.value;
-      setEditedAnswers(updated);
-    } : undefined}
+    value={noteContent?.trim() === '' && showGerman ? '[brak tekstu do tłumaczenia]' : noteContent || ''}
+    readOnly
     rows={4}
     placeholder={t('Dodatkowe uwagi...')}
     style={{
