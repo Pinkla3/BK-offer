@@ -614,15 +614,18 @@ const getOptionWarningStyle = (val) => {
 
 const handleToggleGerman = async () => {
   if (!showGerman) {
-    // Sprawdź, czy trzeba przetłumaczyć (brak DE lub zmiana PL)
     const originalPl = [
       selected.q1, selected.q2, selected.q3, selected.q4,
       selected.q5, selected.q6, selected.q7, selected.q7_why,
       selected.q8_plus, selected.q8_minus, selected.q9, selected.q10
     ];
-    const currentPl = editedAnswers.map(val =>
-      Array.isArray(val) ? val.join(', ') : val || ''
-    );
+
+    const currentPl = editing
+      ? editedAnswers.map(val =>
+          Array.isArray(val) ? val.join(', ') : val || ''
+        )
+      : [...originalPl];
+
     const translatedFromDb = [
       selected.q1_de, selected.q2_de, selected.q3_de, selected.q4_de,
       selected.q5_de, selected.q6_de, selected.q7_de, selected.q7_why_de,
@@ -636,7 +639,7 @@ const handleToggleGerman = async () => {
       const plOld = String(originalPl[i] || '').trim();
       const de = String(translatedFromDb[i] || '').trim();
 
-      const changed = plNow !== plOld;
+      const changed = editing ? (plNow !== plOld) : false;
       const missing = !de || de === '[brak tłumaczenia]' || de === '[brak tekstu do przetłumaczenia]';
 
       if (changed || missing) {
@@ -645,32 +648,26 @@ const handleToggleGerman = async () => {
       }
     }
 
-    // Sprawdź także notatkę
-    const noteNow = (editedNote || '').trim();
+    // Notatka
+    const noteNow = (editing ? editedNote : selected.notes || '').trim();
     const noteOld = (selected.notes || '').trim();
     const noteDe = (selected.notes_de || '').trim();
 
-    if (
-      noteNow !== noteOld ||
-      !noteDe ||
-      noteDe === '[brak tłumaczenia]' ||
-      noteDe === '[brak tekstu do przetłumaczenia]'
-    ) {
+    const noteChanged = editing ? (noteNow !== noteOld) : false;
+    const noteMissing = !noteDe || noteDe === '[brak tłumaczenia]' || noteDe === '[brak tekstu do przetłumaczenia]';
+
+    if (noteChanged || noteMissing) {
       needsTranslation = true;
     }
 
     if (needsTranslation || isPolishChangedSinceTranslation || editing || germanAnswers.length === 0) {
-      await handleDynamicTranslate(); // 🌍 tłumaczenie dynamiczne
+      await handleDynamicTranslate(); // 🌍 uruchom tłumaczenie
     } else {
-      // ✅ nie trzeba tłumaczyć – ustaw dane z bazy
-      const fromDb = [
-        selected.q1_de, selected.q2_de, selected.q3_de, selected.q4_de,
-        selected.q5_de, selected.q6_de, selected.q7_de, selected.q7_why_de,
-        selected.q8_plus_de, selected.q8_minus_de, selected.q9_de, selected.q10_de
-      ];
-      setEditedAnswersDe(fromDb.map(v => v || ''));
-      setTranslatedNote(selected.notes_de || '');
-      setEditedNoteDe(selected.notes_de || '');
+      // ✅ użyj danych z bazy
+      const fromDb = translatedFromDb.map(v => v || '');
+      setEditedAnswersDe(fromDb);
+      setTranslatedNote(noteDe || '');
+      setEditedNoteDe(noteDe || '');
       setIsTranslated(true);
     }
 
