@@ -331,6 +331,11 @@ const noteLabelPl = 'Notatka:';
 const noteLabelDe = 'Anmerkung:';
 
 const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
+
+if (!selected) {
+  return <div>Brak wybranego feedbacku.</div>;
+}
+
   const [responses, setResponses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -1222,9 +1227,14 @@ const handleToggleGerman = async () => {
 
 {/* Notatka */}
 <QuestionGroup>
-  <Label style={{ fontWeight: '600', fontSize: '16px' }}>
-    {noteLabel} {getMissingTranslationMessage(showGerman ? selected.notes_de : noteContent)}
-  </Label>
+<Label style={{ fontWeight: '600', fontSize: '16px' }}>
+  {noteLabel}
+  {showGerman && (!selected.notes || selected.notes.trim() === '') && (
+    <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
+      Brak odpowiedzi do tłumaczenia
+    </span>
+  )}
+</Label>
   <TextArea
     value={
       editing
