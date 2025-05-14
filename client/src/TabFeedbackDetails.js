@@ -332,8 +332,15 @@ const noteLabelDe = 'Anmerkung:';
 
 const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
 
+const [selected, setSelected] = useState(props.selected);
+
+useEffect(() => {
+  setSelected(props.selected);
+}, [props.selected]);
+
 if (!selected) {
   return <div>Brak wybranego feedbacku.</div>;
+}
 }
 
   const [responses, setResponses] = useState([]);
