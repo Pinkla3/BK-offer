@@ -561,7 +561,7 @@ const handleDynamicTranslate = async () => {
       q8_minus: editedAnswers[9],
       q9: editedAnswers[10],
       q10: editedAnswers[11],
-      notes: editedAnswers[12],
+      notes: editedNote,
 
       // DE
       q1_de: answersDe[0],
@@ -576,7 +576,7 @@ const handleDynamicTranslate = async () => {
       q8_minus_de: answersDe[9],
       q9_de: answersDe[10],
       q10_de: answersDe[11],
-      notes_de: answersDe[12],
+      notes: editedNoteDe,
     };
 
     await axios.patch(`${API_BASE_URL}/api/tabResponses/${selected.id}`, payload, {
@@ -1236,30 +1236,33 @@ const handleToggleGerman = async () => {
   )}
 </Label>
   <TextArea
-    value={
-      editing
-        ? editedAnswers[12] || ''
-        : showGerman
+  value={
+    editing
+      ? (showGerman ? editedNoteDe : editedNote)
+      : (showGerman
           ? selected.notes_de || '[brak tłumaczenia]'
-          : noteContent || ''
+          : selected.notes || ''
+        )
+  }
+  readOnly={!editing}
+  onChange={editing ? (e) => {
+    if (showGerman) {
+      setEditedNoteDe(e.target.value);
+    } else {
+      setEditedNote(e.target.value);
     }
-    readOnly={!editing}
-    onChange={editing ? (e) => {
-      const updated = [...editedAnswers];
-      updated[12] = e.target.value;
-      setEditedAnswers(updated);
-    } : undefined}
-    rows={4}
-    placeholder={t('Dodatkowe uwagi...')}
-    style={{
-      ...getTextAreaStyle(showGerman ? selected.notes_de : noteContent),
-      ...(showGerman && (!selected.notes_de || selected.notes_de.trim() === '') && {
-        backgroundColor: '#f8d7da',
-        borderColor: '#f5c6cb',
-        color: '#721c24'
-      })
-    }}
-  />
+  } : undefined}
+  rows={4}
+  placeholder={t('Dodatkowe uwagi...')}
+  style={{
+    ...getTextAreaStyle(showGerman ? selected.notes_de : selected.notes),
+    ...(showGerman && (!selected.notes_de || selected.notes_de.trim() === '') && {
+      backgroundColor: '#f8d7da',
+      borderColor: '#f5c6cb',
+      color: '#721c24'
+    })
+  }}
+/>
 </QuestionGroup>
 </TabSection>
 
