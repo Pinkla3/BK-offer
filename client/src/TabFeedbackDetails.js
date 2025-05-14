@@ -476,19 +476,7 @@ const handleSave = async () => {
       { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
     );
 
-    const updated = res.data;
-
-    setSelected(prev => ({
-      ...prev,
-      ...payload,
-      caregiverFirstName: updated.caregiverFirstName,
-      caregiverLastName: updated.caregiverLastName,
-      caregiverPhone: updated.caregiverPhone,
-      patientFirstName: updated.patientFirstName,
-      patientLastName: updated.patientLastName,
-      user_name: updated.user_name || prev.user_name,
-      edit_history: updated.edit_history
-    }));
+   setSelected(updated);
 
     setEditing(false);
     setIsTranslated(false);
