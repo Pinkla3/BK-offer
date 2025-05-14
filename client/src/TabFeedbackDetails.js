@@ -468,7 +468,7 @@ const handleSave = async () => {
       q8_minus: editedAnswers[9],
       q9: editedAnswers[10],
       q10: editedAnswers[11],
-      notes: editedNote,
+      notes: editedAnswers[12]
     };
 
     const res = await axios.patch(
@@ -478,13 +478,6 @@ const handleSave = async () => {
     );
 
     const updated = res.data;
-const updatedSelected = {
-  ...selected,
-  ...payload,
-  user_name: updated.user_name || selected.user_name,
-  edit_history: updated.edit_history
-};
-setSelected(updatedSelected);
 
    setSelected(res.data);
 
@@ -559,7 +552,7 @@ const handleDynamicTranslate = async () => {
       q8_minus: editedAnswers[9],
       q9: editedAnswers[10],
       q10: editedAnswers[11],
-      notes: editedNote,
+      notes: editedAnswers[12],
 
       // DE
       q1_de: answersDe[0],
@@ -574,7 +567,7 @@ const handleDynamicTranslate = async () => {
       q8_minus_de: answersDe[9],
       q9_de: answersDe[10],
       q10_de: answersDe[11],
-      notes_de: editedNoteDe,
+      notes_de: answersDe[12],
     };
 
     await axios.patch(`${API_BASE_URL}/api/tabResponses/${selected.id}`, payload, {
@@ -1233,23 +1226,20 @@ const handleToggleGerman = async () => {
     </span>
   )}
 </Label>
-<TextArea
-  value={
-    editing
-      ? (showGerman ? editedNoteDe : editedNote)
-      : (showGerman
+  <TextArea
+    value={
+      editing
+        ? editedAnswers[12] || ''
+        : showGerman
           ? selected.notes_de || '[brak tłumaczenia]'
-          : selected.notes || ''
-        )
-  }
-  readOnly={!editing}
-  onChange={editing ? (e) => {
-    if (showGerman) {
-      setEditedNoteDe(e.target.value);
-    } else {
-      setEditedNote(e.target.value);
+          : noteContent || ''
     }
-  } : undefined}
+    readOnly={!editing}
+    onChange={editing ? (e) => {
+      const updated = [...editedAnswers];
+      updated[12] = e.target.value;
+      setEditedAnswers(updated);
+    } : undefined}
     rows={4}
     placeholder={t('Dodatkowe uwagi...')}
     style={{
