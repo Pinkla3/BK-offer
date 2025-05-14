@@ -467,7 +467,7 @@ const handleSave = async () => {
       q8_minus: editedAnswers[9],
       q9: editedAnswers[10],
       q10: editedAnswers[11],
-      notes: editedAnswers[12]
+      notes: editedNote,
     };
 
     const res = await axios.patch(
@@ -519,7 +519,7 @@ const handleDynamicTranslate = async () => {
       const idx = fieldMap[key];
       const val = editedAnswers[idx];
       return Array.isArray(val) ? val.join(', ') : val || '';
-    }).concat(editedAnswers[12] || ''); // notes
+    }).concat(editedNote || ''); // notes
 
     const trimmed = textsToTranslate.map(t => t.trim());
     const toSend = trimmed.filter(t => t.length > 0);
@@ -561,7 +561,7 @@ const handleDynamicTranslate = async () => {
       q8_minus: editedAnswers[9],
       q9: editedAnswers[10],
       q10: editedAnswers[11],
-      notes: editedAnswers[12],
+      notes: editedNote,
 
       // DE
       q1_de: answersDe[0],
@@ -1238,7 +1238,7 @@ const handleToggleGerman = async () => {
   <TextArea
     value={
       editing
-        ? editedAnswers[12] || ''
+        ? editedNote || ''
         : showGerman
           ? selected.notes_de || '[brak tłumaczenia]'
           : noteContent || ''
