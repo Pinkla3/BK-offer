@@ -1227,42 +1227,47 @@ const handleToggleGerman = async () => {
 
 {/* Notatka */}
 <QuestionGroup>
-<Label style={{ fontWeight: '600', fontSize: '16px' }}>
-  {noteLabel}
-  {showGerman && (!selected.notes || selected.notes.trim() === '') && (
-    <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
-      Brak odpowiedzi do tłumaczenia
-    </span>
-  )}
-</Label>
+  <Label style={{ fontWeight: '600', fontSize: '16px' }}>
+    {noteLabel}
+    {showGerman && (!editing ? !selected.notes : !editedNote || editedNote.trim() === '') && (
+      <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
+        Brak odpowiedzi do tłumaczenia
+      </span>
+    )}
+  </Label>
+
   <TextArea
-  value={
-    editing
-      ? (showGerman ? editedNoteDe : editedNote)
-      : (showGerman
-          ? selected.notes_de || '[brak tłumaczenia]'
-          : selected.notes || ''
-        )
-  }
-  readOnly={!editing}
-  onChange={editing ? (e) => {
-    if (showGerman) {
-      setEditedNoteDe(e.target.value);
-    } else {
-      setEditedNote(e.target.value);
+    value={
+      editing
+        ? (showGerman ? editedNoteDe : editedNote)
+        : (showGerman
+            ? (editedNoteDe || selected.notes_de || '[brak tłumaczenia]')
+            : (editedNote || selected.notes || '')
+          )
     }
-  } : undefined}
-  rows={4}
-  placeholder={t('Dodatkowe uwagi...')}
-  style={{
-    ...getTextAreaStyle(showGerman ? selected.notes_de : selected.notes),
-    ...(showGerman && (!selected.notes_de || selected.notes_de.trim() === '') && {
-      backgroundColor: '#f8d7da',
-      borderColor: '#f5c6cb',
-      color: '#721c24'
-    })
-  }}
-/>
+    readOnly={!editing}
+    onChange={editing ? (e) => {
+      if (showGerman) {
+        setEditedNoteDe(e.target.value);
+      } else {
+        setEditedNote(e.target.value);
+      }
+    } : undefined}
+    rows={4}
+    placeholder={t('Dodatkowe uwagi...')}
+    style={{
+      ...getTextAreaStyle(
+        showGerman
+          ? (editing ? editedNote : selected.notes)
+          : (editing ? editedNote : selected.notes)
+      ),
+      ...(showGerman && (!selected.notes_de || selected.notes_de.trim() === '') && {
+        backgroundColor: '#f8d7da',
+        borderColor: '#f5c6cb',
+        color: '#721c24'
+      })
+    }}
+  />
 </QuestionGroup>
 </TabSection>
 
