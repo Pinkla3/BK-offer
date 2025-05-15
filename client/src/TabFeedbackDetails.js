@@ -434,42 +434,67 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
 const handleSave = async () => {
   try {
     const payload = {
-  caregiver_first_name: editedCaregiverFirstName,
-  caregiver_last_name: editedCaregiverLastName,
-  caregiver_phone: editedCaregiverPhone,
-  patient_first_name: editedPatientFirstName,
-  patient_last_name: editedPatientLastName,
-      q1: editedAnswers[0],
-      q2: editedAnswers[1],
-      q3: Array.isArray(editedAnswers[2]) ? editedAnswers[2].join(', ') : editedAnswers[2],
-      q4: editedAnswers[3],
-      q5: editedAnswers[4],
-      q6: editedAnswers[5],
-      q7: editedAnswers[6],
-      q7_why: editedAnswers[7],
-      q8_plus: editedAnswers[8],
-      q8_minus: editedAnswers[9],
-      q9: editedAnswers[10],
-      q10: editedAnswers[11],
-      notes: editedNote,
+      caregiver_first_name: editedCaregiverFirstName,
+      caregiver_last_name: editedCaregiverLastName,
+      caregiver_phone: editedCaregiverPhone,
+      patient_first_name: editedPatientFirstName,
+      patient_last_name: editedPatientLastName,
     };
+
+    if (showGerman) {
+      // zapis niemieckiej wersji
+      payload.q1_de = editedAnswersDe[0];
+      payload.q2_de = editedAnswersDe[1];
+      payload.q3_de = Array.isArray(editedAnswers[2]) ? editedAnswers[2].join(', ') : editedAnswersDe[2];
+      payload.q4_de = editedAnswersDe[3];
+      payload.q5_de = editedAnswersDe[4];
+      payload.q6_de = editedAnswersDe[5];
+      payload.q7_de = editedAnswersDe[6];
+      payload.q7_why_de = editedAnswersDe[7];
+      payload.q8_plus_de = editedAnswersDe[8];
+      payload.q8_minus_de = editedAnswersDe[9];
+      payload.q9_de = editedAnswersDe[10];
+      payload.q10_de = editedAnswersDe[11];
+      payload.notes_de = editedNoteDe;
+      payload.no_history = true; // ⛔ bez wpisu w historii
+    } else {
+      // zapis polskiej wersji
+      payload.q1 = editedAnswers[0];
+      payload.q2 = editedAnswers[1];
+      payload.q3 = Array.isArray(editedAnswers[2]) ? editedAnswers[2].join(', ') : editedAnswers[2];
+      payload.q4 = editedAnswers[3];
+      payload.q5 = editedAnswers[4];
+      payload.q6 = editedAnswers[5];
+      payload.q7 = editedAnswers[6];
+      payload.q7_why = editedAnswers[7];
+      payload.q8_plus = editedAnswers[8];
+      payload.q8_minus = editedAnswers[9];
+      payload.q9 = editedAnswers[10];
+      payload.q10 = editedAnswers[11];
+      payload.notes = editedNote;
+    }
 
     const res = await axios.patch(
       `${API_BASE_URL}/api/tabResponses/${selected.id}`,
       payload,
       { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
     );
-const updated = res.data;
-   setSelected(updated);
 
+    const updated = res.data;
+    setSelected(updated);
     setEditing(false);
     setIsTranslated(false);
     setIsPolishChangedSinceTranslation(true);
-    toast.success('Wersja polska zapisana.');
     window.dispatchEvent(new Event('feedbackUpdated'));
+
+    if (showGerman) {
+      toast.success('Wersja niemiecka zapisana.');
+    } else {
+      toast.success('Wersja polska zapisana.');
+    }
   } catch (err) {
-    console.error('Błąd zapisu wersji PL:', err);
-    toast.error('Nie udało się zapisać wersji polskiej.');
+    console.error('❌ Błąd zapisu:', err);
+    toast.error('Nie udało się zapisać odpowiedzi.');
   }
 };
 
