@@ -510,41 +510,51 @@ const handleDynamicTranslate = async () => {
 
     const textsToTranslate = [];
     const indexes = [];
+    let missingPolishCount = 0;
 
- fieldsToTranslate.forEach((key) => {
-  const idx = fieldMap[key];
-  let val;
+    fieldsToTranslate.forEach((key) => {
+      const idx = fieldMap[key];
+      let val;
 
-  if (key === 'notes') {
-    val = editedNote || selected.notes || '';
-  } else {
-    const field = editedAnswers.length > idx
-      ? editedAnswers[idx]
-      : selected[key] || '';
-    val = Array.isArray(field) ? field.join(', ') : field;
-  }
+      if (key === 'notes') {
+        val = editedNote || selected.notes || '';
+      } else {
+        const field = editedAnswers.length > idx
+          ? editedAnswers[idx]
+          : selected[key] || '';
+        val = Array.isArray(field) ? field.join(', ') : field;
+      }
 
-  const text = String(val || '').trim();
-  const original = String(selected?.[key] || '').trim();
-  const translation = String(selected?.[`${key}_de`] || '').trim();
+      const text = String(val || '').trim();
+      const original = String(selected?.[key] || '').trim();
+      const translation = String(selected?.[`${key}_de`] || '').trim();
 
-  const wasChanged = text !== original;
-  const translationMissing = !translation || translation === '[brak tłumaczenia]' || translation === '[brak tekstu do tłumaczenia]';
-  const shouldTranslate = wasChanged || translationMissing;
+      const wasChanged = text !== original;
+      const translationMissing =
+        !translation ||
+        translation === '[brak tłumaczenia]' ||
+        translation === '[brak tekstu do tłumaczenia]';
 
-  if (shouldTranslate && text.length > 0) {
-    textsToTranslate.push(text);
-    indexes.push(key);
-  }
-});
+      const shouldTranslate = wasChanged || translationMissing;
+
+      if (shouldTranslate && text.length > 0) {
+        textsToTranslate.push(text);
+        indexes.push(key);
+      }
+
+      if (text.length === 0) {
+        missingPolishCount++;
+      }
+    });
 
     console.log('🧪 editedAnswers:', editedAnswers);
-    console.log('🧪 editedNote:', editedNote);
     console.log('📄 textsToTranslate:', textsToTranslate);
     console.log('🧩 indexes:', indexes);
 
     if (textsToTranslate.length === 0) {
-      toast.warn('Brak tekstu do przetłumaczenia.');
+      if (missingPolishCount > 0) {
+        toast.warn(`Brak tekstu do przetłumaczenia w ${missingPolishCount} pytaniach.`);
+      }
       return;
     }
 
@@ -560,7 +570,7 @@ const handleDynamicTranslate = async () => {
       throw new Error('Błąd formatu odpowiedzi z API');
     }
 
-    console.log('📥 Translations from API:', data.translations);
+    toast.success('Tłumaczenie zakończone.');
 
     const answersDe = Array(12).fill('');
     let translatedNote = '';
@@ -580,29 +590,28 @@ const handleDynamicTranslate = async () => {
     setEditedNoteDe(translatedNote);
     setTranslatedNote(translatedNote);
 
-    // Przygotuj payload do zapisania
-const payload = {
-  ...Object.fromEntries(Object.entries(fieldMap).map(([k, i]) => [
-    k,
-    Array.isArray(editedAnswers?.[i])
-      ? editedAnswers[i].join(', ')
-      : (editedAnswers?.[i] !== undefined && editedAnswers?.[i] !== ''
-          ? editedAnswers[i]
-          : selected?.[k] || '')
-  ])),
-  notes: editedNote !== undefined && editedNote !== '' ? editedNote : selected?.notes || '',
-  ...Object.fromEntries(Object.entries(fieldMap).map(([k, i]) => [
-    `${k}_de`,
-    answersDe?.[i] || selected?.[`${k}_de`] || ''
-  ])),
-  notes_de: translatedNote || selected?.notes_de || '',
-  caregiver_first_name: editedCaregiverFirstName || selected?.caregiver_first_name || '',
-  caregiver_last_name: editedCaregiverLastName || selected?.caregiver_last_name || '',
-  caregiver_phone: editedCaregiverPhone || selected?.caregiver_phone || '',
-  patient_first_name: editedPatientFirstName || selected?.patient_first_name || '',
-  patient_last_name: editedPatientLastName || selected?.patient_last_name || '',
-  no_history: true
-};
+    const payload = {
+      ...Object.fromEntries(Object.entries(fieldMap).map(([k, i]) => [
+        k,
+        Array.isArray(editedAnswers?.[i])
+          ? editedAnswers[i].join(', ')
+          : (editedAnswers?.[i] !== undefined && editedAnswers?.[i] !== ''
+              ? editedAnswers[i]
+              : selected?.[k] || '')
+      ])),
+      notes: editedNote !== undefined && editedNote !== '' ? editedNote : selected?.notes || '',
+      ...Object.fromEntries(Object.entries(fieldMap).map(([k, i]) => [
+        `${k}_de`,
+        answersDe?.[i] || selected?.[`${k}_de`] || ''
+      ])),
+      notes_de: translatedNote || selected?.notes_de || '',
+      caregiver_first_name: editedCaregiverFirstName || selected?.caregiver_first_name || '',
+      caregiver_last_name: editedCaregiverLastName || selected?.caregiver_last_name || '',
+      caregiver_phone: editedCaregiverPhone || selected?.caregiver_phone || '',
+      patient_first_name: editedPatientFirstName || selected?.patient_first_name || '',
+      patient_last_name: editedPatientLastName || selected?.patient_last_name || '',
+      no_history: true
+    };
 
     await axios.patch(`${API_BASE_URL}/api/tabResponses/${selected.id}`, payload, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
@@ -610,7 +619,7 @@ const payload = {
 
     setSelected(prev => ({ ...prev, ...payload }));
     setIsTranslated(true);
-    toast.success('Tłumaczenie na niemiecki zakończone i zapisane.');
+
   } catch (err) {
     console.error('❌ Błąd tłumaczenia:', err);
     toast.error('Nie udało się przetłumaczyć.');
@@ -618,7 +627,6 @@ const payload = {
     setTranslating(false);
   }
 };
-
 
 const isMissingTranslation = (val) => val?.trim() === '[brak tekstu do tłumaczenia]';
 
