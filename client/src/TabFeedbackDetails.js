@@ -924,7 +924,7 @@ const handleToggleGerman = async () => {
 <QuestionGroup style={{ marginTop: '32px' }}>
   <Label>
     {questions[0]}
-    {showGerman && (!selected.q1 || selected.q1.trim() === '') && (
+    {showGerman && !editing && !((selected.q1_de || '').trim()) && (
       <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
         Brak odpowiedzi do tłumaczenia
       </span>
@@ -945,20 +945,24 @@ const handleToggleGerman = async () => {
     }}
   >
     {['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map(val => {
-      const isActive = (editing ? editedAnswers[0] : selected.q1) === val;
+      const isActive = editing
+        ? (showGerman ? editedAnswersDe[0] : editedAnswers[0]) === val
+        : (showGerman ? selected.q1_de : selected.q1) === val;
+
       return (
         <OptionButton
           key={val}
           type="button"
           active={isActive}
           editing={editing}
-          onClick={() => editing && setEditedAnswers(prev => {
-            const updated = [...prev];
+          onClick={() => {
+            if (!editing) return;
+            const updated = showGerman ? [...editedAnswersDe] : [...editedAnswers];
             updated[0] = val;
-            return updated;
-          })}
+            showGerman ? setEditedAnswersDe(updated) : setEditedAnswers(updated);
+          }}
         >
-          {val}
+          {t(val)}
         </OptionButton>
       );
     })}
@@ -969,40 +973,48 @@ const handleToggleGerman = async () => {
     style={{
       marginTop: '16px',
       overflow: 'hidden',
-      maxHeight: ['średnio', 'mam zastrzeżenia'].includes(editing ? editedAnswers[0] : selected.q1) ? '200px' : '0px',
-      opacity: ['średnio', 'mam zastrzeżenia'].includes(editing ? editedAnswers[0] : selected.q1) ? 1 : 0,
+      maxHeight: ['średnio', 'mam zastrzeżenia'].includes(
+        editing
+          ? (showGerman ? editedAnswersDe[0] : editedAnswers[0])
+          : (showGerman ? selected.q1_de : selected.q1)
+      ) ? '200px' : '0px',
+      opacity: ['średnio', 'mam zastrzeżenia'].includes(
+        editing
+          ? (showGerman ? editedAnswersDe[0] : editedAnswers[0])
+          : (showGerman ? selected.q1_de : selected.q1)
+      ) ? 1 : 0,
       transition: 'all 0.4s ease',
       width: '100%'
     }}
   >
     <TextArea
-  name="q2"
-  value={
-    editing
-      ? editedAnswers[1] || ''
-      : showGerman
-        ? selected.q2_de || '[brak tekstu do tłumaczenia]'
-        : selected.q2 || ''
-  }
-  onChange={editing ? (e) => {
-    const updated = [...editedAnswers];
-    updated[1] = e.target.value;
-    setEditedAnswers(updated);
-  } : undefined}
-  placeholder="Dlaczego?"
-  rows={3}
-  style={{
-    width: '100%',
-    border: '1px solid #ccc',
-    borderRadius: '8px',
-    padding: '10px',
-    fontSize: '14px',
-    boxSizing: 'border-box',
-    transition: 'opacity 0.3s ease',
-    resize: 'vertical',
-    backgroundColor: '#fff',
-  }}
-/>
+      name="q2"
+      value={
+        editing
+          ? (showGerman ? editedAnswersDe[1] : editedAnswers[1]) || ''
+          : showGerman
+            ? selected.q2_de || '[brak tłumaczenia]'
+            : selected.q2 || ''
+      }
+      onChange={editing ? (e) => {
+        const updated = showGerman ? [...editedAnswersDe] : [...editedAnswers];
+        updated[1] = e.target.value;
+        showGerman ? setEditedAnswersDe(updated) : setEditedAnswers(updated);
+      } : undefined}
+      placeholder="Dlaczego?"
+      rows={3}
+      style={{
+        width: '100%',
+        border: '1px solid #ccc',
+        borderRadius: '8px',
+        padding: '10px',
+        fontSize: '14px',
+        boxSizing: 'border-box',
+        transition: 'opacity 0.3s ease',
+        resize: 'vertical',
+        backgroundColor: '#fff',
+      }}
+    />
   </div>
 </QuestionGroup>
 {/* Pytanie 2 */}
