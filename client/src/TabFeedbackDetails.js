@@ -503,7 +503,6 @@ const handleDynamicTranslate = async () => {
       'q7', 'q7_why', 'q8_plus', 'q8_minus', 'q9', 'q10', 'notes'
     ];
 
-    // Przygotuj teksty i indeksy
     const textsToTranslate = [];
     const indexes = [];
 
@@ -521,7 +520,7 @@ const handleDynamicTranslate = async () => {
       const trimmed = String(val).trim();
       if (trimmed.length > 0) {
         textsToTranslate.push(trimmed);
-        indexes.push(key); // zapamiętaj, do którego pola
+        indexes.push(key);
       }
     });
 
@@ -530,7 +529,6 @@ const handleDynamicTranslate = async () => {
       return;
     }
 
-    // 🔁 Wyślij do tłumaczenia
     const { data } = await axios.post(`${API_BASE_URL}/api/translate`, {
       texts: textsToTranslate,
       source: 'pl',
@@ -543,7 +541,6 @@ const handleDynamicTranslate = async () => {
       throw new Error('Błąd formatu odpowiedzi z API');
     }
 
-    // 📥 Przypisz tłumaczenia na właściwe miejsca
     const answersDe = Array(12).fill('');
     let translatedNote = '';
 
@@ -557,17 +554,31 @@ const handleDynamicTranslate = async () => {
       }
     });
 
-    // Zapisz do stanu
     setEditedAnswersDe(answersDe);
     setGermanAnswers(answersDe);
     setEditedNoteDe(translatedNote);
     setTranslatedNote(translatedNote);
 
-    // Zapisz do bazy
+    // przygotowanie payloadu do zapisu
     const payload = {
-      ...Object.fromEntries(Object.entries(fieldMap).filter(([k]) => k !== 'notes').map(([k, i]) => [k, editedAnswers[i]])),
+      // PL
+      ...Object.entries(fieldMap)
+        .filter(([k]) => k !== 'notes')
+        .reduce((acc, [k, i]) => {
+          acc[k] = Array.isArray(editedAnswers[i])
+            ? editedAnswers[i].join(', ')
+            : editedAnswers[i];
+          return acc;
+        }, {}),
       notes: editedNote,
-      ...Object.fromEntries(Object.entries(fieldMap).filter(([k]) => k !== 'notes').map(([k, i]) => [`${k}_de`, answersDe[i]])),
+
+      // DE
+      ...Object.entries(fieldMap)
+        .filter(([k]) => k !== 'notes')
+        .reduce((acc, [k, i]) => {
+          acc[`${k}_de`] = answersDe[i];
+          return acc;
+        }, {}),
       notes_de: translatedNote
     };
 
@@ -577,7 +588,7 @@ const handleDynamicTranslate = async () => {
 
     setSelected(prev => ({ ...prev, ...payload }));
     setIsTranslated(true);
-    toast.success('Tłumaczenie na niemiecki zakończone.');
+    toast.success('Tłumaczenie na niemiecki zakończone i zapisane.');
   } catch (err) {
     console.error('Błąd tłumaczenia:', err);
     toast.error('Nie udało się przetłumaczyć.');
