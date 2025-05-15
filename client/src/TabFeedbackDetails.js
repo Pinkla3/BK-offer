@@ -514,9 +514,8 @@ const handleDynamicTranslate = async () => {
 
     const textsToTranslate = [];
     const indexes = [];
-    let emptyFieldCount = 0;
 
-    // 🔍 Grupy logiczne: 6 pytań + notatka
+    // 🔍 Grupy logiczne
     const groupsToCheck = [
       ['q1'],                     // Pytanie 1
       ['q3'],                     // Pytanie 2
@@ -555,7 +554,7 @@ const handleDynamicTranslate = async () => {
       }
     });
 
-    const countQuestions = missingGroupNames.filter(g => g === 'pytanie').length;
+    const emptyGroupCount = missingGroupNames.filter(g => g === 'pytanie').length;
     const hasMissingNote = missingGroupNames.includes('notes');
 
     // 🔍 Zbieranie pól do tłumaczenia
@@ -573,8 +572,6 @@ const handleDynamicTranslate = async () => {
       }
 
       const text = String(val || '').trim();
-      if (text.length === 0) emptyFieldCount++;
-
       const original = String(selected?.[key] || '').trim();
       const translation = String(selected?.[`${key}_de`] || '').trim();
 
@@ -594,21 +591,21 @@ const handleDynamicTranslate = async () => {
 
     // 🧾 TOASTY: brak tekstów do tłumaczenia
     if (textsToTranslate.length === 0) {
-      if (countQuestions === 6 && hasMissingNote) {
+      if (emptyGroupCount === 6 && hasMissingNote) {
         toast.error('Brak tłumaczenia – brak odpowiedzi na pytania.');
-      } else if (countQuestions === 0 && hasMissingNote) {
+      } else if (emptyGroupCount === 0 && hasMissingNote) {
         toast.warn('Brak notatki.');
-      } else if (countQuestions > 0 && hasMissingNote) {
-        toast.warn(`Brak tekstu do przetłumaczenia w ${countQuestions} ${odmianaPytanie(countQuestions)} i notatce.`);
-      } else if (countQuestions > 0) {
-        toast.warn(`Brak tekstu do przetłumaczenia w ${countQuestions} ${odmianaPytanie(countQuestions)}.`);
+      } else if (emptyGroupCount > 0 && hasMissingNote) {
+        toast.warn(`Brak tekstu do przetłumaczenia w ${emptyGroupCount} ${odmianaPytanie(emptyGroupCount)} i notatce.`);
+      } else if (emptyGroupCount > 0) {
+        toast.warn(`Brak tekstu do przetłumaczenia w ${emptyGroupCount} ${odmianaPytanie(emptyGroupCount)}.`);
       } else {
         toast.info('Tekst już został przetłumaczony.');
       }
       return;
     }
 
-    // 🔁 Tłumaczenie
+    // 🔁 Tłumaczenie przez API
     const { data } = await axios.post(`${API_BASE_URL}/api/translate`, {
       texts: textsToTranslate,
       source: 'pl',
@@ -621,10 +618,11 @@ const handleDynamicTranslate = async () => {
       throw new Error('Błąd formatu odpowiedzi z API');
     }
 
+    // ✅ TOASTY po tłumaczeniu
     toast.success('Tłumaczenie zakończone.');
 
-    if (emptyFieldCount > 0) {
-      toast.warn(`Brakuje odpowiedzi w ${emptyFieldCount} ${odmianaPytanie(emptyFieldCount)}.`);
+    if (emptyGroupCount > 0) {
+      toast.warn(`Brakuje odpowiedzi w ${emptyGroupCount} ${odmianaPytanie(emptyGroupCount)}. Odpowiedzi te nie zostały przetłumaczone.`);
     }
 
     const answersDe = Array(12).fill('');
@@ -681,14 +679,6 @@ const handleDynamicTranslate = async () => {
   } finally {
     setTranslating(false);
   }
-};
-
-const isMissingTranslation = (val) => val?.trim() === '[brak tekstu do tłumaczenia]';
-
-const getTextAreaStyle = (val) => {
-  return val?.trim() === '[brak tekstu do tłumaczenia]'
-    ? { backgroundColor: '#f8d7da', borderColor: '#f5c6cb', color: '#721c24' }
-    : {};
 };
 
 
