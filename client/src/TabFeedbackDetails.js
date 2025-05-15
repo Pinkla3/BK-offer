@@ -493,50 +493,43 @@ const handleSave = async () => {
     const updated = res.data;
     setSelected(updated);
 
+    // 🔁 Uzupełnij tylko te dane, które są dostępne — nie nadpisuj pustymi
     setEditedAnswers(prev => {
-  const copy = [...prev];
-  copy[0] = updated.q1 || prev[0]; // przywróć zaznaczenie PL
-  return copy;
-});
-setEditedAnswersDe(prev => {
-  const copy = [...prev];
-  copy[0] = updated.q1_de || prev[0]; // przywróć DE
-  return copy;
-});
+      const copy = [...prev];
+      copy[0] = updated.q1 ?? prev[0];
+      copy[1] = updated.q2 ?? prev[1];
+      copy[2] = updated.q3 ? updated.q3.split(', ') : prev[2];
+      copy[3] = updated.q4 ?? prev[3];
+      copy[4] = updated.q5 ?? prev[4];
+      copy[5] = updated.q6 ?? prev[5];
+      copy[6] = updated.q7 ?? prev[6];
+      copy[7] = updated.q7_why ?? prev[7];
+      copy[8] = updated.q8_plus ?? prev[8];
+      copy[9] = updated.q8_minus ?? prev[9];
+      copy[10] = updated.q9 ?? prev[10];
+      copy[11] = updated.q10 ?? prev[11];
+      return copy;
+    });
 
-    // 🔁 Synchronizacja po zapisie
-    setEditedAnswers([
-      updated.q1 || '',
-      updated.q2 || '',
-      updated.q3?.split(', ') || [],
-      updated.q4 || '',
-      updated.q5 || '',
-      updated.q6 || '',
-      updated.q7 || '',
-      updated.q7_why || '',
-      updated.q8_plus || '',
-      updated.q8_minus || '',
-      updated.q9 || '',
-      updated.q10 || ''
-    ]);
+    setEditedAnswersDe(prev => {
+      const copy = [...prev];
+      copy[0] = updated.q1_de ?? prev[0];
+      copy[1] = updated.q2_de ?? prev[1];
+      copy[2] = updated.q3_de ?? prev[2];
+      copy[3] = updated.q4_de ?? prev[3];
+      copy[4] = updated.q5_de ?? prev[4];
+      copy[5] = updated.q6_de ?? prev[5];
+      copy[6] = updated.q7_de ?? prev[6];
+      copy[7] = updated.q7_why_de ?? prev[7];
+      copy[8] = updated.q8_plus_de ?? prev[8];
+      copy[9] = updated.q8_minus_de ?? prev[9];
+      copy[10] = updated.q9_de ?? prev[10];
+      copy[11] = updated.q10_de ?? prev[11];
+      return copy;
+    });
 
-    setEditedAnswersDe([
-      updated.q1_de || '',
-      updated.q2_de || '',
-      updated.q3_de || '',
-      updated.q4_de || '',
-      updated.q5_de || '',
-      updated.q6_de || '',
-      updated.q7_de || '',
-      updated.q7_why_de || '',
-      updated.q8_plus_de || '',
-      updated.q8_minus_de || '',
-      updated.q9_de || '',
-      updated.q10_de || ''
-    ]);
-
-    setEditedNote(updated.notes || '');
-    setEditedNoteDe(updated.notes_de || '');
+    setEditedNote(updated.notes ?? editedNote);
+    setEditedNoteDe(updated.notes_de ?? editedNoteDe);
 
     setEditing(false);
     setIsTranslated(true);
