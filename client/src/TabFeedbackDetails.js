@@ -1307,13 +1307,13 @@ const handleToggleGerman = async () => {
     )}
   </Label>
   <TextArea
-    value={
-      editing
-        ? editedAnswers[8] || ''
-        : showGerman
-          ? editedAnswersDe[8] || selected.q8_plus_de || ''
-          : selected.q8_plus || ''
-    }
+value={
+  editing
+    ? editedAnswers[8] || ''
+    : showGerman
+      ? (editedAnswersDe[8] || selected.q8_plus_de || '[brak tłumaczenia]')
+      : selected.q8_plus || ''
+}
     readOnly={!editing}
     onChange={editing ? (e) => {
       const updated = [...editedAnswers];
@@ -1340,13 +1340,13 @@ const handleToggleGerman = async () => {
     )}
   </Label>
   <TextArea
-    value={
-      editing
-        ? editedAnswers[9] || ''
-        : showGerman
-          ? editedAnswersDe[9] || selected.q8_minus_de || ''
-          : selected.q8_minus || ''
-    }
+value={
+  editing
+    ? editedAnswers[9] || ''
+    : showGerman
+      ? (editedAnswersDe[9] || selected.q8_minus_de || '[brak tłumaczenia]')
+      : selected.q8_minus || ''
+}
     readOnly={!editing}
     onChange={editing ? (e) => {
       const updated = [...editedAnswers];
