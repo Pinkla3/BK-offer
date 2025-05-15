@@ -704,6 +704,8 @@ const handleToggleGerman = async () => {
   console.log('📌 handleToggleGerman start — showGerman:', showGerman);
 
   if (!showGerman) {
+    // Przechodzimy z PL → DE
+
     const originalPl = [
       selected.q1, selected.q2, selected.q3, selected.q4,
       selected.q5, selected.q6, selected.q7, selected.q7_why,
@@ -730,7 +732,7 @@ const handleToggleGerman = async () => {
       const de = String(translatedFromDb[i] || '').trim();
 
       const changed = editing ? (plNow !== plOld) : false;
-      const missing = !de || de === '[brak tłumaczenia]' || de === '[brak tekstu do przetłumaczenia]';
+      const missing = !de || de === '[brak tłumaczenia]' || de === '[brak tekstu do tłumaczenia]';
 
       if (changed || missing) {
         console.log(`❗ Pytanie ${i + 1} wymaga tłumaczenia: changed=${changed}, missing=${missing}`);
@@ -745,7 +747,7 @@ const handleToggleGerman = async () => {
     const noteDe = (selected.notes_de || '').trim();
 
     const noteChanged = editing ? (noteNow !== noteOld) : false;
-    const noteMissing = !noteDe || noteDe === '[brak tłumaczenia]' || noteDe === '[brak tekstu do przetłumaczenia]';
+    const noteMissing = !noteDe || noteDe === '[brak tłumaczenia]' || noteDe === '[brak tekstu do tłumaczenia]';
 
     if (noteChanged || noteMissing) {
       console.log(`❗ Notatka wymaga tłumaczenia: changed=${noteChanged}, missing=${noteMissing}`);
@@ -754,18 +756,18 @@ const handleToggleGerman = async () => {
 
     if (needsTranslation || isPolishChangedSinceTranslation || editing || germanAnswers.length === 0) {
       console.log('🌍 Wywołanie handleDynamicTranslate()');
-      await handleDynamicTranslate();
+      await handleDynamicTranslate(); // tłumaczenie dynamiczne
     } else {
-      console.log('✅ Korzystam z tłumaczenia z bazy');
-      const fromDb = translatedFromDb.map(v => v || '');
-      setEditedAnswersDe(fromDb);
-      setTranslatedNote(noteDe || '');
+      // ✅ użyj danych z bazy do edytowalnej wersji
+      setEditedAnswersDe(translatedFromDb.map(v => v || ''));
       setEditedNoteDe(noteDe || '');
+      setTranslatedNote(noteDe || '');
       setIsTranslated(true);
     }
 
     setShowGerman(true);
   } else {
+    // Wracamy z DE → PL
     setShowGerman(false);
   }
 };
