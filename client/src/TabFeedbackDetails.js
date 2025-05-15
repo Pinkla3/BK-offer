@@ -1042,39 +1042,41 @@ const handleToggleGerman = async () => {
   }}
 >
   {['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map(val => {
-    const isActive = editedAnswers[0] === val;
+  const isActive = editing
+    ? (showGerman ? editedAnswersDe[0] : editedAnswers[0]) === val
+    : (showGerman ? selected.q1_de : selected.q1) === val;
 
-    return (
-      <OptionButton
-        key={val}
-        type="button"
-        active={isActive}
-        editing={editing}
-        onClick={() => {
-          if (!editing) return;
+  return (
+    <OptionButton
+      key={val}
+      type="button"
+      active={isActive}
+      editing={editing}
+      onClick={() => {
+        if (!editing) return;
 
-          const updatedPL = [...editedAnswers];
-          const updatedDE = [...editedAnswersDe];
-          updatedPL[0] = val;
+        const updatedPL = [...editedAnswers];
+        const updatedDE = [...editedAnswersDe];
+        updatedPL[0] = val;
 
-          const translationMapPlToDe = {
-            'bardzo dobrze': 'sehr gut',
-            'dobrze': 'gut',
-            'średnio': 'durchschnittlich',
-            'mam zastrzeżenia': 'Ich habe Bedenken'
-          };
-          updatedDE[0] = translationMapPlToDe[val] || '';
+        const translationMapPlToDe = {
+          'bardzo dobrze': 'sehr gut',
+          'dobrze': 'gut',
+          'średnio': 'durchschnittlich',
+          'mam zastrzeżenia': 'Ich habe Bedenken'
+        };
+        updatedDE[0] = translationMapPlToDe[val] || '';
 
-          setEditedAnswers(updatedPL);
-          setEditedAnswersDe(updatedDE);
-        }}
-      >
-        {showGerman
-          ? translationMapPlToDe[val] || val
-          : val}
-      </OptionButton>
-    );
-  })}
+        setEditedAnswers(updatedPL);
+        setEditedAnswersDe(updatedDE);
+      }}
+    >
+      {showGerman
+        ? translationMapPlToDe[val] || val
+        : val}
+    </OptionButton>
+  );
+})}
 </div>
 
   {/* Animowany input zależny od wyboru */}
