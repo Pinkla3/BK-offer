@@ -161,25 +161,6 @@ const FieldInput = styled.input`
   background: #fff;
 `;
 
-const QuestionList = styled.div`
-  background: #fafafa;
-  border-radius: 8px;
-`;
-
-const QuestionItem = styled.div`
-  border-left: 4px solid #007bff;
-  padding: 12px;
-`;
-
-const QuestionText = styled.div`
-  font-weight: 600;
-  margin-bottom: 6px;
-`;
-
-const AnswerText = styled.div`
-  color: #555;
-`;
-
 const TabSection = styled.div`
   margin-bottom: 24px;
   background: #ffffff;
@@ -970,27 +951,33 @@ const handleToggleGerman = async () => {
     }}
   >
     <TextArea
-      name="q2"
-      value={editing ? editedAnswers[1] || '' : selected.q2 || ''}
-      onChange={editing ? (e) => {
-        const updated = [...editedAnswers];
-        updated[1] = e.target.value;
-        setEditedAnswers(updated);
-      } : undefined}
-      placeholder="Dlaczego?"
-      rows={3}
-      style={{
-        width: '100%',
-        border: '1px solid #ccc',
-        borderRadius: '8px',
-        padding: '10px',
-        fontSize: '14px',
-        boxSizing: 'border-box',
-        transition: 'opacity 0.3s ease',
-        resize: 'vertical',
-        backgroundColor: '#fff',
-      }}
-    />
+  name="q2"
+  value={
+    editing
+      ? editedAnswers[1] || ''
+      : showGerman
+        ? selected.q2_de || '[brak tekstu do tłumaczenia]'
+        : selected.q2 || ''
+  }
+  onChange={editing ? (e) => {
+    const updated = [...editedAnswers];
+    updated[1] = e.target.value;
+    setEditedAnswers(updated);
+  } : undefined}
+  placeholder="Dlaczego?"
+  rows={3}
+  style={{
+    width: '100%',
+    border: '1px solid #ccc',
+    borderRadius: '8px',
+    padding: '10px',
+    fontSize: '14px',
+    boxSizing: 'border-box',
+    transition: 'opacity 0.3s ease',
+    resize: 'vertical',
+    backgroundColor: '#fff',
+  }}
+/>
   </div>
 </QuestionGroup>
 {/* Pytanie 2 */}
