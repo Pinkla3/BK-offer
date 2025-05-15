@@ -628,7 +628,11 @@ app.post('/api/translate', authenticate, async (req, res) => {
 
 app.patch('/api/tabResponses/:id', authenticate, async (req, res) => {
   const { id } = req.params;
-  const updates = req.body;
+
+  // Skopiuj body i sprawdź flagę
+  const updates = { ...req.body };
+  const skipHistory = updates.no_history === true;
+  delete updates.no_history;
 
   // Jeśli q3 to tablica – zamień na string
   if (Array.isArray(updates.q3)) {
@@ -669,7 +673,10 @@ app.patch('/api/tabResponses/:id', authenticate, async (req, res) => {
       }
     }
 
-    updatedHistory.push(historyEntry);
+    // 🟡 Dodaj historię tylko jeśli nie ma no_history
+    if (!skipHistory) {
+      updatedHistory.push(historyEntry);
+    }
 
     const [result] = await pool.query(`
       UPDATE tab_responses SET

@@ -594,7 +594,8 @@ const payload = {
   caregiver_last_name: editedCaregiverLastName || selected?.caregiver_last_name || '',
   caregiver_phone: editedCaregiverPhone || selected?.caregiver_phone || '',
   patient_first_name: editedPatientFirstName || selected?.patient_first_name || '',
-  patient_last_name: editedPatientLastName || selected?.patient_last_name || ''
+  patient_last_name: editedPatientLastName || selected?.patient_last_name || '',
+  no_history: true
 };
 
     await axios.patch(`${API_BASE_URL}/api/tabResponses/${selected.id}`, payload, {
