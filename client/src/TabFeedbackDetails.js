@@ -505,6 +505,7 @@ const handleDynamicTranslate = async () => {
     ];
 
     const textsToTranslate = [];
+    console.log('📄 textsToTranslate:', textsToTranslate);
     const indexes = [];
 
     fieldsToTranslate.forEach((key) => {
@@ -547,6 +548,7 @@ const handleDynamicTranslate = async () => {
 
     indexes.forEach((key, i) => {
       const translation = data.translations[i];
+      console.log('📥 Translations from API:', data.translations);
       if (key === 'notes') {
         translatedNote = translation;
       } else {
