@@ -591,18 +591,20 @@ const handleDynamicTranslate = async () => {
     });
 
     // 🧾 Obsługa toastów jeśli nic do tłumaczenia
-    if (textsToTranslate.length === 0) {
-      if (countQuestions === 0 && hasMissingNote) {
-        toast.warn('Brak notatki.');
-      } else if (countQuestions === 0 && !hasMissingNote) {
-        toast.warn('Brak tłumaczenia – brak odpowiedzi na pytania.');
-      } else if (countQuestions > 0 && hasMissingNote) {
-        toast.warn(`Brak tekstu do przetłumaczenia w ${countQuestions} ${odmianaPytanie(countQuestions)} i notatce.`);
-      } else if (countQuestions > 0) {
-        toast.warn(`Brak tekstu do przetłumaczenia w ${countQuestions} ${odmianaPytanie(countQuestions)}.`);
-      }
-      return;
-    }
+if (textsToTranslate.length === 0) {
+  if (countQuestions === 0 && hasMissingNote) {
+    toast.warn('Brak notatki.');
+  } else if (countQuestions === 0 && !hasMissingNote) {
+    toast.warn('Brak tłumaczenia – brak odpowiedzi na pytania.');
+  } else if (countQuestions > 0 && hasMissingNote) {
+    toast.warn(`Brak tekstu do przetłumaczenia w ${countQuestions} ${odmianaPytanie(countQuestions)} i notatce.`);
+  } else if (countQuestions > 0) {
+    toast.warn(`Brak tekstu do przetłumaczenia w ${countQuestions} ${odmianaPytanie(countQuestions)}.`);
+  } else {
+    toast.info('Tekst już został przetłumaczony.');
+  }
+  return;
+}
 
     // 🔁 Tłumaczenie przez API
     const { data } = await axios.post(`${API_BASE_URL}/api/translate`, {
