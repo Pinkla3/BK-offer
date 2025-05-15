@@ -681,6 +681,14 @@ const handleDynamicTranslate = async () => {
   }
 };
 
+const isMissingTranslation = (val) => val?.trim() === '[brak tekstu do tłumaczenia]';
+
+const getTextAreaStyle = (val) => {
+  return val?.trim() === '[brak tekstu do tłumaczenia]'
+    ? { backgroundColor: '#f8d7da', borderColor: '#f5c6cb', color: '#721c24' }
+    : {};
+};
+
 
 const handleToggleGerman = async () => {
   console.log('📌 handleToggleGerman start — showGerman:', showGerman);
