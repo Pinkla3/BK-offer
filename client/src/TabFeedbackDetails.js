@@ -957,27 +957,31 @@ const handleToggleGerman = async () => {
     }}
   >
     {['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map(val => {
-      const isActive = editing
-        ? (showGerman ? editedAnswersDe[0] : editedAnswers[0]) === val
-        : (showGerman ? selected.q1_de : selected.q1) === val;
+  const isActive = (editing ? editedAnswers[0] : selected.q1) === val;
 
-      return (
-        <OptionButton
-          key={val}
-          type="button"
-          active={isActive}
-          editing={editing}
-          onClick={() => {
-            if (!editing) return;
-            const updated = showGerman ? [...editedAnswersDe] : [...editedAnswers];
-            updated[0] = val;
-            showGerman ? setEditedAnswersDe(updated) : setEditedAnswers(updated);
-          }}
-        >
-          {t(val)}
-        </OptionButton>
-      );
-    })}
+  return (
+    <OptionButton
+      key={val}
+      type="button"
+      active={isActive}
+      editing={editing}
+      onClick={() => {
+        if (!editing) return;
+
+        const updatedPL = [...editedAnswers];
+        const updatedDE = [...editedAnswersDe];
+
+        updatedPL[0] = val;
+        updatedDE[0] = val; // 🔁 automatyczna synchronizacja
+
+        setEditedAnswers(updatedPL);
+        setEditedAnswersDe(updatedDE);
+      }}
+    >
+      {val}
+    </OptionButton>
+  );
+})}
   </div>
 
   {/* Animowany input pokazujący się tylko przy wybranych odpowiedziach */}
