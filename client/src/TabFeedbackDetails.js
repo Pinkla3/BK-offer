@@ -916,14 +916,15 @@ const handleToggleGerman = async () => {
           </TabsBar>
 {/* Pytanie 1 */}
 <QuestionGroup style={{ marginTop: '32px' }}>
- <Label>
-  {questions[0]}
-  {showGerman && (!selected.q1 || selected.q1.trim() === '') && (
-    <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
-      Brak odpowiedzi do tłumaczenia
-    </span>
-  )}
-</Label>
+  <Label>
+    {questions[0]}
+    {showGerman && (!selected.q1 || selected.q1.trim() === '') && (
+      <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
+        Brak odpowiedzi do tłumaczenia
+      </span>
+    )}
+  </Label>
+
   <div
     style={{
       display: 'grid',
@@ -938,7 +939,6 @@ const handleToggleGerman = async () => {
     }}
   >
     {['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map(val => {
-      const translated = t(val);
       const isActive = (editing ? editedAnswers[0] : selected.q1) === val;
       return (
         <OptionButton
@@ -952,10 +952,45 @@ const handleToggleGerman = async () => {
             return updated;
           })}
         >
-          {translated}
+          {val}
         </OptionButton>
       );
     })}
+  </div>
+
+  {/* Animowany input pokazujący się tylko przy wybranych odpowiedziach */}
+  <div
+    style={{
+      marginTop: '16px',
+      overflow: 'hidden',
+      maxHeight: ['średnio', 'mam zastrzeżenia'].includes(editing ? editedAnswers[0] : selected.q1) ? '200px' : '0px',
+      opacity: ['średnio', 'mam zastrzeżenia'].includes(editing ? editedAnswers[0] : selected.q1) ? 1 : 0,
+      transition: 'all 0.4s ease',
+      width: '100%'
+    }}
+  >
+    <TextArea
+      name="q7_why"
+      value={editing ? editedAnswers[7] || '' : selected.q7_why || ''}
+      onChange={editing ? (e) => {
+        const updated = [...editedAnswers];
+        updated[7] = e.target.value;
+        setEditedAnswers(updated);
+      } : undefined}
+      placeholder="Dlaczego?"
+      rows={3}
+      style={{
+        width: '100%',
+        border: '1px solid #ccc',
+        borderRadius: '8px',
+        padding: '10px',
+        fontSize: '14px',
+        boxSizing: 'border-box',
+        transition: 'opacity 0.3s ease',
+        resize: 'vertical',
+        backgroundColor: '#fff',
+      }}
+    />
   </div>
 </QuestionGroup>
 {/* Pytanie 2 */}
