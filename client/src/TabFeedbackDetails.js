@@ -1028,68 +1028,82 @@ const handleToggleGerman = async () => {
     )}
   </Label>
 
- <div
-  style={{
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))',
-    gap: '16px',
-    justifyContent: 'center',
-    marginTop: '12px',
-    width: '100%',
-    maxWidth: '500px',
-    marginLeft: 'auto',
-    marginRight: 'auto'
-  }}
->
-  {['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map(val => {
-  const isActive = editing
-    ? (showGerman ? editedAnswersDe[0] : editedAnswers[0]) === val
-    : (showGerman ? selected.q1_de : selected.q1) === val;
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))',
+      gap: '16px',
+      justifyContent: 'center',
+      marginTop: '12px',
+      width: '100%',
+      maxWidth: '500px',
+      marginLeft: 'auto',
+      marginRight: 'auto'
+    }}
+  >
+    {['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map(val => {
+      const translationMapPlToDe = {
+        'bardzo dobrze': 'sehr gut',
+        'dobrze': 'gut',
+        'średnio': 'durchschnittlich',
+        'mam zastrzeżenia': 'Ich habe Bedenken'
+      };
 
-  return (
-    <OptionButton
-      key={val}
-      type="button"
-      active={isActive}
-      editing={editing}
-      onClick={() => {
-        if (!editing) return;
+      const valueToCheck = showGerman ? translationMapPlToDe[val] : val;
 
-        const updatedPL = [...editedAnswers];
-        const updatedDE = [...editedAnswersDe];
-        updatedPL[0] = val;
+      const isActive = editing
+        ? (showGerman ? editedAnswersDe[0] : editedAnswers[0]) === valueToCheck
+        : (showGerman ? selected.q1_de : selected.q1) === valueToCheck;
 
-        const translationMapPlToDe = {
-          'bardzo dobrze': 'sehr gut',
-          'dobrze': 'gut',
-          'średnio': 'durchschnittlich',
-          'mam zastrzeżenia': 'Ich habe Bedenken'
-        };
-        updatedDE[0] = translationMapPlToDe[val] || '';
+      return (
+        <OptionButton
+          key={val}
+          type="button"
+          active={isActive}
+          editing={editing}
+          onClick={() => {
+            if (!editing) return;
 
-        setEditedAnswers(updatedPL);
-        setEditedAnswersDe(updatedDE);
-      }}
-    >
-      {showGerman
-        ? translationMapPlToDe[val] || val
-        : val}
-    </OptionButton>
-  );
-})}
-</div>
+            const updatedPL = [...editedAnswers];
+            const updatedDE = [...editedAnswersDe];
 
-  {/* Animowany input zależny od wyboru */}
- <div
-  style={{
-    marginTop: '16px',
-    overflow: 'hidden',
-    maxHeight: ['średnio', 'mam zastrzeżenia'].includes(editedAnswers[0]) ? '200px' : '0px',
-    opacity: ['średnio', 'mam zastrzeżenia'].includes(editedAnswers[0]) ? 1 : 0,
-    transition: 'all 0.4s ease',
-    width: '100%'
-  }}
->
+            if (showGerman) {
+              updatedDE[0] = translationMapPlToDe[val];
+              updatedPL[0] = val;
+            } else {
+              updatedPL[0] = val;
+              updatedDE[0] = translationMapPlToDe[val];
+            }
+
+            setEditedAnswers(updatedPL);
+            setEditedAnswersDe(updatedDE);
+          }}
+        >
+          {showGerman ? translationMapPlToDe[val] : val}
+        </OptionButton>
+      );
+    })}
+  </div>
+
+  {/* Animowany input zależny od odpowiedzi */}
+  <div
+    style={{
+      marginTop: '16px',
+      overflow: 'hidden',
+      maxHeight: ['średnio', 'mam zastrzeżenia'].includes(
+        editing
+          ? (showGerman ? editedAnswers[0] : editedAnswers[0])
+          : (showGerman ? selected.q1 : selected.q1)
+      ) ? '200px' : '0px',
+      opacity: ['średnio', 'mam zastrzeżenia'].includes(
+        editing
+          ? (showGerman ? editedAnswers[0] : editedAnswers[0])
+          : (showGerman ? selected.q1 : selected.q1)
+      ) ? 1 : 0,
+      transition: 'all 0.4s ease',
+      width: '100%'
+    }}
+  >
     <TextArea
       name="q2"
       value={
