@@ -1041,48 +1041,49 @@ const handleToggleGerman = async () => {
       marginRight: 'auto'
     }}
   >
-    {['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map(val => {
-      const translationMapPlToDe = {
-        'bardzo dobrze': 'sehr gut',
-        'dobrze': 'gut',
-        'średnio': 'durchschnittlich',
-        'mam zastrzeżenia': 'Ich habe Bedenken'
-      };
+{['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map(val => {
+  const translationMapPlToDe = {
+    'bardzo dobrze': 'sehr gut',
+    'dobrze': 'gut',
+    'średnio': 'durchschnittlich',
+    'mam zastrzeżenia': 'Ich habe Bedenken'
+  };
 
-      const valueToCheck = showGerman ? translationMapPlToDe[val] : val;
+  const plValue = val;
+  const deValue = translationMapPlToDe[val];
 
-      const isActive = editing
-        ? (showGerman ? editedAnswersDe[0] : editedAnswers[0]) === valueToCheck
-        : (showGerman ? selected.q1_de : selected.q1) === valueToCheck;
+  const activeValue = editing
+    ? (showGerman ? editedAnswersDe[0] : editedAnswers[0])
+    : (showGerman ? selected.q1_de : selected.q1);
 
-      return (
-        <OptionButton
-          key={val}
-          type="button"
-          active={isActive}
-          editing={editing}
-          onClick={() => {
-            if (!editing) return;
+  const isActive = showGerman
+    ? activeValue === deValue
+    : activeValue === plValue;
 
-            const updatedPL = [...editedAnswers];
-            const updatedDE = [...editedAnswersDe];
+  return (
+    <OptionButton
+      key={val}
+      type="button"
+      active={isActive}
+      editing={editing}
+      onClick={() => {
+        if (!editing) return;
 
-            if (showGerman) {
-              updatedDE[0] = translationMapPlToDe[val];
-              updatedPL[0] = val;
-            } else {
-              updatedPL[0] = val;
-              updatedDE[0] = translationMapPlToDe[val];
-            }
+        const updatedPL = [...editedAnswers];
+        const updatedDE = [...editedAnswersDe];
 
-            setEditedAnswers(updatedPL);
-            setEditedAnswersDe(updatedDE);
-          }}
-        >
-          {showGerman ? translationMapPlToDe[val] : val}
-        </OptionButton>
-      );
-    })}
+        updatedPL[0] = plValue;
+        updatedDE[0] = deValue;
+
+        setEditedAnswers(updatedPL);
+        setEditedAnswersDe(updatedDE);
+      }}
+    >
+      {showGerman ? deValue : plValue}
+    </OptionButton>
+  );
+})}
+
   </div>
 
   {/* Animowany input zależny od odpowiedzi */}
