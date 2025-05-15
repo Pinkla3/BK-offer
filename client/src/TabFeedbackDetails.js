@@ -524,36 +524,36 @@ const handleSave = async () => {
     // Uzupełnienie pozostałych danych
     setEditedAnswers([
       syncedQ1,
-      updated.q2 || '',
-      updated.q3?.split(', ') || [],
-      updated.q4 || '',
-      updated.q5 || '',
-      updated.q6 || '',
-      updated.q7 || '',
-      updated.q7_why || '',
-      updated.q8_plus || '',
-      updated.q8_minus || '',
-      updated.q9 || '',
-      updated.q10 || ''
+      updated.q2,
+      updated.q3?.split(', '),
+      updated.q4,
+      updated.q5,
+      updated.q6,
+      updated.q7,
+      updated.q7_why,
+      updated.q8_plus,
+      updated.q8_minus,
+      updated.q9,
+      updated.q10
     ]);
 
     setEditedAnswersDe([
       syncedQ1_de,
-      updated.q2_de || '',
-      updated.q3_de || '',
-      updated.q4_de || '',
-      updated.q5_de || '',
-      updated.q6_de || '',
-      updated.q7_de || '',
-      updated.q7_why_de || '',
-      updated.q8_plus_de || '',
-      updated.q8_minus_de || '',
-      updated.q9_de || '',
-      updated.q10_de || ''
+      updated.q2_de,
+      updated.q3_de,
+      updated.q4_de,
+      updated.q5_de,
+      updated.q6_de,
+      updated.q7_de,
+      updated.q7_why_de,
+      updated.q8_plus_de,
+      updated.q8_minus_de,
+      updated.q9_de,
+      updated.q10_de
     ]);
 
-    setEditedNote(updated.notes || '');
-    setEditedNoteDe(updated.notes_de || '');
+    setEditedNote(updated.notes);
+    setEditedNoteDe(updated.notes_de);
 
     setEditing(false);
     setIsTranslated(true);
