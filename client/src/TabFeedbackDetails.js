@@ -1086,7 +1086,7 @@ const handleToggleGerman = async () => {
         updated[1] = e.target.value;
         showGerman ? setEditedAnswersDe(updated) : setEditedAnswers(updated);
       } : undefined}
-      placeholder="Dlaczego?"
+      placeholder={showGerman ? 'Warum?' : 'Dlaczego?'}
       rows={3}
       style={{
         width: '100%',
