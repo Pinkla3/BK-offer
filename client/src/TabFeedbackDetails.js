@@ -511,7 +511,7 @@ const handleDynamicTranslate = async () => {
     const textsToTranslate = [];
     const indexes = [];
 
-   fieldsToTranslate.forEach((key) => {
+ fieldsToTranslate.forEach((key) => {
   const idx = fieldMap[key];
   let val;
 
@@ -525,12 +525,18 @@ const handleDynamicTranslate = async () => {
   }
 
   const text = String(val || '').trim();
-  if (text.length > 0) {
+  const original = String(selected?.[key] || '').trim();
+  const translation = String(selected?.[`${key}_de`] || '').trim();
+
+  const wasChanged = text !== original;
+  const translationMissing = !translation || translation === '[brak tłumaczenia]' || translation === '[brak tekstu do tłumaczenia]';
+  const shouldTranslate = wasChanged || translationMissing;
+
+  if (shouldTranslate && text.length > 0) {
     textsToTranslate.push(text);
     indexes.push(key);
   }
 });
-
 
     console.log('🧪 editedAnswers:', editedAnswers);
     console.log('🧪 editedNote:', editedNote);
