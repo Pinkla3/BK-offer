@@ -433,67 +433,66 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
 
 const handleSave = async () => {
   try {
+    const answers = showGerman ? editedAnswersDe : editedAnswers;
+    const note = showGerman ? editedNoteDe : editedNote;
+
     const payload = {
+      ...(showGerman
+        ? {
+            q1_de: answers[0],
+            q2_de: answers[1],
+            q3_de: answers[2],
+            q4_de: answers[3],
+            q5_de: answers[4],
+            q6_de: answers[5],
+            q7_de: answers[6],
+            q7_why_de: answers[7],
+            q8_plus_de: answers[8],
+            q8_minus_de: answers[9],
+            q9_de: answers[10],
+            q10_de: answers[11],
+            notes_de: note
+          }
+        : {
+            q1: answers[0],
+            q2: answers[1],
+            q3: Array.isArray(answers[2]) ? answers[2].join(', ') : answers[2],
+            q4: answers[3],
+            q5: answers[4],
+            q6: answers[5],
+            q7: answers[6],
+            q7_why: answers[7],
+            q8_plus: answers[8],
+            q8_minus: answers[9],
+            q9: answers[10],
+            q10: answers[11],
+            notes: note
+          }),
+
       caregiver_first_name: editedCaregiverFirstName,
       caregiver_last_name: editedCaregiverLastName,
       caregiver_phone: editedCaregiverPhone,
       patient_first_name: editedPatientFirstName,
       patient_last_name: editedPatientLastName,
-    };
 
-    if (showGerman) {
-      // Zapis wersji niemieckiej
-      payload.q1_de = editedAnswersDe[0];
-      payload.q2_de = editedAnswersDe[1];
-      payload.q3_de = Array.isArray(editedAnswersDe[2]) ? editedAnswersDe[2].join(', ') : editedAnswersDe[2];
-      payload.q4_de = editedAnswersDe[3];
-      payload.q5_de = editedAnswersDe[4];
-      payload.q6_de = editedAnswersDe[5];
-      payload.q7_de = editedAnswersDe[6];
-      payload.q7_why_de = editedAnswersDe[7];
-      payload.q8_plus_de = editedAnswersDe[8];
-      payload.q8_minus_de = editedAnswersDe[9];
-      payload.q9_de = editedAnswersDe[10];
-      payload.q10_de = editedAnswersDe[11];
-      payload.notes_de = editedNoteDe;
-      payload.no_history = true;
-    } else {
-      // Zapis wersji polskiej
-      payload.q1 = editedAnswers[0];
-      payload.q2 = editedAnswers[1];
-      payload.q3 = Array.isArray(editedAnswers[2]) ? editedAnswers[2].join(', ') : editedAnswers[2];
-      payload.q4 = editedAnswers[3];
-      payload.q5 = editedAnswers[4];
-      payload.q6 = editedAnswers[5];
-      payload.q7 = editedAnswers[6];
-      payload.q7_why = editedAnswers[7];
-      payload.q8_plus = editedAnswers[8];
-      payload.q8_minus = editedAnswers[9];
-      payload.q9 = editedAnswers[10];
-      payload.q10 = editedAnswers[11];
-      payload.notes = editedNote;
-    }
+      no_history: showGerman // nie zapisuj historii przy wersji DE
+    };
 
     const res = await axios.patch(
       `${API_BASE_URL}/api/tabResponses/${selected.id}`,
       payload,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      }
+      { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
     );
 
     const updated = res.data;
     setSelected(updated);
     setEditing(false);
-    setIsTranslated(false);
-    setIsPolishChangedSinceTranslation(true);
-    window.dispatchEvent(new Event('feedbackUpdated'));
+    setIsTranslated(true); // oznacz jako przetłumaczone
 
     toast.success(showGerman ? 'Wersja niemiecka zapisana.' : 'Wersja polska zapisana.');
+    window.dispatchEvent(new Event('feedbackUpdated'));
   } catch (err) {
-    console.error('❌ Błąd zapisu:', err);
+    console.error('Błąd zapisu:', err);
     toast.error('Nie udało się zapisać odpowiedzi.');
   }
 };
