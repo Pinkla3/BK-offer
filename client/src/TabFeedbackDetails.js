@@ -493,6 +493,17 @@ const handleSave = async () => {
     const updated = res.data;
     setSelected(updated);
 
+    setEditedAnswers(prev => {
+  const copy = [...prev];
+  copy[0] = updated.q1 || prev[0]; // przywróć zaznaczenie PL
+  return copy;
+});
+setEditedAnswersDe(prev => {
+  const copy = [...prev];
+  copy[0] = updated.q1_de || prev[0]; // przywróć DE
+  return copy;
+});
+
     // 🔁 Synchronizacja po zapisie
     setEditedAnswers([
       updated.q1 || '',
