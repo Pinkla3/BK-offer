@@ -970,8 +970,8 @@ const handleToggleGerman = async () => {
     }}
   >
     <TextArea
-      name="q7_why"
-      value={editing ? editedAnswers[7] || '' : selected.q7_why || ''}
+      name="q2"
+      value={editing ? editedAnswers[1] || '' : selected.q2 || ''}
       onChange={editing ? (e) => {
         const updated = [...editedAnswers];
         updated[7] = e.target.value;
