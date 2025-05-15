@@ -511,23 +511,26 @@ const handleDynamicTranslate = async () => {
     const textsToTranslate = [];
     const indexes = [];
 
-    fieldsToTranslate.forEach((key) => {
-      const idx = fieldMap[key];
-      let val;
+   fieldsToTranslate.forEach((key) => {
+  const idx = fieldMap[key];
+  let val;
 
-      if (key === 'notes') {
-        val = editedNote;
-      } else {
-        const field = editedAnswers[idx];
-        val = Array.isArray(field) ? field.join(', ') : field;
-      }
+  if (key === 'notes') {
+    val = editedNote || selected.notes || '';
+  } else {
+    const field = editedAnswers.length > idx
+      ? editedAnswers[idx]
+      : selected[key] || '';
+    val = Array.isArray(field) ? field.join(', ') : field;
+  }
 
-      const text = String(val || '').trim(); // ZAWSZE string
-      if (text.length > 0) {
-        textsToTranslate.push(text);
-        indexes.push(key);
-      }
-    });
+  const text = String(val || '').trim();
+  if (text.length > 0) {
+    textsToTranslate.push(text);
+    indexes.push(key);
+  }
+});
+
 
     console.log('🧪 editedAnswers:', editedAnswers);
     console.log('🧪 editedNote:', editedNote);
