@@ -1066,16 +1066,8 @@ const handleToggleGerman = async () => {
   style={{
     marginTop: '16px',
     overflow: 'hidden',
-    maxHeight: ['średnio', 'mam zastrzeżenia'].includes(
-      editing
-        ? (showGerman ? editedAnswersDe[0] : editedAnswers[0])
-        : (showGerman ? selected.q1_de : selected.q1)
-    ) ? '200px' : '0px',
-    opacity: ['średnio', 'mam zastrzeżenia'].includes(
-      editing
-        ? (showGerman ? editedAnswersDe[0] : editedAnswers[0])
-        : (showGerman ? selected.q1_de : selected.q1)
-    ) ? 1 : 0,
+    maxHeight: ['średnio', 'mam zastrzeżenia'].includes(editedAnswers[0]) ? '200px' : '0px',
+    opacity: ['średnio', 'mam zastrzeżenia'].includes(editedAnswers[0]) ? 1 : 0,
     transition: 'all 0.4s ease',
     width: '100%'
   }}
