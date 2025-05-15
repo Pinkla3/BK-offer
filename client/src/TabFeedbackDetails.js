@@ -430,7 +430,6 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
     setEditedPatientFirstName(selected.patient_first_name || '');
     setEditedPatientLastName(selected.patient_last_name || '');
   };
-
 const handleSave = async () => {
   try {
     const answers = showGerman ? editedAnswersDe : editedAnswers;
@@ -482,7 +481,7 @@ const handleSave = async () => {
       patient_first_name: editedPatientFirstName,
       patient_last_name: editedPatientLastName,
 
-      no_history: showGerman // zapobiega dodawaniu historii dla tłumaczeń
+      no_history: showGerman
     };
 
     const res = await axios.patch(
@@ -493,6 +492,41 @@ const handleSave = async () => {
 
     const updated = res.data;
     setSelected(updated);
+
+    // 🔁 Synchronizacja po zapisie
+    setEditedAnswers([
+      updated.q1 || '',
+      updated.q2 || '',
+      updated.q3?.split(', ') || [],
+      updated.q4 || '',
+      updated.q5 || '',
+      updated.q6 || '',
+      updated.q7 || '',
+      updated.q7_why || '',
+      updated.q8_plus || '',
+      updated.q8_minus || '',
+      updated.q9 || '',
+      updated.q10 || ''
+    ]);
+
+    setEditedAnswersDe([
+      updated.q1_de || '',
+      updated.q2_de || '',
+      updated.q3_de || '',
+      updated.q4_de || '',
+      updated.q5_de || '',
+      updated.q6_de || '',
+      updated.q7_de || '',
+      updated.q7_why_de || '',
+      updated.q8_plus_de || '',
+      updated.q8_minus_de || '',
+      updated.q9_de || '',
+      updated.q10_de || ''
+    ]);
+
+    setEditedNote(updated.notes || '');
+    setEditedNoteDe(updated.notes_de || '');
+
     setEditing(false);
     setIsTranslated(true);
 
@@ -503,6 +537,7 @@ const handleSave = async () => {
     toast.error('Nie udało się zapisać odpowiedzi.');
   }
 };
+
 
 const odmianaPytanie = (count) => {
   if (count === 1) return 'pytaniu';
