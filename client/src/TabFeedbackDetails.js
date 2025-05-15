@@ -492,6 +492,7 @@ const updated = res.data;
 const handleDynamicTranslate = async () => {
   console.log('🔁 handleDynamicTranslate start');
   setTranslating(true);
+
   try {
     const fieldMap = {
       q1: 0, q2: 1, q3: 2, q4: 3, q5: 4,
@@ -505,7 +506,6 @@ const handleDynamicTranslate = async () => {
     ];
 
     const textsToTranslate = [];
-    console.log('📄 textsToTranslate:', textsToTranslate);
     const indexes = [];
 
     fieldsToTranslate.forEach((key) => {
@@ -516,15 +516,17 @@ const handleDynamicTranslate = async () => {
         val = editedNote;
       } else {
         const field = editedAnswers[idx];
-        val = Array.isArray(field) ? field.join(', ') : field || '';
+        val = Array.isArray(field) ? field.join(', ') : field;
       }
 
-      const trimmed = String(val).trim();
+      const trimmed = typeof val === 'string' ? val.trim() : '';
       if (trimmed.length > 0) {
         textsToTranslate.push(trimmed);
         indexes.push(key);
       }
     });
+
+    console.log('📄 textsToTranslate:', textsToTranslate);
 
     if (textsToTranslate.length === 0) {
       toast.warn('Brak tekstu do przetłumaczenia.');
@@ -543,12 +545,13 @@ const handleDynamicTranslate = async () => {
       throw new Error('Błąd formatu odpowiedzi z API');
     }
 
+    console.log('📥 Translations from API:', data.translations);
+
     const answersDe = Array(12).fill('');
     let translatedNote = '';
 
     indexes.forEach((key, i) => {
       const translation = data.translations[i];
-      console.log('📥 Translations from API:', data.translations);
       if (key === 'notes') {
         translatedNote = translation;
       } else {
@@ -562,32 +565,31 @@ const handleDynamicTranslate = async () => {
     setEditedNoteDe(translatedNote);
     setTranslatedNote(translatedNote);
 
-    // przygotowanie payloadu do zapisu
+    // Przygotuj payload do PATCH
     const payload = {
       // PL
       ...Object.entries(fieldMap)
         .filter(([k]) => k !== 'notes')
         .reduce((acc, [k, i]) => {
-          acc[k] = Array.isArray(editedAnswers[i])
-            ? editedAnswers[i].join(', ')
-            : editedAnswers[i];
+          const val = editedAnswers[i];
+          acc[k] = Array.isArray(val)
+            ? val.join(', ')
+            : val || '';
           return acc;
         }, {}),
-      notes: editedNote,
+      notes: editedNote || '',
 
       // DE
       ...Object.entries(fieldMap)
         .filter(([k]) => k !== 'notes')
         .reduce((acc, [k, i]) => {
-          acc[`${k}_de`] = answersDe[i];
+          acc[`${k}_de`] = answersDe[i] || '';
           return acc;
         }, {}),
-      notes_de: translatedNote
+      notes_de: translatedNote || ''
     };
 
-    
-// 🔍 ZOBACZ CO WYSYŁASZ
-console.log('[DEBUG PATCH payload]', payload);
+    console.log('[DEBUG PATCH payload]', payload);
 
     await axios.patch(`${API_BASE_URL}/api/tabResponses/${selected.id}`, payload, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
@@ -597,7 +599,7 @@ console.log('[DEBUG PATCH payload]', payload);
     setIsTranslated(true);
     toast.success('Tłumaczenie na niemiecki zakończone i zapisane.');
   } catch (err) {
-    console.error('Błąd tłumaczenia:', err);
+    console.error('❌ Błąd tłumaczenia:', err);
     toast.error('Nie udało się przetłumaczyć.');
   } finally {
     setTranslating(false);
