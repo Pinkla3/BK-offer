@@ -582,6 +582,10 @@ const handleDynamicTranslate = async () => {
       notes_de: translatedNote
     };
 
+    
+// 🔍 ZOBACZ CO WYSYŁASZ
+console.log('[DEBUG PATCH payload]', payload);
+
     await axios.patch(`${API_BASE_URL}/api/tabResponses/${selected.id}`, payload, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
