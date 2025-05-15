@@ -1038,7 +1038,7 @@ const handleToggleGerman = async () => {
       marginRight: 'auto'
     }}
   >
-    {['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map(val => {
+    {['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map((val) => {
       const translationMapPlToDe = {
         'bardzo dobrze': 'sehr gut',
         'dobrze': 'gut',
@@ -1049,13 +1049,8 @@ const handleToggleGerman = async () => {
       const plValue = val;
       const deValue = translationMapPlToDe[val];
 
-      const activeValue = editing
-        ? (showGerman ? editedAnswersDe[0] : editedAnswers[0])
-        : (showGerman ? selected.q1_de : selected.q1);
-
-      const isActive = showGerman
-        ? activeValue === deValue
-        : activeValue === plValue;
+      const currentPL = editing ? editedAnswers[0] : selected.q1;
+      const isActive = currentPL === plValue;
 
       return (
         <OptionButton
@@ -1065,13 +1060,10 @@ const handleToggleGerman = async () => {
           editing={editing}
           onClick={() => {
             if (!editing) return;
-
             const updatedPL = [...editedAnswers];
             const updatedDE = [...editedAnswersDe];
-
             updatedPL[0] = plValue;
             updatedDE[0] = deValue;
-
             setEditedAnswers(updatedPL);
             setEditedAnswersDe(updatedDE);
           }}
@@ -1082,19 +1074,24 @@ const handleToggleGerman = async () => {
     })}
   </div>
 
-  {/* Animowany input zależny od odpowiedzi w PL */}
+  {/* Animowany input q2 (pokazuje się dla PL i DE odpowiedzi "średnio"/"mam zastrzeżenia") */}
   {(() => {
-    const shouldShowTextarea = ['średnio', 'mam zastrzeżenia'].includes(
-      editing ? editedAnswers[0] : selected.q1
-    );
+    const triggerWordsPL = ['średnio', 'mam zastrzeżenia'];
+    const triggerWordsDE = ['durchschnittlich', 'Ich habe Bedenken'];
+
+    const currentValue = editing
+      ? editedAnswers[0] || editedAnswersDe[0]
+      : selected.q1 || selected.q1_de;
+
+    const shouldShow = triggerWordsPL.includes(currentValue) || triggerWordsDE.includes(currentValue);
 
     return (
       <div
         style={{
           marginTop: '16px',
           overflow: 'hidden',
-          maxHeight: shouldShowTextarea ? '200px' : '0px',
-          opacity: shouldShowTextarea ? 1 : 0,
+          maxHeight: shouldShow ? '200px' : '0px',
+          opacity: shouldShow ? 1 : 0,
           transition: 'all 0.4s ease',
           width: '100%'
         }}
