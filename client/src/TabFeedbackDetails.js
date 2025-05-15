@@ -631,6 +631,8 @@ const getOptionWarningStyle = (val) => {
 
 
 const handleToggleGerman = async () => {
+  console.log('📌 handleToggleGerman start — showGerman:', showGerman);
+
   if (!showGerman) {
     const originalPl = [
       selected.q1, selected.q2, selected.q3, selected.q4,
@@ -661,6 +663,7 @@ const handleToggleGerman = async () => {
       const missing = !de || de === '[brak tłumaczenia]' || de === '[brak tekstu do przetłumaczenia]';
 
       if (changed || missing) {
+        console.log(`❗ Pytanie ${i + 1} wymaga tłumaczenia: changed=${changed}, missing=${missing}`);
         needsTranslation = true;
         break;
       }
@@ -675,13 +678,15 @@ const handleToggleGerman = async () => {
     const noteMissing = !noteDe || noteDe === '[brak tłumaczenia]' || noteDe === '[brak tekstu do przetłumaczenia]';
 
     if (noteChanged || noteMissing) {
+      console.log(`❗ Notatka wymaga tłumaczenia: changed=${noteChanged}, missing=${noteMissing}`);
       needsTranslation = true;
     }
 
     if (needsTranslation || isPolishChangedSinceTranslation || editing || germanAnswers.length === 0) {
-      await handleDynamicTranslate(); // 🌍 uruchom tłumaczenie
+      console.log('🌍 Wywołanie handleDynamicTranslate()');
+      await handleDynamicTranslate();
     } else {
-      // ✅ użyj danych z bazy
+      console.log('✅ Korzystam z tłumaczenia z bazy');
       const fromDb = translatedFromDb.map(v => v || '');
       setEditedAnswersDe(fromDb);
       setTranslatedNote(noteDe || '');
