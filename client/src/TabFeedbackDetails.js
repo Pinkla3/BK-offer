@@ -619,11 +619,15 @@ const handleDynamicTranslate = async () => {
     }
 
     // ✅ TOASTY po tłumaczeniu
-    toast.success('Tłumaczenie zakończone.');
+toast.success('Tłumaczenie zakończone.');
 
-    if (emptyGroupCount > 0) {
-      toast.warn(`Brakuje odpowiedzi w ${emptyGroupCount} ${odmianaPytanie(emptyGroupCount)}. Odpowiedzi te nie zostały przetłumaczone.`);
-    }
+if (emptyGroupCount > 0) {
+  toast.warn(`Brakuje odpowiedzi w ${emptyGroupCount} ${odmianaPytanie(emptyGroupCount)}. Odpowiedzi te nie zostały przetłumaczone.`);
+}
+
+if (hasMissingNote) {
+  toast.warn('Brakuje notatki. Nie została przetłumaczona.');
+}
 
     const answersDe = Array(12).fill('');
     let translatedNote = '';
