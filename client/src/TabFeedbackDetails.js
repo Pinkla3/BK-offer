@@ -758,9 +758,19 @@ const handleToggleGerman = async () => {
       console.log('🌍 Wywołanie handleDynamicTranslate()');
       await handleDynamicTranslate(); // tłumaczenie dynamiczne
     } else {
-      // ✅ użyj danych z bazy do edytowalnej wersji
-      setEditedAnswersDe(translatedFromDb.map(v => v || ''));
-      setEditedNoteDe(noteDe || '');
+      // ✅ Fallback: jeśli tłumaczenie puste → użyj polskiej wartości
+      setEditedAnswersDe(
+        translatedFromDb.map((v, i) =>
+          (v && v.trim() !== '[brak tłumaczenia]' && v.trim() !== '[brak tekstu do tłumaczenia]')
+            ? v
+            : originalPl[i] || ''
+        )
+      );
+      setEditedNoteDe(
+        noteDe && noteDe.trim() !== '[brak tłumaczenia]' && noteDe.trim() !== '[brak tekstu do tłumaczenia]'
+          ? noteDe
+          : selected.notes || ''
+      );
       setTranslatedNote(noteDe || '');
       setIsTranslated(true);
     }
