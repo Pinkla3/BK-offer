@@ -436,10 +436,17 @@ const handleSave = async () => {
     const answers = showGerman ? editedAnswersDe : editedAnswers;
     const note = showGerman ? editedNoteDe : editedNote;
 
+    const translationMapPlToDe = {
+      'bardzo dobrze': 'sehr gut',
+      'dobrze': 'gut',
+      'średnio': 'durchschnittlich',
+      'mam zastrzeżenia': 'Ich habe Bedenken'
+    };
+
     const payload = {
       ...(showGerman
         ? {
-            q1_de: answers[0],
+            q1_de: translationMapPlToDe[editedAnswers[0]] || '',
             q2_de: answers[1],
             q3_de: answers[2],
             q4_de: answers[3],
@@ -475,7 +482,7 @@ const handleSave = async () => {
       patient_first_name: editedPatientFirstName,
       patient_last_name: editedPatientLastName,
 
-      no_history: showGerman // nie zapisuj historii przy wersji DE
+      no_history: showGerman // zapobiega dodawaniu historii dla tłumaczeń
     };
 
     const res = await axios.patch(
@@ -487,7 +494,7 @@ const handleSave = async () => {
     const updated = res.data;
     setSelected(updated);
     setEditing(false);
-    setIsTranslated(true); // oznacz jako przetłumaczone
+    setIsTranslated(true);
 
     toast.success(showGerman ? 'Wersja niemiecka zapisana.' : 'Wersja polska zapisana.');
     window.dispatchEvent(new Event('feedbackUpdated'));
@@ -965,15 +972,12 @@ const handleToggleGerman = async () => {
       type="button"
       active={isActive}
       editing={editing}
-      onClick={() => {
-        if (!editing) return;
-        const updatedPL = [...editedAnswers];
-        const updatedDE = [...editedAnswersDe];
-        updatedPL[0] = val;
-        updatedDE[0] = val;
-        setEditedAnswers(updatedPL);
-        setEditedAnswersDe(updatedDE);
-      }}
+onClick={() => {
+  if (!editing) return;
+  const updated = [...editedAnswers];
+  updated[0] = val;
+  setEditedAnswers(updated);
+}}
     >
       {label}
     </OptionButton>
