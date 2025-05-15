@@ -490,6 +490,7 @@ const updated = res.data;
 };
 
 const handleDynamicTranslate = async () => {
+  console.log('🔁 handleDynamicTranslate start');
   setTranslating(true);
   try {
     const fieldMap = {
