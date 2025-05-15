@@ -514,8 +514,9 @@ const handleDynamicTranslate = async () => {
 
     const textsToTranslate = [];
     const indexes = [];
+    let emptyFieldCount = 0;
 
-    // 🔍 Grupy logiczne
+    // 🔍 Grupy logiczne: 6 pytań + notatka
     const groupsToCheck = [
       ['q1'],                     // Pytanie 1
       ['q3'],                     // Pytanie 2
@@ -557,7 +558,7 @@ const handleDynamicTranslate = async () => {
     const countQuestions = missingGroupNames.filter(g => g === 'pytanie').length;
     const hasMissingNote = missingGroupNames.includes('notes');
 
-    // 🔍 Zbieraj teksty do tłumaczenia
+    // 🔍 Zbieranie pól do tłumaczenia
     fieldsToTranslate.forEach((key) => {
       const idx = fieldMap[key];
       let val;
@@ -572,6 +573,8 @@ const handleDynamicTranslate = async () => {
       }
 
       const text = String(val || '').trim();
+      if (text.length === 0) emptyFieldCount++;
+
       const original = String(selected?.[key] || '').trim();
       const translation = String(selected?.[`${key}_de`] || '').trim();
 
@@ -589,10 +592,10 @@ const handleDynamicTranslate = async () => {
       }
     });
 
-    // 🧾 TOAST: brak tekstów do tłumaczenia
+    // 🧾 TOASTY: brak tekstów do tłumaczenia
     if (textsToTranslate.length === 0) {
       if (countQuestions === 6 && hasMissingNote) {
-        toast.warn('Brak tłumaczenia – brak odpowiedzi na pytania.');
+        toast.error('Brak tłumaczenia – brak odpowiedzi na pytania.');
       } else if (countQuestions === 0 && hasMissingNote) {
         toast.warn('Brak notatki.');
       } else if (countQuestions > 0 && hasMissingNote) {
@@ -605,7 +608,7 @@ const handleDynamicTranslate = async () => {
       return;
     }
 
-    // 🔁 Tłumaczenie przez API
+    // 🔁 Tłumaczenie
     const { data } = await axios.post(`${API_BASE_URL}/api/translate`, {
       texts: textsToTranslate,
       source: 'pl',
@@ -619,6 +622,10 @@ const handleDynamicTranslate = async () => {
     }
 
     toast.success('Tłumaczenie zakończone.');
+
+    if (emptyFieldCount > 0) {
+      toast.warn(`Brakuje odpowiedzi w ${emptyFieldCount} ${odmianaPytanie(emptyFieldCount)}.`);
+    }
 
     const answersDe = Array(12).fill('');
     let translatedNote = '';
@@ -667,6 +674,7 @@ const handleDynamicTranslate = async () => {
 
     setSelected(prev => ({ ...prev, ...payload }));
     setIsTranslated(true);
+
   } catch (err) {
     console.error('❌ Błąd tłumaczenia:', err);
     toast.error('Nie udało się przetłumaczyć.');
@@ -674,7 +682,6 @@ const handleDynamicTranslate = async () => {
     setTranslating(false);
   }
 };
-
 
 const isMissingTranslation = (val) => val?.trim() === '[brak tekstu do tłumaczenia]';
 
