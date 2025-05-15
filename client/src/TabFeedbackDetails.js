@@ -576,26 +576,17 @@ const handleDynamicTranslate = async () => {
 
     // Przygotuj payload do zapisania
     const payload = {
-      // PL
-      ...Object.entries(fieldMap)
-        .filter(([k]) => k !== 'notes')
-        .reduce((acc, [k, i]) => {
-          const val = editedAnswers[i];
-          acc[k] = Array.isArray(val)
-            ? val.join(', ')
-            : val || '';
-          return acc;
-        }, {}),
-      notes: editedNote || '',
-
-      // DE
-      ...Object.entries(fieldMap)
-        .filter(([k]) => k !== 'notes')
-        .reduce((acc, [k, i]) => {
-          acc[`${k}_de`] = answersDe[i] || '';
-          return acc;
-        }, {}),
-      notes_de: translatedNote || ''
+...Object.entries(fieldMap)
+  .filter(([k]) => k !== 'notes')
+  .reduce((acc, [k, i]) => {
+    let val = editedAnswers[i];
+    if (val === undefined || val === null || val === '') {
+      val = selected[k] || '';
+    }
+    acc[k] = Array.isArray(val) ? val.join(', ') : val;
+    return acc;
+  }, {}),
+notes: editedNote || selected.notes || '',
     };
 
     console.log('[DEBUG PATCH payload]', payload);
