@@ -942,7 +942,7 @@ const handleToggleGerman = async () => {
 <QuestionGroup style={{ marginTop: '32px' }}>
   <Label>
     {questions[0]}
-    {showGerman && !editing && !((selected.q1_de || '').trim()) && (
+    {showGerman && !editing && !(selected.q1_de || '').trim() && (
       <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
         Brak odpowiedzi do tłumaczenia
       </span>
@@ -962,76 +962,76 @@ const handleToggleGerman = async () => {
       marginRight: 'auto'
     }}
   >
-{['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map(val => {
-  const isActive = (editing ? editedAnswers[0] : selected.q1) === val;
-  const label = showGerman ? translationMapPlToDe[val] || val : val;
+    {['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map(val => {
+      const label = showGerman ? translationMapPlToDe[val] || val : val;
 
-  return (
-    <OptionButton
-      key={val}
-      type="button"
-      active={isActive}
-      editing={editing}
-onClick={() => {
-  if (!editing) return;
-  const updated = [...editedAnswers];
-  updated[0] = val;
-  setEditedAnswers(updated);
-}}
-    >
-      {label}
-    </OptionButton>
-  );
-})}
+      const isActive = editing
+        ? editedAnswers[0] === val
+        : selected.q1 === val;
+
+      return (
+        <OptionButton
+          key={val}
+          type="button"
+          active={isActive}
+          editing={editing}
+          onClick={() => {
+            if (!editing) return;
+            const updated = [...editedAnswers];
+            updated[0] = val;
+            setEditedAnswers(updated);
+          }}
+        >
+          {label}
+        </OptionButton>
+      );
+    })}
   </div>
 
-  {/* Pytanie 2 – input uzależniony od q1 */}
-  {(() => {
-    const selectedQ1Polish = editing ? editedAnswers[0] : selected.q1;
-    const showFollowup = ['średnio', 'mam zastrzeżenia'].includes(selectedQ1Polish);
-
-    return (
-      <div
-        style={{
-          marginTop: '16px',
-          overflow: 'hidden',
-          maxHeight: showFollowup ? '200px' : '0px',
-          opacity: showFollowup ? 1 : 0,
-          transition: 'all 0.4s ease',
-          width: '100%'
-        }}
-      >
-        <TextArea
-          name="q2"
-          value={
-            editing
-              ? (showGerman ? editedAnswersDe[1] : editedAnswers[1]) || ''
-              : showGerman
-                ? selected.q2_de || '[brak tłumaczenia]'
-                : selected.q2 || ''
-          }
-          onChange={editing ? (e) => {
-            const updated = showGerman ? [...editedAnswersDe] : [...editedAnswers];
-            updated[1] = e.target.value;
-            showGerman ? setEditedAnswersDe(updated) : setEditedAnswers(updated);
-          } : undefined}
-          placeholder="Dlaczego?"
-          rows={3}
-          style={{
-            width: '100%',
-            border: '1px solid #ccc',
-            borderRadius: '8px',
-            padding: '10px',
-            fontSize: '14px',
-            boxSizing: 'border-box',
-            transition: 'opacity 0.3s ease',
-            resize: 'vertical',
-            backgroundColor: '#fff',
-          }}
-        />
-      </div>
-    );
-  })()}
+  {/* Animowany input zależny od wyboru */}
+  <div
+    style={{
+      marginTop: '16px',
+      overflow: 'hidden',
+      maxHeight: ['średnio', 'mam zastrzeżenia'].includes(
+        editing ? editedAnswers[0] : selected.q1
+      ) ? '200px' : '0px',
+      opacity: ['średnio', 'mam zastrzeżenia'].includes(
+        editing ? editedAnswers[0] : selected.q1
+      ) ? 1 : 0,
+      transition: 'all 0.4s ease',
+      width: '100%'
+    }}
+  >
+    <TextArea
+      name="q2"
+      value={
+        editing
+          ? (showGerman ? editedAnswersDe[1] : editedAnswers[1]) || ''
+          : showGerman
+            ? selected.q2_de || '[brak tłumaczenia]'
+            : selected.q2 || ''
+      }
+      onChange={editing ? (e) => {
+        const updated = showGerman ? [...editedAnswersDe] : [...editedAnswers];
+        updated[1] = e.target.value;
+        showGerman ? setEditedAnswersDe(updated) : setEditedAnswers(updated);
+      } : undefined}
+      placeholder="Dlaczego?"
+      rows={3}
+      style={{
+        width: '100%',
+        border: '1px solid #ccc',
+        borderRadius: '8px',
+        padding: '10px',
+        fontSize: '14px',
+        boxSizing: 'border-box',
+        transition: 'opacity 0.3s ease',
+        resize: 'vertical',
+        backgroundColor: '#fff',
+      }}
+    />
+  </div>
 </QuestionGroup>
 {/* Pytanie 2 */}
 <QuestionGroup>
