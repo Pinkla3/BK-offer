@@ -355,23 +355,26 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
 
 useEffect(() => {
   if (editing && selected) {
-    setEditedAnswers([
-      selected.q1 || '',         // 0
-      selected.q2 || '',         // 1
-      Array.isArray(selected.q3)
-        ? selected.q3
-        : typeof selected.q3 === 'string'
-          ? selected.q3.split(', ')
-          : [],                  // 2
-      selected.q4 || '',         // 3
-      selected.q5 || '',         // 4
-      selected.q6 || '',         // 5
-      selected.q7 || '',         // 6
-      selected.q7_why || '',     // 7
-      selected.q8_plus || '',    // 8 ✅
-      selected.q8_minus || '',   // 9 ✅
-      selected.notes || ''       // 10 ✅
-    ]);
+setEditedAnswers([
+  selected.q1 || '',        // 0
+  selected.q2 || '',        // 1
+  Array.isArray(selected.q3)
+    ? selected.q3
+    : typeof selected.q3 === 'string'
+      ? selected.q3.split(', ')
+      : [],                 // 2
+  selected.q4 || '',        // 3
+  selected.q5 || '',        // 4
+  selected.q6 || '',        // 5
+  selected.q7 || '',        // 6
+  selected.q7_why || '',    // 7
+  selected.q8_plus || '',   // 8
+  selected.q8_minus || '',  // 9
+  selected.q9 || '',        // 10 ✅ brakowało
+  selected.q10 || ''        // 11 ✅ brakowało
+]);
+
+setEditedNote(selected.notes || ''); // 🔁 notatka oddzielnie
   }
 }, [editing, selected]);
 
