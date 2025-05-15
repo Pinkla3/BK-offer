@@ -492,6 +492,12 @@ const updated = res.data;
   }
 };
 
+const odmianaPytanie = (count) => {
+  if (count === 1) return 'pytaniu';
+  if ([2, 3, 4].includes(count)) return 'pytaniach';
+  return 'pytaniach';
+};
+
 const handleDynamicTranslate = async () => {
   console.log('🔁 handleDynamicTranslate start');
   setTranslating(true);
@@ -510,8 +516,49 @@ const handleDynamicTranslate = async () => {
 
     const textsToTranslate = [];
     const indexes = [];
-    let missingPolishCount = 0;
 
+    // 🔍 Sprawdź brakujące grupy
+    const groupsToCheck = [
+      ['q1'],
+      ['q3'],
+      ['q5'],
+      ['q6'],
+      ['q8_plus', 'q8_minus'],
+      ['notes']
+    ];
+
+    const missingGroupNames = [];
+
+    groupsToCheck.forEach((keys) => {
+      const allEmpty = keys.every((key) => {
+        const idx = fieldMap[key];
+        let val;
+
+        if (key === 'notes') {
+          val = editedNote || selected.notes || '';
+        } else {
+          const field = editedAnswers.length > idx
+            ? editedAnswers[idx]
+            : selected[key] || '';
+          val = Array.isArray(field) ? field.join(', ') : field;
+        }
+
+        return String(val || '').trim().length === 0;
+      });
+
+      if (allEmpty) {
+        if (keys.includes('notes')) {
+          missingGroupNames.push('notes');
+        } else {
+          missingGroupNames.push('pytanie');
+        }
+      }
+    });
+
+    const countQuestions = missingGroupNames.filter(g => g === 'pytanie').length;
+    const hasMissingNote = missingGroupNames.includes('notes');
+
+    // 🔍 Zbierz teksty do tłumaczenia
     fieldsToTranslate.forEach((key) => {
       const idx = fieldMap[key];
       let val;
@@ -541,23 +588,23 @@ const handleDynamicTranslate = async () => {
         textsToTranslate.push(text);
         indexes.push(key);
       }
-
-      if (text.length === 0) {
-        missingPolishCount++;
-      }
     });
 
-    console.log('🧪 editedAnswers:', editedAnswers);
-    console.log('📄 textsToTranslate:', textsToTranslate);
-    console.log('🧩 indexes:', indexes);
-
+    // 🧾 Obsługa toastów jeśli nic do tłumaczenia
     if (textsToTranslate.length === 0) {
-      if (missingPolishCount > 0) {
-        toast.warn(`Brak tekstu do przetłumaczenia w ${missingPolishCount} pytaniach.`);
+      if (countQuestions === 0 && hasMissingNote) {
+        toast.warn('Brak notatki.');
+      } else if (countQuestions === 0 && !hasMissingNote) {
+        toast.warn('Brak tłumaczenia – brak odpowiedzi na pytania.');
+      } else if (countQuestions > 0 && hasMissingNote) {
+        toast.warn(`Brak tekstu do przetłumaczenia w ${countQuestions} ${odmianaPytanie(countQuestions)} i notatce.`);
+      } else if (countQuestions > 0) {
+        toast.warn(`Brak tekstu do przetłumaczenia w ${countQuestions} ${odmianaPytanie(countQuestions)}.`);
       }
       return;
     }
 
+    // 🔁 Tłumaczenie przez API
     const { data } = await axios.post(`${API_BASE_URL}/api/translate`, {
       texts: textsToTranslate,
       source: 'pl',
@@ -627,29 +674,9 @@ const handleDynamicTranslate = async () => {
     setTranslating(false);
   }
 };
-
 const isMissingTranslation = (val) => val?.trim() === '[brak tekstu do tłumaczenia]';
 
-const getMissingTranslationMessage = (val) =>
-  isMissingTranslation(val) ? (
-    <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
-      Brak odpowiedzi do tłumaczenia
-    </span>
-  ) : null;
-
 const getTextAreaStyle = (val) => {
-  return val?.trim() === '[brak tekstu do tłumaczenia]'
-    ? { backgroundColor: '#f8d7da', borderColor: '#f5c6cb', color: '#721c24' }
-    : {};
-};
-
-const getInputStyle = (val) => {
-  return val?.trim() === '[brak tekstu do tłumaczenia]'
-    ? { backgroundColor: '#f8d7da', borderColor: '#f5c6cb', color: '#721c24' }
-    : {};
-};
-
-const getOptionWarningStyle = (val) => {
   return val?.trim() === '[brak tekstu do tłumaczenia]'
     ? { backgroundColor: '#f8d7da', borderColor: '#f5c6cb', color: '#721c24' }
     : {};
@@ -725,19 +752,6 @@ const handleToggleGerman = async () => {
     setShowGerman(false);
   }
 };
-
-  const handlePolishAnswerChange = (index, value) => {
-    const arr = [...editedAnswers];
-    arr[index] = value;
-    setEditedAnswers(arr);
-    setIsPolishChangedSinceTranslation(true);
-  };
-
-  const handlePolishNoteChange = (value) => {
-    setEditedNote(value);
-    setIsPolishChangedSinceTranslation(true);
-  };
-
 
   if (loading) return <Wrapper><p>Ładowanie...</p></Wrapper>;
   if (error) return <Wrapper><p>{error}</p></Wrapper>;
