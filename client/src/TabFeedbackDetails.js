@@ -336,26 +336,42 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
 
 useEffect(() => {
   if (editing && selected) {
-setEditedAnswers([
-  selected.q1 || '',        // 0
-  selected.q2 || '',        // 1
-  Array.isArray(selected.q3)
-    ? selected.q3
-    : typeof selected.q3 === 'string'
-      ? selected.q3.split(', ')
-      : [],                 // 2
-  selected.q4 || '',        // 3
-  selected.q5 || '',        // 4
-  selected.q6 || '',        // 5
-  selected.q7 || '',        // 6
-  selected.q7_why || '',    // 7
-  selected.q8_plus || '',   // 8
-  selected.q8_minus || '',  // 9
-  selected.q9 || '',        // 10 ✅ brakowało
-  selected.q10 || ''        // 11 ✅ brakowało
-]);
+    setEditedAnswers([
+      selected.q1 || '',
+      selected.q2 || '',
+      Array.isArray(selected.q3)
+        ? selected.q3
+        : typeof selected.q3 === 'string'
+          ? selected.q3.split(', ')
+          : [],
+      selected.q4 || '',
+      selected.q5 || '',
+      selected.q6 || '',
+      selected.q7 || '',
+      selected.q7_why || '',
+      selected.q8_plus || '',
+      selected.q8_minus || '',
+      selected.q9 || '',
+      selected.q10 || ''
+    ]);
 
-setEditedNote(selected.notes || ''); // 🔁 notatka oddzielnie
+    setEditedAnswersDe([
+      selected.q1_de || '',
+      selected.q2_de || '',
+      selected.q3_de || '',
+      selected.q4_de || '',
+      selected.q5_de || '',
+      selected.q6_de || '',
+      selected.q7_de || '',
+      selected.q7_why_de || '',
+      selected.q8_plus_de || '',
+      selected.q8_minus_de || '',
+      selected.q9_de || '',
+      selected.q10_de || ''
+    ]);
+
+    setEditedNote(selected.notes || '');
+    setEditedNoteDe(selected.notes_de || '');
   }
 }, [editing, selected]);
 
