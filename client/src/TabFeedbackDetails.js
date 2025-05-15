@@ -491,68 +491,69 @@ const handleSave = async () => {
       no_history: showGerman
     };
 
-    const res = await axios.patch(`${API_BASE_URL}/api/tabResponses/${selected.id}`, payload, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    });
+    const res = await axios.patch(
+      `${API_BASE_URL}/api/tabResponses/${selected.id}`,
+      payload,
+      { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+    );
 
     const updated = res.data;
     setSelected(updated);
 
-    // ✅ Zsynchronizuj q1 (etykiety aktywnego przycisku)
+    // Synchronizacja q1 ⇄ q1_de
+    const syncedQ1 = showGerman
+      ? reverseTranslationMap[updated.q1_de] || ''
+      : updated.q1 || '';
+
+    const syncedQ1_de = showGerman
+      ? updated.q1_de || translationMapPlToDe[updated.q1] || ''
+      : translationMapPlToDe[updated.q1] || '';
+
     setEditedAnswers(prev => {
       const copy = [...prev];
-      if (showGerman) {
-        const pl = Object.entries(translationMapPlToDe).find(([pl, de]) => de === updated.q1_de)?.[0];
-        copy[0] = pl || prev[0];
-      } else {
-        copy[0] = updated.q1 ?? prev[0];
-      }
+      copy[0] = syncedQ1;
       return copy;
     });
 
     setEditedAnswersDe(prev => {
       const copy = [...prev];
-      if (showGerman) {
-        copy[0] = updated.q1_de ?? prev[0];
-      } else {
-        copy[0] = translationMapPlToDe[updated.q1] || prev[0];
-      }
+      copy[0] = syncedQ1_de;
       return copy;
     });
 
-    // 🔁 Pozostałe dane
+    // Uzupełnienie pozostałych danych
     setEditedAnswers([
-      updated.q1 ?? '',
-      updated.q2 ?? '',
-      updated.q3?.split(', ') ?? [],
-      updated.q4 ?? '',
-      updated.q5 ?? '',
-      updated.q6 ?? '',
-      updated.q7 ?? '',
-      updated.q7_why ?? '',
-      updated.q8_plus ?? '',
-      updated.q8_minus ?? '',
-      updated.q9 ?? '',
-      updated.q10 ?? ''
+      syncedQ1,
+      updated.q2 || '',
+      updated.q3?.split(', ') || [],
+      updated.q4 || '',
+      updated.q5 || '',
+      updated.q6 || '',
+      updated.q7 || '',
+      updated.q7_why || '',
+      updated.q8_plus || '',
+      updated.q8_minus || '',
+      updated.q9 || '',
+      updated.q10 || ''
     ]);
 
     setEditedAnswersDe([
-      updated.q1_de ?? '',
-      updated.q2_de ?? '',
-      updated.q3_de ?? '',
-      updated.q4_de ?? '',
-      updated.q5_de ?? '',
-      updated.q6_de ?? '',
-      updated.q7_de ?? '',
-      updated.q7_why_de ?? '',
-      updated.q8_plus_de ?? '',
-      updated.q8_minus_de ?? '',
-      updated.q9_de ?? '',
-      updated.q10_de ?? ''
+      syncedQ1_de,
+      updated.q2_de || '',
+      updated.q3_de || '',
+      updated.q4_de || '',
+      updated.q5_de || '',
+      updated.q6_de || '',
+      updated.q7_de || '',
+      updated.q7_why_de || '',
+      updated.q8_plus_de || '',
+      updated.q8_minus_de || '',
+      updated.q9_de || '',
+      updated.q10_de || ''
     ]);
 
-    setEditedNote(updated.notes ?? '');
-    setEditedNoteDe(updated.notes_de ?? '');
+    setEditedNote(updated.notes || '');
+    setEditedNoteDe(updated.notes_de || '');
 
     setEditing(false);
     setIsTranslated(true);
@@ -564,7 +565,6 @@ const handleSave = async () => {
     toast.error('Nie udało się zapisać odpowiedzi.');
   }
 };
-
 
 
 const odmianaPytanie = (count) => {
