@@ -974,7 +974,7 @@ const handleToggleGerman = async () => {
       value={editing ? editedAnswers[1] || '' : selected.q2 || ''}
       onChange={editing ? (e) => {
         const updated = [...editedAnswers];
-        updated[7] = e.target.value;
+        updated[1] = e.target.value;
         setEditedAnswers(updated);
       } : undefined}
       placeholder="Dlaczego?"
