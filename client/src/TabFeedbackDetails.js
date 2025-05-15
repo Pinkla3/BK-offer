@@ -342,8 +342,8 @@ useEffect(() => {
       Array.isArray(selected.q3)
         ? selected.q3
         : typeof selected.q3 === 'string'
-          ? selected.q3.split(', ')
-          : [],
+        ? selected.q3.split(', ')
+        : [],
       selected.q4 || '',
       selected.q5 || '',
       selected.q6 || '',
@@ -369,9 +369,6 @@ useEffect(() => {
       selected.q9_de || '',
       selected.q10_de || ''
     ]);
-
-    setEditedNote(selected.notes || '');
-    setEditedNoteDe(selected.notes_de || '');
   }
 }, [editing, selected]);
 
