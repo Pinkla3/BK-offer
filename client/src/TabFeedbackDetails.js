@@ -956,32 +956,30 @@ const handleToggleGerman = async () => {
       marginRight: 'auto'
     }}
   >
-    {['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map(val => {
-      const isActive = (editing ? editedAnswers[0] : selected.q1) === val;
+{['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map(val => {
+  const isActive = (editing ? editedAnswers[0] : selected.q1) === val;
+  const label = showGerman ? translationMapPlToDe[val] || val : val;
 
-      return (
-        <OptionButton
-          key={val}
-          type="button"
-          active={isActive}
-          editing={editing}
-          onClick={() => {
-            if (!editing) return;
-
-            const updatedPL = [...editedAnswers];
-            const updatedDE = [...editedAnswersDe];
-
-            updatedPL[0] = val;
-            updatedDE[0] = val; // synchronizujemy q1_de z q1
-
-            setEditedAnswers(updatedPL);
-            setEditedAnswersDe(updatedDE);
-          }}
-        >
-          {val}
-        </OptionButton>
-      );
-    })}
+  return (
+    <OptionButton
+      key={val}
+      type="button"
+      active={isActive}
+      editing={editing}
+      onClick={() => {
+        if (!editing) return;
+        const updatedPL = [...editedAnswers];
+        const updatedDE = [...editedAnswersDe];
+        updatedPL[0] = val;
+        updatedDE[0] = val;
+        setEditedAnswers(updatedPL);
+        setEditedAnswersDe(updatedDE);
+      }}
+    >
+      {label}
+    </OptionButton>
+  );
+})}
   </div>
 
   {/* Pytanie 2 – input uzależniony od q1 */}
