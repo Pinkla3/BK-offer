@@ -491,39 +491,40 @@ const handleSave = async () => {
       no_history: showGerman
     };
 
-    const res = await axios.patch(
-      `${API_BASE_URL}/api/tabResponses/${selected.id}`,
-      payload,
-      {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      }
-    );
+    const res = await axios.patch(`${API_BASE_URL}/api/tabResponses/${selected.id}`, payload, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
 
     const updated = res.data;
     setSelected(updated);
 
-    // ✅ Synchronizacja opcji q1 PL/DE po zapisie
+    // ✅ Zsynchronizuj q1 (etykiety aktywnego przycisku)
     setEditedAnswers(prev => {
       const copy = [...prev];
-      copy[0] = showGerman
-        ? reverseTranslationMap[updated.q1_de] || prev[0]
-        : updated.q1 ?? prev[0];
+      if (showGerman) {
+        const pl = Object.entries(translationMapPlToDe).find(([pl, de]) => de === updated.q1_de)?.[0];
+        copy[0] = pl || prev[0];
+      } else {
+        copy[0] = updated.q1 ?? prev[0];
+      }
       return copy;
     });
 
     setEditedAnswersDe(prev => {
       const copy = [...prev];
-      copy[0] = showGerman
-        ? updated.q1_de ?? prev[0]
-        : translationMapPlToDe[updated.q1] || prev[0];
+      if (showGerman) {
+        copy[0] = updated.q1_de ?? prev[0];
+      } else {
+        copy[0] = translationMapPlToDe[updated.q1] || prev[0];
+      }
       return copy;
     });
 
-    // ✅ Aktualizacja pozostałych pól
+    // 🔁 Pozostałe dane
     setEditedAnswers([
       updated.q1 ?? '',
       updated.q2 ?? '',
-      updated.q3 ? updated.q3.split(', ') : [],
+      updated.q3?.split(', ') ?? [],
       updated.q4 ?? '',
       updated.q5 ?? '',
       updated.q6 ?? '',
@@ -1011,44 +1012,54 @@ const handleToggleGerman = async () => {
     )}
   </Label>
 
-  <div
-    style={{
-      display: 'grid',
-      gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))',
-      gap: '16px',
-      justifyContent: 'center',
-      marginTop: '12px',
-      width: '100%',
-      maxWidth: '500px',
-      marginLeft: 'auto',
-      marginRight: 'auto'
-    }}
-  >
-    {['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map(val => {
-      const label = showGerman ? translationMapPlToDe[val] || val : val;
+ <div
+  style={{
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))',
+    gap: '16px',
+    justifyContent: 'center',
+    marginTop: '12px',
+    width: '100%',
+    maxWidth: '500px',
+    marginLeft: 'auto',
+    marginRight: 'auto'
+  }}
+>
+  {['bardzo dobrze', 'dobrze', 'średnio', 'mam zastrzeżenia'].map(val => {
+    const isActive = editedAnswers[0] === val;
 
-      const isActive = editing
-        ? editedAnswers[0] === val
-        : selected.q1 === val;
+    return (
+      <OptionButton
+        key={val}
+        type="button"
+        active={isActive}
+        editing={editing}
+        onClick={() => {
+          if (!editing) return;
 
-      return (
-        <OptionButton
-          key={val}
-          type="button"
-          active={isActive}
-          editing={editing}
-          onClick={() => {
-            if (!editing) return;
-            const updated = [...editedAnswers];
-            updated[0] = val;
-            setEditedAnswers(updated);
-          }}
-        >
-          {label}
-        </OptionButton>
-      );
-    })}
-  </div>
+          const updatedPL = [...editedAnswers];
+          const updatedDE = [...editedAnswersDe];
+          updatedPL[0] = val;
+
+          const translationMapPlToDe = {
+            'bardzo dobrze': 'sehr gut',
+            'dobrze': 'gut',
+            'średnio': 'durchschnittlich',
+            'mam zastrzeżenia': 'Ich habe Bedenken'
+          };
+          updatedDE[0] = translationMapPlToDe[val] || '';
+
+          setEditedAnswers(updatedPL);
+          setEditedAnswersDe(updatedDE);
+        }}
+      >
+        {showGerman
+          ? translationMapPlToDe[val] || val
+          : val}
+      </OptionButton>
+    );
+  })}
+</div>
 
   {/* Animowany input zależny od wyboru */}
   <div
