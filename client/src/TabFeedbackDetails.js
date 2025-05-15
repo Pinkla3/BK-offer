@@ -1062,20 +1062,24 @@ const handleToggleGerman = async () => {
 </div>
 
   {/* Animowany input zależny od wyboru */}
-  <div
-    style={{
-      marginTop: '16px',
-      overflow: 'hidden',
-      maxHeight: ['średnio', 'mam zastrzeżenia'].includes(
-        editing ? editedAnswers[0] || editedAnswersDe[0] : selected.q1
-      ) ? '200px' : '0px',
-      opacity: ['średnio', 'mam zastrzeżenia'].includes(
-         editing ? editedAnswers[0] || editedAnswersDe[0] : selected.q1
-      ) ? 1 : 0,
-      transition: 'all 0.4s ease',
-      width: '100%'
-    }}
-  >
+ <div
+  style={{
+    marginTop: '16px',
+    overflow: 'hidden',
+    maxHeight: ['średnio', 'mam zastrzeżenia'].includes(
+      editing
+        ? (showGerman ? editedAnswersDe[0] : editedAnswers[0])
+        : (showGerman ? selected.q1_de : selected.q1)
+    ) ? '200px' : '0px',
+    opacity: ['średnio', 'mam zastrzeżenia'].includes(
+      editing
+        ? (showGerman ? editedAnswersDe[0] : editedAnswers[0])
+        : (showGerman ? selected.q1_de : selected.q1)
+    ) ? 1 : 0,
+    transition: 'all 0.4s ease',
+    width: '100%'
+  }}
+>
     <TextArea
       name="q2"
       value={
