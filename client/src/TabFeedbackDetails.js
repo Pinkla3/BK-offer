@@ -576,36 +576,25 @@ const handleDynamicTranslate = async () => {
 
     // Przygotuj payload do zapisania
 const payload = {
-  // 🇵🇱 Wersja polska (z fallbackiem na selected)
-  ...Object.entries(fieldMap)
-    .filter(([k]) => k !== 'notes')
-    .reduce((acc, [k, i]) => {
-      let val = editedAnswers[i];
-      if (val === undefined || val === null || val === '') {
-        val = selected[k] || '';
-      }
-      acc[k] = Array.isArray(val) ? val.join(', ') : val;
-      return acc;
-    }, {}),
-  notes: editedNote || selected.notes || '',
-
-  // 🇩🇪 Wersja niemiecka
-  ...Object.entries(fieldMap)
-    .filter(([k]) => k !== 'notes')
-    .reduce((acc, [k, i]) => {
-      acc[`${k}_de`] = answersDe[i] || selected[`${k}_de`] || '';
-      return acc;
-    }, {}),
-  notes_de: translatedNote || selected.notes_de || '',
-
-  // 👩‍⚕️ Opiekunka
-  caregiver_first_name: editedCaregiverFirstName || selected.caregiver_first_name || '',
-  caregiver_last_name: editedCaregiverLastName || selected.caregiver_last_name || '',
-  caregiver_phone: editedCaregiverPhone || selected.caregiver_phone || '',
-
-  // 👵 Pacjent
-  patient_first_name: editedPatientFirstName || selected.patient_first_name || '',
-  patient_last_name: editedPatientLastName || selected.patient_last_name || ''
+  ...Object.fromEntries(Object.entries(fieldMap).map(([k, i]) => [
+    k,
+    Array.isArray(editedAnswers?.[i])
+      ? editedAnswers[i].join(', ')
+      : (editedAnswers?.[i] !== undefined && editedAnswers?.[i] !== ''
+          ? editedAnswers[i]
+          : selected?.[k] || '')
+  ])),
+  notes: editedNote !== undefined && editedNote !== '' ? editedNote : selected?.notes || '',
+  ...Object.fromEntries(Object.entries(fieldMap).map(([k, i]) => [
+    `${k}_de`,
+    answersDe?.[i] || selected?.[`${k}_de`] || ''
+  ])),
+  notes_de: translatedNote || selected?.notes_de || '',
+  caregiver_first_name: editedCaregiverFirstName || selected?.caregiver_first_name || '',
+  caregiver_last_name: editedCaregiverLastName || selected?.caregiver_last_name || '',
+  caregiver_phone: editedCaregiverPhone || selected?.caregiver_phone || '',
+  patient_first_name: editedPatientFirstName || selected?.patient_first_name || '',
+  patient_last_name: editedPatientLastName || selected?.patient_last_name || ''
 };
 
     await axios.patch(`${API_BASE_URL}/api/tabResponses/${selected.id}`, payload, {
