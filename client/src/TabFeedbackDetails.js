@@ -1067,10 +1067,10 @@ const handleToggleGerman = async () => {
       marginTop: '16px',
       overflow: 'hidden',
       maxHeight: ['średnio', 'mam zastrzeżenia'].includes(
-        editing ? editedAnswers[0] : selected.q1
+        editing ? editedAnswers[0] || editedAnswersDe[0] : selected.q1
       ) ? '200px' : '0px',
       opacity: ['średnio', 'mam zastrzeżenia'].includes(
-        editing ? editedAnswers[0] : selected.q1
+         editing ? editedAnswers[0] || editedAnswersDe[0] : selected.q1
       ) ? 1 : 0,
       transition: 'all 0.4s ease',
       width: '100%'
