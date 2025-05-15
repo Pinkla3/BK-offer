@@ -442,10 +442,10 @@ const handleSave = async () => {
     };
 
     if (showGerman) {
-      // zapis niemieckiej wersji
+      // Zapis wersji niemieckiej
       payload.q1_de = editedAnswersDe[0];
       payload.q2_de = editedAnswersDe[1];
-      payload.q3_de = Array.isArray(editedAnswers[2]) ? editedAnswers[2].join(', ') : editedAnswersDe[2];
+      payload.q3_de = Array.isArray(editedAnswersDe[2]) ? editedAnswersDe[2].join(', ') : editedAnswersDe[2];
       payload.q4_de = editedAnswersDe[3];
       payload.q5_de = editedAnswersDe[4];
       payload.q6_de = editedAnswersDe[5];
@@ -456,9 +456,9 @@ const handleSave = async () => {
       payload.q9_de = editedAnswersDe[10];
       payload.q10_de = editedAnswersDe[11];
       payload.notes_de = editedNoteDe;
-      payload.no_history = true; // ⛔ bez wpisu w historii
+      payload.no_history = true;
     } else {
-      // zapis polskiej wersji
+      // Zapis wersji polskiej
       payload.q1 = editedAnswers[0];
       payload.q2 = editedAnswers[1];
       payload.q3 = Array.isArray(editedAnswers[2]) ? editedAnswers[2].join(', ') : editedAnswers[2];
@@ -477,7 +477,11 @@ const handleSave = async () => {
     const res = await axios.patch(
       `${API_BASE_URL}/api/tabResponses/${selected.id}`,
       payload,
-      { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }
     );
 
     const updated = res.data;
@@ -487,11 +491,7 @@ const handleSave = async () => {
     setIsPolishChangedSinceTranslation(true);
     window.dispatchEvent(new Event('feedbackUpdated'));
 
-    if (showGerman) {
-      toast.success('Wersja niemiecka zapisana.');
-    } else {
-      toast.success('Wersja polska zapisana.');
-    }
+    toast.success(showGerman ? 'Wersja niemiecka zapisana.' : 'Wersja polska zapisana.');
   } catch (err) {
     console.error('❌ Błąd zapisu:', err);
     toast.error('Nie udało się zapisać odpowiedzi.');
