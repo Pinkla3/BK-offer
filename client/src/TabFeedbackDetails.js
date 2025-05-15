@@ -522,14 +522,17 @@ const handleDynamicTranslate = async () => {
         val = Array.isArray(field) ? field.join(', ') : field;
       }
 
-      const trimmed = typeof val === 'string' ? val.trim() : '';
-      if (trimmed.length > 0) {
-        textsToTranslate.push(trimmed);
+      const text = String(val || '').trim(); // ZAWSZE string
+      if (text.length > 0) {
+        textsToTranslate.push(text);
         indexes.push(key);
       }
     });
 
+    console.log('🧪 editedAnswers:', editedAnswers);
+    console.log('🧪 editedNote:', editedNote);
     console.log('📄 textsToTranslate:', textsToTranslate);
+    console.log('🧩 indexes:', indexes);
 
     if (textsToTranslate.length === 0) {
       toast.warn('Brak tekstu do przetłumaczenia.');
@@ -568,7 +571,7 @@ const handleDynamicTranslate = async () => {
     setEditedNoteDe(translatedNote);
     setTranslatedNote(translatedNote);
 
-    // Przygotuj payload do PATCH
+    // Przygotuj payload do zapisania
     const payload = {
       // PL
       ...Object.entries(fieldMap)
