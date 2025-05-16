@@ -648,7 +648,7 @@ app.patch('/api/tabResponses/:id', authenticate, async (req, res) => {
 
     const [rows] = await pool.query('SELECT edit_history FROM tab_responses WHERE id = ?', [id]);
     if (rows.length === 0) {
-      return res.status(404).json({ error: 'Nie znaleziono odpowiedzi' });
+      return res.status(404).json({ error: 'Nie znaleziono wpisu' });
     }
 
     let updatedHistory = [];
@@ -660,32 +660,61 @@ app.patch('/api/tabResponses/:id', authenticate, async (req, res) => {
         updatedHistory = [];
       }
     }
-
     updatedHistory.push(historyEntry);
 
-    await pool.query(`
+    const query = `
       UPDATE tab_responses SET
         caregiver_first_name = ?, caregiver_last_name = ?, caregiver_phone = ?,
         patient_first_name = ?, patient_last_name = ?,
         q1 = ?, q2 = ?, q3 = ?, q4 = ?, q5 = ?,
-        q6 = ?, q7 = ?, q8 = ?, q9 = ?, q10 = ?,
-        notes = ?, q1_de = ?, q2_de = ?, q3_de = ?, q4_de = ?, q5_de = ?,
-        q6_de = ?, q7_de = ?, q8_de = ?, q9_de = ?, q10_de = ?,
-        notes_de = ?, edit_history = ?
+        q6 = ?, q7 = ?, q7_why = ?, q8_plus = ?, q8_minus = ?, q9 = ?, q10 = ?, notes = ?,
+        q1_de = ?, q2_de = ?, q3_de = ?, q5_de = ?,
+        q6_de = ?, q7_de = ?, q7_why_de = ?, q8_plus_de = ?, q8_minus_de = ?, q9_de = ?, q10_de = ?, notes_de = ?,
+        edit_history = ?
       WHERE id = ?
-    `, [
-      updates.caregiver_first_name, updates.caregiver_last_name, updates.caregiver_phone,
-      updates.patient_first_name, updates.patient_last_name,
-      updates.q1, updates.q2, updates.q3, updates.q4, updates.q5,
-      updates.q6, updates.q7, updates.q8, updates.q9, updates.q10,
-      updates.notes,
-      updates.q1_de, updates.q2_de, updates.q3_de, updates.q4_de, updates.q5_de,
-      updates.q6_de, updates.q7_de, updates.q8_de, updates.q9_de, updates.q10_de,
-      updates.notes_de,
+    `;
+
+    const values = [
+      updates.caregiver_first_name || '',
+      updates.caregiver_last_name || '',
+      updates.caregiver_phone || '',
+      updates.patient_first_name || '',
+      updates.patient_last_name || '',
+
+      updates.q1 || '',
+      updates.q2 || '',
+      updates.q3 || '',
+      updates.q4 || '',
+      updates.q5 || '',
+      updates.q6 || '',
+      updates.q7 || '',
+      updates.q7_why || '',
+      updates.q8_plus || '',
+      updates.q8_minus || '',
+      updates.q9 || '',
+      updates.q10 || '',
+      updates.notes || '',
+
+      updates.q1_de || '',
+      updates.q2_de || '',
+      updates.q3_de || '',
+      updates.q5_de || '',
+      updates.q6_de || '',
+      updates.q7_de || '',
+      updates.q7_why_de || '',
+      updates.q8_plus_de || '',
+      updates.q8_minus_de || '',
+      updates.q9_de || '',
+      updates.q10_de || '',
+      updates.notes_de || '',
+
       JSON.stringify(updatedHistory),
       id
-    ]);
+    ];
 
+    await pool.query(query, values);
+
+    // Zwracamy cały wpis z user_name po aktualizacji
     const [[updated]] = await pool.query(`
       SELECT tab_responses.*, users.name AS user_name
       FROM tab_responses
@@ -695,8 +724,8 @@ app.patch('/api/tabResponses/:id', authenticate, async (req, res) => {
 
     res.json(updated);
   } catch (err) {
-    console.error('Błąd przy aktualizacji feedback:', err);
-    res.status(500).json({ error: 'Błąd serwera podczas zapisu feedback.' });
+    console.error('❌ Błąd podczas PATCH /api/tabResponses/:id:', err);
+    res.status(500).json({ error: 'Wystąpił błąd serwera podczas aktualizacji feedbacku.' });
   }
 });
 
