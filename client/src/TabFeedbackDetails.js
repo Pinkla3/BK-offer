@@ -443,175 +443,50 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
     setEditedPatientFirstName(selected.patient_first_name || '');
     setEditedPatientLastName(selected.patient_last_name || '');
   };
-const handleSave = async () => {
-  try {
-    const answers = editedAnswers;
-    const answersDe = editedAnswersDe;
-    const note = editedNote;
-    const noteDe = editedNoteDe;
-
-    const translationMapPlToDe = {
-      'bardzo dobrze': 'sehr gut',
-      'dobrze': 'gut',
-      'średnio': 'durchschnittlich',
-      'mam zastrzeżenia': 'Ich habe Bedenken',
-      'Tak': 'Ja',
-      'Nie': 'Nein'
-    };
-
-    const reverseTranslationMap = {
-      'sehr gut': 'bardzo dobrze',
-      'gut': 'dobrze',
-      'durchschnittlich': 'średnio',
-      'Ich habe Bedenken': 'mam zastrzeżenia',
-      'Ja': 'Tak',
-      'Nein': 'Nie'
-    };
-
-    const payload = {
-      caregiver_first_name: editedCaregiverFirstName,
-      caregiver_last_name: editedCaregiverLastName,
-      caregiver_phone: editedCaregiverPhone,
-      patient_first_name: editedPatientFirstName,
-      patient_last_name: editedPatientLastName,
-      no_history: showGerman
-    };
-
-    const assignIfFilled = (val, key) => {
-      if (val?.toString().trim()) payload[key] = val;
-    };
-
-    if (showGerman) {
-      // Tekstowe pola _de
-      assignIfFilled(answersDe[1], 'q2_de');
-      assignIfFilled(answersDe[3], 'q4_de');
-      assignIfFilled(answersDe[7], 'q7_why_de');
-      assignIfFilled(answersDe[8], 'q8_plus_de');
-      assignIfFilled(answersDe[9], 'q8_minus_de');
-      assignIfFilled(answersDe[10], 'q9_de');
-      assignIfFilled(answersDe[11], 'q10_de');
-      assignIfFilled(noteDe, 'notes_de');
-
-      // q1, q5, q7 (tylko jeśli PL puste)
-      if (answersDe[0]?.trim()) {
-        payload.q1_de = answersDe[0];
-        if (!selected.q1?.trim()) {
-          payload.q1 = reverseTranslationMap[answersDe[0]];
-        }
-      }
-      if (answersDe[4]?.trim()) {
-        payload.q5_de = answersDe[4];
-        if (!selected.q5?.trim()) {
-          payload.q5 = reverseTranslationMap[answersDe[4]];
-        }
-      }
-      if (answersDe[6]?.trim()) {
-        payload.q7_de = answersDe[6];
-        if (!selected.q7?.trim()) {
-          payload.q7 = reverseTranslationMap[answersDe[6]];
-        }
-      }
-
-      // q3 (checkbox)
-      const q3de = Array.isArray(answersDe[2]) ? answersDe[2].join(', ') : answersDe[2] || '';
-      if (q3de) {
-        payload.q3_de = q3de;
-        if (!selected.q3?.trim()) {
-          payload.q3 = q3de;
-        }
-      }
-
-      // q6 (liczba)
-      const q6de = answersDe[5]?.toString().trim();
-      if (q6de) {
-        payload.q6_de = q6de;
-        if (!selected.q6?.toString().trim()) {
-          payload.q6 = q6de;
-        }
-      }
-
-    } else {
-      // Tekstowe pola PL
-      assignIfFilled(answers[1], 'q2');
-      assignIfFilled(answers[3], 'q4');
-      assignIfFilled(answers[7], 'q7_why');
-      assignIfFilled(answers[8], 'q8_plus');
-      assignIfFilled(answers[9], 'q8_minus');
-      assignIfFilled(answers[10], 'q9');
-      assignIfFilled(answers[11], 'q10');
-      assignIfFilled(note, 'notes');
-
-      // q1, q5, q7
-      if (answers[0]?.trim()) {
-        payload.q1 = answers[0];
-        if (!selected.q1_de?.trim()) {
-          payload.q1_de = translationMapPlToDe[answers[0]];
-        }
-      }
-      if (answers[4]?.trim()) {
-        payload.q5 = answers[4];
-        if (!selected.q5_de?.trim()) {
-          payload.q5_de = translationMapPlToDe[answers[4]];
-        }
-      }
-      if (answers[6]?.trim()) {
-        payload.q7 = answers[6];
-        if (!selected.q7_de?.trim()) {
-          payload.q7_de = translationMapPlToDe[answers[6]];
-        }
-      }
-
-      // q3
-      const q3 = Array.isArray(answers[2]) ? answers[2].join(', ') : answers[2] || '';
-      if (q3) {
-        payload.q3 = q3;
-        if (!selected.q3_de?.trim()) {
-          payload.q3_de = q3;
-        }
-      }
-
-      // q6
-      const q6 = answers[5]?.toString().trim();
-      if (q6) {
-        payload.q6 = q6;
-        if (!selected.q6_de?.toString().trim()) {
-          payload.q6_de = q6;
-        }
-      }
+ const handleSave = async () => {
+    try {
+      const payload = {
+        caregiver_first_name: editedCaregiverFirstName,
+        caregiver_last_name: editedCaregiverLastName,
+        caregiver_phone: editedCaregiverPhone,
+        patient_first_name: editedPatientFirstName,
+        patient_last_name: editedPatientLastName,
+      };
+  
+      editedAnswers.forEach((ans, i) => { payload[`q${i + 1}`] = ans; });
+      editedAnswersDe.forEach((ans, i) => { payload[`q${i + 1}_de`] = ans; });
+      payload.notes = editedNote;
+      payload.notes_de = editedNoteDe;
+  
+      // 🔁 Zapis do backendu
+      const res = await axios.patch(
+        `${API_BASE_URL}/api/tabResponses/${selected.id}`,
+        payload,
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+      );
+  
+      const updated = res.data;
+  
+      const updatedSelected = {
+        ...selected,
+        ...payload,
+        user_name: updated.user_name || selected.user_name,
+        edit_history: updated.edit_history
+      };
+  
+      setSelected(updatedSelected);
+      setGermanAnswers(editedAnswersDe);
+      setTranslatedNote(editedNoteDe);
+      setEditing(false);
+      setIsTranslated(true);
+  
+      toast.success('Dane zapisane pomyślnie!');
+      window.dispatchEvent(new Event('feedbackUpdated')); // 🔔 odśwież listę w tle
+    } catch (err) {
+      console.error('Błąd zapisu:', err);
+      toast.error('Wystąpił błąd podczas zapisywania. Spróbuj ponownie.');
     }
-
-    const res = await axios.patch(
-      `${API_BASE_URL}/api/tabResponses/${selected.id}`,
-      payload,
-      { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
-    );
-
-    const updated = res.data;
-
-    const getAnswersFrom = (source, isGerman = false) =>
-      Array.from({ length: 12 }, (_, i) => {
-        const key = `q${i + 1}${isGerman ? '_de' : ''}`;
-        const val = source[key];
-        return key === 'q3' || key === 'q3_de'
-          ? (typeof val === 'string' ? val.split(', ').filter(Boolean) : val || [])
-          : val || '';
-      });
-
-    setEditedAnswers(getAnswersFrom(updated, false));
-    setEditedAnswersDe(getAnswersFrom(updated, true));
-    setEditedNote(updated.notes || '');
-    setEditedNoteDe(updated.notes_de || '');
-    setSelected(updated);
-    setEditing(false);
-    setIsTranslated(true);
-
-    toast.success('Dane zapisane pomyślnie!');
-    window.dispatchEvent(new Event('feedbackUpdated'));
-  } catch (err) {
-    console.error('❌ Błąd zapisu:', err);
-    toast.error('Wystąpił błąd podczas zapisywania. Spróbuj ponownie.');
-  }
-};
+  };
 
 
 
