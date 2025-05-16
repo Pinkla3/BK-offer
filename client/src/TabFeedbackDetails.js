@@ -477,8 +477,22 @@ const handleSave = async () => {
       no_history: showGerman
     };
 
-    // === q1, q5, q7 - tylko kierunek zależny od showGerman
+    const assignIfFilled = (val, key) => {
+      if (val?.toString().trim()) payload[key] = val;
+    };
+
     if (showGerman) {
+      // Tekstowe pola _de
+      assignIfFilled(answersDe[1], 'q2_de');
+      assignIfFilled(answersDe[3], 'q4_de');
+      assignIfFilled(answersDe[7], 'q7_why_de');
+      assignIfFilled(answersDe[8], 'q8_plus_de');
+      assignIfFilled(answersDe[9], 'q8_minus_de');
+      assignIfFilled(answersDe[10], 'q9_de');
+      assignIfFilled(answersDe[11], 'q10_de');
+      assignIfFilled(noteDe, 'notes_de');
+
+      // Synchronizowane mapą: q1, q5, q7
       if (answersDe[0]?.trim()) {
         payload.q1_de = answersDe[0];
         payload.q1 = reverseTranslationMap[answersDe[0]] || selected.q1;
@@ -491,7 +505,33 @@ const handleSave = async () => {
         payload.q7_de = answersDe[6];
         payload.q7 = reverseTranslationMap[answersDe[6]] || selected.q7;
       }
+
+      // q3 (checkbox)
+      const q3de = Array.isArray(answersDe[2]) ? answersDe[2].join(', ') : answersDe[2] || '';
+      if (q3de) {
+        payload.q3_de = q3de;
+        payload.q3 = q3de;
+      }
+
+      // q6 (liczba)
+      const q6de = answersDe[5]?.toString().trim();
+      if (q6de) {
+        payload.q6_de = q6de;
+        payload.q6 = q6de;
+      }
+
     } else {
+      // Tekstowe pola PL
+      assignIfFilled(answers[1], 'q2');
+      assignIfFilled(answers[3], 'q4');
+      assignIfFilled(answers[7], 'q7_why');
+      assignIfFilled(answers[8], 'q8_plus');
+      assignIfFilled(answers[9], 'q8_minus');
+      assignIfFilled(answers[10], 'q9');
+      assignIfFilled(answers[11], 'q10');
+      assignIfFilled(note, 'notes');
+
+      // Synchronizowane mapą: q1, q5, q7
       if (answers[0]?.trim()) {
         payload.q1 = answers[0];
         payload.q1_de = translationMapPlToDe[answers[0]] || selected.q1_de;
@@ -504,58 +544,23 @@ const handleSave = async () => {
         payload.q7 = answers[6];
         payload.q7_de = translationMapPlToDe[answers[6]] || selected.q7_de;
       }
-    }
 
-    // === q3 – checkbox (tablica jako string) synchronizowana
-    const q3pl = Array.isArray(answers[2]) ? answers[2].join(', ') : answers[2] || '';
-    const q3de = Array.isArray(answersDe[2]) ? answersDe[2].join(', ') : answersDe[2] || '';
-    if (showGerman) {
-      if (q3de) {
-        payload.q3_de = q3de;
-        payload.q3 = q3pl || q3de;
+      // q3 (checkbox)
+      const q3 = Array.isArray(answers[2]) ? answers[2].join(', ') : answers[2] || '';
+      if (q3) {
+        payload.q3 = q3;
+        payload.q3_de = q3;
       }
-    } else {
-      if (q3pl) {
-        payload.q3 = q3pl;
-        payload.q3_de = q3de || q3pl;
+
+      // q6 (liczba)
+      const q6 = answers[5]?.toString().trim();
+      if (q6) {
+        payload.q6 = q6;
+        payload.q6_de = q6;
       }
     }
 
-    // === q6 – wspólna wartość
-    const q6 = answers[5]?.toString().trim();
-    const q6de = answersDe[5]?.toString().trim();
-    const q6Final = q6 || q6de || '';
-    if (q6Final) {
-      payload.q6 = q6Final;
-      payload.q6_de = q6Final;
-    }
-
-    // === Pozostałe pola – tylko w aktywnym języku
-    const assignIfFilled = (val, key) => {
-      if (val?.trim()) payload[key] = val;
-    };
-
-    if (!showGerman) {
-      assignIfFilled(answers[1], 'q2');
-      assignIfFilled(answers[3], 'q4');
-      assignIfFilled(answers[7], 'q7_why');
-      assignIfFilled(answers[8], 'q8_plus');
-      assignIfFilled(answers[9], 'q8_minus');
-      assignIfFilled(answers[10], 'q9');
-      assignIfFilled(answers[11], 'q10');
-      assignIfFilled(note, 'notes');
-    } else {
-      assignIfFilled(answersDe[1], 'q2_de');
-      assignIfFilled(answersDe[3], 'q4_de');
-      assignIfFilled(answersDe[7], 'q7_why_de');
-      assignIfFilled(answersDe[8], 'q8_plus_de');
-      assignIfFilled(answersDe[9], 'q8_minus_de');
-      assignIfFilled(answersDe[10], 'q9_de');
-      assignIfFilled(answersDe[11], 'q10_de');
-      assignIfFilled(noteDe, 'notes_de');
-    }
-
-    // === PATCH do backendu
+    // PATCH do backendu
     const res = await axios.patch(
       `${API_BASE_URL}/api/tabResponses/${selected.id}`,
       payload,
@@ -564,7 +569,7 @@ const handleSave = async () => {
 
     const updated = res.data;
 
-    // === Odświeżenie stanu formularza
+    // Odśwież formularz
     const getAnswersFrom = (source, isGerman = false) =>
       Array.from({ length: 12 }, (_, i) => {
         const key = `q${i + 1}${isGerman ? '_de' : ''}`;
@@ -589,6 +594,7 @@ const handleSave = async () => {
     toast.error('Wystąpił błąd podczas zapisywania. Spróbuj ponownie.');
   }
 };
+
 
 
 const odmianaPytanie = (count) => {
