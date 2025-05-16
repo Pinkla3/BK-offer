@@ -1148,8 +1148,9 @@ const handleToggleGerman = async () => {
       marginRight: 'auto'
     }}
   >
-    {checkboxOptionsQ2.slice(0, 4).map(option => {
+    {checkboxOptionsQ2.map(option => {
      const isChecked = (editing ? editedAnswers[2] : (selected.q3 ? selected.q3.split(', ') : [])).includes(option);
+
       return (
         <label
           key={option}
@@ -1169,11 +1170,23 @@ const handleToggleGerman = async () => {
             disabled={!editing}
             onChange={() => {
               if (!editing) return;
+
+              const toggle = (list, item) =>
+                list.includes(item)
+                  ? list.filter(i => i !== item)
+                  : [...list, item];
+
               setEditedAnswers(prev => {
                 const list = prev[2] || [];
-                const updated = list.includes(option)
-                  ? list.filter(i => i !== option)
-                  : [...list, option];
+                const updated = toggle(list, option);
+                const newAnswers = [...prev];
+                newAnswers[2] = updated;
+                return newAnswers;
+              });
+
+              setEditedAnswersDe(prev => {
+                const list = prev[2] || [];
+                const updated = toggle(list, option);
                 const newAnswers = [...prev];
                 newAnswers[2] = updated;
                 return newAnswers;
@@ -1190,67 +1203,35 @@ const handleToggleGerman = async () => {
       );
     })}
 
-    {/* Checkbox "inne trudności" */}
-    <label
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '10px',
-        fontSize: '16px',
-        cursor: editing ? 'pointer' : 'default',
-        userSelect: 'none',
-        whiteSpace: 'nowrap'
-      }}
-    >
-      <input
-        type="checkbox"
-        checked={(editing ? editedAnswers[2] : selected.q3 || []).includes('inne trudności')}
-        disabled={!editing}
-        onChange={() => {
-          if (!editing) return;
-          setEditedAnswers(prev => {
-            const list = prev[2] || [];
-            const updated = list.includes('inne trudności')
-              ? list.filter(i => i !== 'inne trudności')
-              : [...list, 'inne trudności'];
-            const newAnswers = [...prev];
-            newAnswers[2] = updated;
-            return newAnswers;
-          });
-        }}
-        style={{
-          width: '20px',
-          height: '20px',
-          accentColor: '#007bff'
-        }}
-      />
-      <span>{t('inne trudności')}</span>
-    </label>
+    {/* Input tekstowy dla "inne trudności" */}
+    <Input
+      type="text"
+      placeholder={t('Proszę podać szczegóły')}
+      value={
+        editing
+          ? editedAnswers[3] || ''
+          : showGerman
+            ? selected.q4_de?.trim() || '[brak tekstu do tłumaczenia]'
+            : selected.q4 || ''
+      }
+      onChange={editing ? (e) => {
+        const val = e.target.value;
+        const updatedPL = [...editedAnswers];
+        updatedPL[3] = val;
+        setEditedAnswers(updatedPL);
 
-    {/* Input tekstowy */}
-<Input
-  type="text"
-  placeholder={t('Proszę podać szczegóły')}
-  value={
-    editing
-      ? editedAnswers[3] || ''
-      : showGerman
-        ? selected.q4_de?.trim() || '[brak tekstu do tłumaczenia]'
-        : selected.q4 || ''
-  }
-  onChange={editing ? (e) => {
-    const updated = [...editedAnswers];
-    updated[3] = e.target.value;
-    setEditedAnswers(updated);
-  } : undefined}
-  readOnly={!editing}
-  style={{
-    width: '100%',
-    maxWidth: '300px',
-    visibility: (editing ? editedAnswers[2] : selected.q3?.split(', ') || []).includes('inne trudności') ? 'visible' : 'hidden',
-    pointerEvents: (editing ? editedAnswers[2] : selected.q3?.split(', ') || []).includes('inne trudności') ? 'auto' : 'none'
-  }}
-/>
+        const updatedDE = [...editedAnswersDe];
+        updatedDE[3] = val;
+        setEditedAnswersDe(updatedDE);
+      } : undefined}
+      readOnly={!editing}
+      style={{
+        width: '100%',
+        maxWidth: '300px',
+        visibility: (editing ? editedAnswers[2] : selected.q3?.split(', ') || []).includes('inne trudności') ? 'visible' : 'hidden',
+        pointerEvents: (editing ? editedAnswers[2] : selected.q3?.split(', ') || []).includes('inne trudności') ? 'auto' : 'none'
+      }}
+    />
   </div>
 </QuestionGroup>
 {/* Pytanie 3 */}
