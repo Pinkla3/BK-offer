@@ -587,7 +587,7 @@ const handleSave = async () => {
         updated.q1_de || '',
         updated.q2_de?.split(', ') || [],
         updated.q3_de?.split(', ') || [],
-        '', // q4_de nie istnieje
+         updated.q4_de || '',
         updated.q5_de || '',
         updated.q6_de || '',
         updated.q7_de || '',
