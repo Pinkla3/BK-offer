@@ -466,8 +466,8 @@ const handleSave = async () => {
       'Nein': 'Nie'
     };
 
-    const sync = (pl, de) => showGerman ? reverseTranslationMap[de] || '' : pl;
-    const syncDe = (pl, de) => showGerman ? de : translationMapPlToDe[pl] || '';
+    const sync = (pl, de) => showGerman ? reverseTranslationMap[de] || pl : pl;
+    const syncDe = (pl, de) => showGerman ? de : translationMapPlToDe[pl] || de;
 
     const payload = {
       ...(showGerman
@@ -475,7 +475,7 @@ const handleSave = async () => {
             q1_de: answers[0],
             q2_de: answers[1],
             q3_de: answers[2],
-            q4_de: answers[3], // osobne pole dla DE
+            q4_de: answers[3],
             q5_de: answers[4],
             q6_de: answers[5],
             q7_de: answers[6],
@@ -486,17 +486,18 @@ const handleSave = async () => {
             q10_de: answers[11],
             notes_de: note,
 
+            // synchronizacja PL
             q1: sync(selected.q1, answers[0]),
             q3: Array.isArray(answers[2]) ? answers[2].join(', ') : sync(selected.q3, answers[2]),
             q5: sync(selected.q5, answers[4]),
-            q6: sync(selected.q6, answers[5]),
+            q6: answers[5] ?? selected.q6,
             q7: sync(selected.q7, answers[6])
           }
         : {
             q1: answers[0],
             q2: answers[1],
             q3: Array.isArray(answers[2]) ? answers[2].join(', ') : answers[2],
-            q4: answers[3], // osobne pole dla PL
+            q4: answers[3],
             q5: answers[4],
             q6: answers[5],
             q7: answers[6],
@@ -507,10 +508,11 @@ const handleSave = async () => {
             q10: answers[11],
             notes: note,
 
+            // synchronizacja DE
             q1_de: syncDe(answers[0], selected.q1_de),
             q3_de: syncDe(answers[2], selected.q3_de),
             q5_de: syncDe(answers[4], selected.q5_de),
-            q6_de: syncDe(answers[5], selected.q6_de),
+            q6_de: answers[5] ?? selected.q6_de,
             q7_de: syncDe(answers[6], selected.q7_de)
           }),
 
@@ -536,7 +538,7 @@ const handleSave = async () => {
       updated.q1 || '',
       updated.q2 || '',
       typeof updated.q3 === 'string' ? updated.q3.split(', ') : updated.q3 || '',
-      updated.q4 || '', // PL
+      updated.q4 || '',
       updated.q5 || '',
       updated.q6 || '',
       updated.q7 || '',
@@ -551,7 +553,7 @@ const handleSave = async () => {
       updated.q1_de || '',
       updated.q2_de || '',
       updated.q3_de || '',
-      updated.q4_de || '', // DE
+      updated.q4_de || '',
       updated.q5_de || '',
       updated.q6_de || '',
       updated.q7_de || '',
@@ -1126,15 +1128,14 @@ const handleToggleGerman = async () => {
 </QuestionGroup>
 {/* Pytanie 2 */}
 <QuestionGroup>
-  <Label>
-    {questions[2]}
-    {showGerman && !editing && !(selected.q3_de || '').trim() && (
-      <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
-        Brak odpowiedzi do tłumaczenia
-      </span>
-    )}
-  </Label>
-
+ <Label>
+  {questions[2]}
+  {showGerman && (!selected.q3 || selected.q3.trim() === '') && (
+    <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
+      Brak odpowiedzi do tłumaczenia
+    </span>
+  )}
+</Label>
   <div
     style={{
       display: 'grid',
@@ -1148,12 +1149,7 @@ const handleToggleGerman = async () => {
     }}
   >
     {checkboxOptionsQ2.slice(0, 4).map(option => {
-      const translated = t(option);
-      const isChecked = (editing
-        ? (showGerman ? editedAnswersDe[2] : editedAnswers[2]) || []
-        : (showGerman ? selected.q3_de : selected.q3)?.split(', ') || []
-      ).includes(option);
-
+     const isChecked = (editing ? editedAnswers[2] : (selected.q3 ? selected.q3.split(', ') : [])).includes(option);
       return (
         <label
           key={option}
@@ -1173,35 +1169,28 @@ const handleToggleGerman = async () => {
             disabled={!editing}
             onChange={() => {
               if (!editing) return;
-
-              const listPL = editedAnswers[2] || [];
-              const updatedPL = listPL.includes(option)
-                ? listPL.filter(i => i !== option)
-                : [...listPL, option];
-
-              const listDE = editedAnswersDe[2] || [];
-              const updatedDE = updatedPL; // zakładamy brak tłumaczeń checkboxów
-
               setEditedAnswers(prev => {
-                const next = [...prev];
-                next[2] = updatedPL;
-                return next;
-              });
-
-              setEditedAnswersDe(prev => {
-                const next = [...prev];
-                next[2] = updatedDE;
-                return next;
+                const list = prev[2] || [];
+                const updated = list.includes(option)
+                  ? list.filter(i => i !== option)
+                  : [...list, option];
+                const newAnswers = [...prev];
+                newAnswers[2] = updated;
+                return newAnswers;
               });
             }}
-            style={{ width: '20px', height: '20px', accentColor: '#007bff' }}
+            style={{
+              width: '20px',
+              height: '20px',
+              accentColor: '#007bff'
+            }}
           />
-          <span>{translated}</span>
+          <span>{t(option)}</span>
         </label>
       );
     })}
 
-    {/* "inne trudności" */}
+    {/* Checkbox "inne trudności" */}
     <label
       style={{
         display: 'flex',
@@ -1215,72 +1204,53 @@ const handleToggleGerman = async () => {
     >
       <input
         type="checkbox"
-        checked={
-          (editing
-            ? (showGerman ? editedAnswersDe[2] : editedAnswers[2])
-            : (showGerman ? selected.q3_de : selected.q3)?.split(', ') || []
-          ).includes('inne trudności')
-        }
+        checked={(editing ? editedAnswers[2] : selected.q3 || []).includes('inne trudności')}
         disabled={!editing}
         onChange={() => {
           if (!editing) return;
-
-          const listPL = editedAnswers[2] || [];
-          const updatedPL = listPL.includes('inne trudności')
-            ? listPL.filter(i => i !== 'inne trudności')
-            : [...listPL, 'inne trudności'];
-
           setEditedAnswers(prev => {
-            const next = [...prev];
-            next[2] = updatedPL;
-            return next;
-          });
-
-          setEditedAnswersDe(prev => {
-            const next = [...prev];
-            next[2] = updatedPL; // synchronizacja 1:1
-            return next;
+            const list = prev[2] || [];
+            const updated = list.includes('inne trudności')
+              ? list.filter(i => i !== 'inne trudności')
+              : [...list, 'inne trudności'];
+            const newAnswers = [...prev];
+            newAnswers[2] = updated;
+            return newAnswers;
           });
         }}
-        style={{ width: '20px', height: '20px', accentColor: '#007bff' }}
+        style={{
+          width: '20px',
+          height: '20px',
+          accentColor: '#007bff'
+        }}
       />
       <span>{t('inne trudności')}</span>
     </label>
 
-    {/* Input q4 */}
-    <Input
-      type="text"
-      placeholder={showGerman ? 'Bitte geben Sie Details an' : t('Proszę podać szczegóły')}
-      value={
-        editing
-          ? (showGerman ? editedAnswersDe[3] : editedAnswers[3]) || ''
-          : showGerman
-            ? selected.q4_de?.trim() || '[brak tekstu do tłumaczenia]'
-            : selected.q4 || ''
-      }
-      onChange={editing ? (e) => {
-        const updated = [...(showGerman ? editedAnswersDe : editedAnswers)];
-        updated[3] = e.target.value;
-        showGerman
-          ? setEditedAnswersDe(updated)
-          : setEditedAnswers(updated);
-      } : undefined}
-      readOnly={!editing}
-      style={{
-        width: '100%',
-        maxWidth: '300px',
-        visibility: (
-          editing
-            ? (showGerman ? editedAnswersDe[2] : editedAnswers[2]) || []
-            : (showGerman ? selected.q3_de : selected.q3)?.split(', ') || []
-        ).includes('inne trudności') ? 'visible' : 'hidden',
-        pointerEvents: (
-          editing
-            ? (showGerman ? editedAnswersDe[2] : editedAnswers[2]) || []
-            : (showGerman ? selected.q3_de : selected.q3)?.split(', ') || []
-        ).includes('inne trudności') ? 'auto' : 'none'
-      }}
-    />
+    {/* Input tekstowy */}
+<Input
+  type="text"
+  placeholder={t('Proszę podać szczegóły')}
+  value={
+    editing
+      ? editedAnswers[3] || ''
+      : showGerman
+        ? selected.q4_de?.trim() || '[brak tekstu do tłumaczenia]'
+        : selected.q4 || ''
+  }
+  onChange={editing ? (e) => {
+    const updated = [...editedAnswers];
+    updated[3] = e.target.value;
+    setEditedAnswers(updated);
+  } : undefined}
+  readOnly={!editing}
+  style={{
+    width: '100%',
+    maxWidth: '300px',
+    visibility: (editing ? editedAnswers[2] : selected.q3?.split(', ') || []).includes('inne trudności') ? 'visible' : 'hidden',
+    pointerEvents: (editing ? editedAnswers[2] : selected.q3?.split(', ') || []).includes('inne trudności') ? 'auto' : 'none'
+  }}
+/>
   </div>
 </QuestionGroup>
 {/* Pytanie 3 */}
