@@ -1657,7 +1657,7 @@ value={
     }}
   />
 </QuestionGroup>
-
+<div style={{ marginTop: '32px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
     {editing ? (
       <Button onClick={handleSave} disabled={translating}>
         {translating ? <SpinnerIcon size={16} /> : <FaSave />}
@@ -1668,7 +1668,7 @@ value={
         <FaEdit /> Edytuj
       </Button>
     )}
-
+</div>
 </TabSection>
 
 
