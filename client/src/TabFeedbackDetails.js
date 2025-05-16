@@ -471,28 +471,30 @@ const handleSave = async () => {
 
     const payload = {
       ...(showGerman
-        ? {
-           q1_de: answers[0],
-q2_de: answers[1],
-q3_de: Array.isArray(answers[2]) ? answers[2].join(', ') : answers[2],
-q4_de: answers[3],
-q5_de: answers[4],
-q6_de: answers[5],
-q7_de: answers[6],
-q7_why_de: answers[7],
-q8_plus_de: answers[8],
-q8_minus_de: answers[9],
-q9_de: answers[10],
-q10_de: answers[11],
-notes_de: note,
+  ? {
+      q1_de: answers[0],
+      q2_de: answers[1],
+      q3_de: Array.isArray(answers[2]) ? answers[2].join(', ') : answers[2],
+      q4_de: answers[3],
+      q5_de: answers[4],
+      q6_de: answers[5],
+      q7_de: answers[6],
+      q7_why_de: answers[7],
+      q8_plus_de: answers[8],
+      q8_minus_de: answers[9],
+      q9_de: answers[10],
+      q10_de: answers[11],
+      notes_de: note,
 
-// synchronizacja PL
-q1: sync(selected.q1, answers[0]),
-q3: Array.isArray(answers[2]) ? answers[2].join(', ') : sync(selected.q3, answers[2]),
-q5: sync(selected.q5, answers[4]),
-q6: answers[5] ?? selected.q6,
-q7: sync(selected.q7, answers[6]),
-          }
+      // synchronizacja PL — tylko jeśli dane z DE nie są puste
+      q1: answers[0] ? sync(selected.q1, answers[0]) : selected.q1,
+      q3: answers[2] && answers[2].length
+        ? (Array.isArray(answers[2]) ? answers[2].join(', ') : answers[2])
+        : selected.q3,
+      q5: answers[4] ? sync(selected.q5, answers[4]) : selected.q5,
+      q6: answers[5] !== '' ? answers[5] : selected.q6,
+      q7: answers[6] ? sync(selected.q7, answers[6]) : selected.q7,
+    }
         : {
             q1: answers[0],
             q2: answers[1],
