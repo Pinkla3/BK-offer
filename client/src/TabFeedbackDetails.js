@@ -477,56 +477,64 @@ const handleSave = async () => {
       no_history: showGerman
     };
 
-    // ✳️ Zamknięte pytania
-    if (showGerman) {
-      if (answers[0]?.trim()) payload.q1_de = answers[0];
-      if (answers[4]?.trim()) payload.q5_de = answers[4];
-      if (answers[6]?.trim()) payload.q7_de = answers[6];
-    } else {
-      if (answers[0]?.trim()) payload.q1 = answers[0];
-      if (answers[4]?.trim()) payload.q5 = answers[4];
-      if (answers[6]?.trim()) payload.q7 = answers[6];
-    }
-
-    // ✳️ Tłumaczenia zamkniętych opcji
-    if (showGerman) {
-      if (answers[0]?.trim()) payload.q1 = reverseTranslationMap[answers[0]] || selected.q1;
-      if (answers[4]?.trim()) payload.q5 = reverseTranslationMap[answers[4]] || selected.q5;
-      if (answers[6]?.trim()) payload.q7 = reverseTranslationMap[answers[6]] || selected.q7;
-    } else {
-      if (answers[0]?.trim()) payload.q1_de = translationMapPlToDe[answers[0]] || selected.q1_de;
-      if (answers[4]?.trim()) payload.q5_de = translationMapPlToDe[answers[4]] || selected.q5_de;
-      if (answers[6]?.trim()) payload.q7_de = translationMapPlToDe[answers[6]] || selected.q7_de;
-    }
-
-    // ✳️ Checkboxy (q3)
-    if (Array.isArray(answers[2]) && answers[2].length) {
-      if (showGerman) payload.q3_de = answers[2].join(', ');
-      else payload.q3 = answers[2].join(', ');
-    }
-
-    // ✳️ Pola tekstowe (q4, q7_why, q8_plus, q8_minus, q9, q10)
-    const textFieldIndexes = [3, 7, 8, 9, 10, 11];
-    textFieldIndexes.forEach((i) => {
-      const key = `q${i + 1}`;
-      const val = answers[i];
-      const valDe = answersDe[i];
-
-      if (showGerman && valDe?.trim()) {
-        payload[`${key}_de`] = valDe;
-      } else if (!showGerman && val?.trim()) {
-        payload[key] = val;
-      }
+    // 1. q1, q5, q7 – synchronizacja mapowana
+    const mapSync = (pl, de) => ({
+      pl: de ? reverseTranslationMap[de] || pl : pl,
+      de: pl ? translationMapPlToDe[pl] || de : de
     });
 
-    // ✳️ Notatki
-    if (showGerman && noteDe?.trim()) {
-      payload.notes_de = noteDe;
-    } else if (!showGerman && note?.trim()) {
-      payload.notes = note;
+    const syncQ1 = mapSync(answers[0], answersDe[0]);
+    const syncQ5 = mapSync(answers[4], answersDe[4]);
+    const syncQ7 = mapSync(answers[6], answersDe[6]);
+
+    payload.q1 = syncQ1.pl;
+    payload.q1_de = syncQ1.de;
+    payload.q5 = syncQ5.pl;
+    payload.q5_de = syncQ5.de;
+    payload.q7 = syncQ7.pl;
+    payload.q7_de = syncQ7.de;
+
+    // 2. q3 – checkbox (tablica jako string)
+    const formatQ3 = (val) => Array.isArray(val) ? val.join(', ') : (val || '');
+    const syncQ3 = {
+      pl: formatQ3(answers[2]),
+      de: formatQ3(answersDe[2])
+    };
+    payload.q3 = syncQ3.pl || syncQ3.de;
+    payload.q3_de = syncQ3.de || syncQ3.pl;
+
+    // 3. q6 – liczba, wspólna dla obu
+    const q6Value = answers[5]?.toString().trim() || answersDe[5]?.toString().trim() || '';
+    payload.q6 = q6Value;
+    payload.q6_de = q6Value;
+
+    // 4. Pozostałe – dynamiczne tłumaczenie
+    const textFields = [
+      { key: 'q2', pl: answers[1], de: answersDe[1] },
+      { key: 'q4', pl: answers[3], de: answersDe[3] },
+      { key: 'q7_why', pl: answers[7], de: answersDe[7] },
+      { key: 'q8_plus', pl: answers[8], de: answersDe[8] },
+      { key: 'q8_minus', pl: answers[9], de: answersDe[9] },
+      { key: 'q9', pl: answers[10], de: answersDe[10] },
+      { key: 'q10', pl: answers[11], de: answersDe[11] },
+      { key: 'notes', pl: note, de: noteDe }
+    ];
+
+    for (const field of textFields) {
+      const { key, pl, de } = field;
+
+      if (showGerman && de?.trim()) {
+        payload[`${key}_de`] = de;
+        const translated = await dynamicTranslate(de, 'pl');
+        payload[key] = translated;
+      } else if (!showGerman && pl?.trim()) {
+        payload[key] = pl;
+        const translated = await dynamicTranslate(pl, 'de');
+        payload[`${key}_de`] = translated;
+      }
     }
 
-    // 🛰️ Wyślij tylko to, co naprawdę trzeba
+    // 5. Wyślij dane do backendu
     const res = await axios.patch(
       `${API_BASE_URL}/api/tabResponses/${selected.id}`,
       payload,
@@ -535,12 +543,21 @@ const handleSave = async () => {
 
     const updated = res.data;
 
-    // 🔁 Zaktualizuj tylko zmienione dane lokalnie
-setSelected(updated);
+    // 6. Ustaw stan formularza
+    const getAnswersFrom = (source, isGerman = false) =>
+      Array.from({ length: 12 }, (_, i) => {
+        const key = `q${i + 1}${isGerman ? '_de' : ''}`;
+        const val = source[key];
+        return key === 'q3' || key === 'q3_de'
+          ? (typeof val === 'string' ? val.split(', ').filter(Boolean) : val || [])
+          : val || '';
+      });
 
-    setSelected(updatedSelected);
-    setGermanAnswers(answersDe);
-    setTranslatedNote(noteDe);
+    setEditedAnswers(getAnswersFrom(updated, false));
+    setEditedAnswersDe(getAnswersFrom(updated, true));
+    setEditedNote(updated.notes || '');
+    setEditedNoteDe(updated.notes_de || '');
+    setSelected(updated);
     setEditing(false);
     setIsTranslated(true);
 
@@ -551,7 +568,6 @@ setSelected(updated);
     toast.error('Wystąpił błąd podczas zapisywania. Spróbuj ponownie.');
   }
 };
-
 
 const odmianaPytanie = (count) => {
   if (count === 1) return 'pytaniu';
