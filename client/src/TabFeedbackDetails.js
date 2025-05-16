@@ -451,106 +451,31 @@ const handleSave = async () => {
       caregiver_phone: editedCaregiverPhone,
       patient_first_name: editedPatientFirstName,
       patient_last_name: editedPatientLastName,
+      no_history: showGerman
     };
 
-    const translationMapPlToDe = {
-      'bardzo dobrze': 'sehr gut',
-      'dobrze': 'gut',
-      'średnio': 'durchschnittlich',
-      'mam zastrzeżenia': 'Ich habe Bedenken',
-      'Tak': 'Ja',
-      'Nie': 'Nein'
-    };
+    const inputTextareaIndexes = [1, 3, 7, 8, 9, 10, 11]; // q2, q4, q7_why, q8_plus, q8_minus, q9, q10
+    const answers = showGerman ? editedAnswersDe : editedAnswers;
+    const note = showGerman ? editedNoteDe : editedNote;
 
-    const reverseTranslationMap = Object.fromEntries(
-      Object.entries(translationMapPlToDe).map(([pl, de]) => [de, pl])
-    );
-
-    const safeJoin = (val) =>
-      Array.isArray(val) ? val.join(', ') : val?.toString().trim() || '';
-
-    const assign = (key, value) => {
-      if (value?.toString().trim()) {
-        payload[key] = value;
+    inputTextareaIndexes.forEach((i) => {
+      const val = answers[i];
+      if (val?.toString().trim()) {
+        const key = `q${i + 1}${showGerman ? '_de' : ''}`;
+        payload[key] = val;
       }
-    };
+    });
 
-    // obsługa q1–q12
-    for (let i = 0; i < 12; i++) {
-      const qKey = `q${i + 1}`;
-      const qKeyDe = `${qKey}_de`;
-      const pl = editedAnswers[i];
-      const de = editedAnswersDe[i];
-      const plVal = safeJoin(pl);
-      const deVal = safeJoin(de);
-
-      if (showGerman) {
-        // zapis tylko tekstowych _de
-        if ([2, 4, 8, 9, 10, 11].includes(i)) assign(qKeyDe, deVal);
-
-        // synchronizacja q1, q5, q7
-        if ([0, 4, 6].includes(i) && deVal && !selected[qKey]?.trim()) {
-          assign(qKeyDe, deVal);
-          assign(qKey, reverseTranslationMap[deVal] || '');
-        }
-
-        // q3 (checkbox)
-        if (i === 2 && deVal && !selected[qKey]?.trim()) {
-          assign(qKeyDe, deVal);
-          assign(qKey, deVal);
-        }
-
-        // q6 (liczba)
-        if (i === 5 && deVal && !selected[qKey]?.trim()) {
-          assign(qKeyDe, deVal);
-          assign(qKey, deVal);
-        }
-
-      } else {
-        // zapis tylko tekstowych PL
-        if ([2, 4, 8, 9, 10, 11].includes(i)) assign(qKey, plVal);
-
-        // synchronizacja q1, q5, q7
-        if ([0, 4, 6].includes(i) && plVal && !selected[qKeyDe]?.trim()) {
-          assign(qKey, plVal);
-          assign(qKeyDe, translationMapPlToDe[plVal] || '');
-        }
-
-        // q3 (checkbox)
-        if (i === 2 && plVal && !selected[qKeyDe]?.trim()) {
-          assign(qKey, plVal);
-          assign(qKeyDe, plVal);
-        }
-
-        // q6 (liczba)
-        if (i === 5 && plVal && !selected[qKeyDe]?.trim()) {
-          assign(qKey, plVal);
-          assign(qKeyDe, plVal);
-        }
-      }
-    }
-
-    // notes
-    if (showGerman) {
-      if (editedNoteDe?.trim()) {
-        payload.notes_de = editedNoteDe;
-        if (!selected.notes?.trim()) {
-          payload.notes = editedNoteDe;
-        }
-      }
-    } else {
-      if (editedNote?.trim()) {
-        payload.notes = editedNote;
-        if (!selected.notes_de?.trim()) {
-          payload.notes_de = editedNote;
-        }
-      }
+    if (note?.toString().trim()) {
+      payload[showGerman ? 'notes_de' : 'notes'] = note;
     }
 
     const res = await axios.patch(
       `${API_BASE_URL}/api/tabResponses/${selected.id}`,
       payload,
-      { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+      {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      }
     );
 
     const updated = res.data;
