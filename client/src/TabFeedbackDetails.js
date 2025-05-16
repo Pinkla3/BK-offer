@@ -1310,7 +1310,7 @@ const handleToggleGerman = async () => {
 <QuestionGroup>
   <Label>
     {questions[5]}
-    {showGerman && !editing && (!selected.q6_de || selected.q6_de.trim() === '' || selected.q6_de === '0') && (
+    {showGerman && !editing && (!(selected.q6_de || '').trim() || selected.q6_de === '0') && (
       <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
         Brak odpowiedzi do tłumaczenia
       </span>
@@ -1325,21 +1325,18 @@ const handleToggleGerman = async () => {
           editing
             ? (showGerman ? editedAnswersDe[5] : editedAnswers[5]) ?? ''
             : showGerman
-              ? selected.q6_de || '[brak tekstu do tłumaczenia]'
-              : selected.q6 || ''
+              ? (selected.q6_de && selected.q6_de !== '0' ? selected.q6_de : '[brak tekstu do tłumaczenia]')
+              : (selected.q6 && selected.q6 !== '0' ? selected.q6 : '[brak odpowiedzi]')
         }
-        placeholder={showGerman ? 'z.B. 50' : 'np. 50'}
+        placeholder={showGerman ? 'z. B. 50' : 'np. 50'}
         readOnly={!editing}
         onChange={editing ? (e) => {
           const val = e.target.value;
-          const updatedPL = [...editedAnswers];
-          const updatedDE = [...editedAnswersDe];
-          updatedPL[5] = val;
-          updatedDE[5] = val;
-          setEditedAnswers(updatedPL);
-          setEditedAnswersDe(updatedDE);
+          const updated = showGerman ? [...editedAnswersDe] : [...editedAnswers];
+          updated[5] = val;
+          showGerman ? setEditedAnswersDe(updated) : setEditedAnswers(updated);
         } : undefined}
-        onWheel={(e) => e.target.blur()} // zapobiega zmianie przez scroll
+        onWheel={(e) => e.target.blur()}
         style={{
           width: '100%',
           height: '48px',
@@ -1348,11 +1345,11 @@ const handleToggleGerman = async () => {
           padding: '8px 36px 8px 12px',
           border: '1px solid',
           borderRadius: '10px',
-          backgroundColor: showGerman && !editing && (!selected.q6_de || selected.q6_de.trim() === '' || selected.q6_de === '0')
+          backgroundColor: showGerman && (!(selected.q6_de || '').trim() || selected.q6_de === '0')
             ? '#f8d7da' : (editing ? '#fff' : '#f9f9f9'),
-          borderColor: showGerman && !editing && (!selected.q6_de || selected.q6_de.trim() === '' || selected.q6_de === '0')
+          borderColor: showGerman && (!(selected.q6_de || '').trim() || selected.q6_de === '0')
             ? '#f5c6cb' : '#ccc',
-          color: showGerman && !editing && (!selected.q6_de || selected.q6_de.trim() === '' || selected.q6_de === '0')
+          color: showGerman && (!(selected.q6_de || '').trim() || selected.q6_de === '0')
             ? '#721c24' : '#000',
           appearance: 'textfield',
           MozAppearance: 'textfield'
@@ -1363,7 +1360,7 @@ const handleToggleGerman = async () => {
         right: '10px',
         top: '50%',
         transform: 'translateY(-50%)',
-        color: showGerman && !editing && (!selected.q6_de || selected.q6_de.trim() === '' || selected.q6_de === '0') ? '#721c24' : '#666',
+        color: showGerman && (!(selected.q6_de || '').trim() || selected.q6_de === '0') ? '#721c24' : '#666',
         fontSize: '18px'
       }}>
         €
