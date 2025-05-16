@@ -994,25 +994,44 @@ const handleCopyToClipboard = () => {
     return;
   }
 
-  const questions = showGerman ? questionsDe : questionsPl;
   const suffix = showGerman ? '_de' : '';
   const noteKey = `notes${suffix}`;
   const note = selected[noteKey];
 
-  const content = questions.map((question, index) => {
-    const key = `q${index + 1}${suffix}`;
-    const value = selected[key];
+  const questions = showGerman ? questionsDe : questionsPl;
 
+  // 🔹 Lista dodatkowych pól tekstowych z etykietą
+  const extraFields = [
+    { label: 'Dlaczego?', key: `q7_why${suffix}` },
+    { label: showGerman ? 'Pluspunkte:' : 'Plusy:', key: `q8_plus${suffix}` },
+    { label: showGerman ? 'Minuspunkte:' : 'Minusy:', key: `q8_minus${suffix}` },
+  ];
+
+  const lines = [];
+
+  for (let i = 0; i < questions.length; i++) {
+    const key = `q${i + 1}${suffix}`;
+    const value = selected[key];
     const displayValue = Array.isArray(value)
       ? value.join(', ')
       : typeof value === 'string'
         ? value.trim()
         : value?.toString?.() || '';
 
-    return `${question}\n${displayValue || '[brak odpowiedzi]'}`;
-  }).join('\n\n');
+    lines.push(`${questions[i]}\n${displayValue || '[brak odpowiedzi]'}`);
+  }
 
-  const fullText = `${content}\n\n${showGerman ? 'Notiz:' : 'Notatka:'}\n${note?.trim() || '[brak notatki]'}`;
+  // 🔹 Dodajemy dodatkowe pytania (po q7 itp.)
+  extraFields.forEach(({ label, key }) => {
+    const val = selected[key];
+    const text = typeof val === 'string' ? val.trim() : val?.toString?.() || '';
+    lines.push(`${label}\n${text || '[brak odpowiedzi]'}`);
+  });
+
+  // 🔹 Notatka na końcu
+  lines.push(`\n${showGerman ? 'Notiz:' : 'Notatka:'}\n${note?.trim() || '[brak notatki]'}`);
+
+  const fullText = lines.join('\n\n');
 
   navigator.clipboard.writeText(fullText)
     .then(() => toast.success('Feedback skopiowany do schowka!'))
