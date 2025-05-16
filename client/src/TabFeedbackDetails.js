@@ -425,24 +425,26 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
     }
   };
 
-  const initEdit = () => {
-    const plTexts = questionsPl.map((_, i) => selected[`q${i+1}`] || '');
-    const deTexts = (germanAnswers.length > 0)
-      ? germanAnswers
-      : questionsPl.map((_, i) => selected[`q${i+1}_de`] || '');
+const initEdit = () => {
+  const plTexts = questionsPl.map((_, i) => selected[`q${i + 1}`] || '');
+  const deTexts = questionsPl.map((_, i) => selected[`q${i + 1}_de`] || '');
 
-    setEditedAnswers(plTexts);
-    setEditedAnswersDe(deTexts);
-    setEditedNote(selected.notes || '');
-    setEditedNoteDe(translatedNote || selected.notes_de || '');
-    setEditing(true);
-    setIsPolishChangedSinceTranslation(false);
-    setEditedCaregiverFirstName(selected.caregiver_first_name || '');
-    setEditedCaregiverLastName(selected.caregiver_last_name || '');
-    setEditedCaregiverPhone(selected.caregiver_phone || '');
-    setEditedPatientFirstName(selected.patient_first_name || '');
-    setEditedPatientLastName(selected.patient_last_name || '');
-  };
+  setEditedAnswers(plTexts);
+  setEditedAnswersDe(deTexts);
+  setEditedNote(selected.notes || '');
+  setEditedNoteDe(selected.notes_de || '');
+
+  setEditedCaregiverFirstName(selected.caregiver_first_name || '');
+  setEditedCaregiverLastName(selected.caregiver_last_name || '');
+  setEditedCaregiverPhone(selected.caregiver_phone || '');
+  setEditedPatientFirstName(selected.patient_first_name || '');
+  setEditedPatientLastName(selected.patient_last_name || '');
+
+  setEditing(true);
+  setIsPolishChangedSinceTranslation(false);
+};
+
+
 const handleSave = async () => {
   try {
     const answers = showGerman ? editedAnswersDe : editedAnswers;
