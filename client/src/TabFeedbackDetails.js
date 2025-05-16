@@ -1000,36 +1000,50 @@ const handleCopyToClipboard = () => {
 
   const questions = showGerman ? questionsDe : questionsPl;
 
-  // 🔹 Lista dodatkowych pól tekstowych z etykietą
-  const extraFields = [
-    { label: 'Dlaczego?', key: `q7_why${suffix}` },
-    { label: showGerman ? 'Pluspunkte:' : 'Plusy:', key: `q8_plus${suffix}` },
-    { label: showGerman ? 'Minuspunkte:' : 'Minusy:', key: `q8_minus${suffix}` },
-  ];
-
   const lines = [];
 
-  for (let i = 0; i < questions.length; i++) {
+  // q1–q5 (standardowo)
+  for (let i = 0; i < 5; i++) {
     const key = `q${i + 1}${suffix}`;
     const value = selected[key];
-    const displayValue = Array.isArray(value)
+    const display = Array.isArray(value)
       ? value.join(', ')
       : typeof value === 'string'
         ? value.trim()
         : value?.toString?.() || '';
 
-    lines.push(`${questions[i]}\n${displayValue || '[brak odpowiedzi]'}`);
+    lines.push(`${questions[i]}\n${display || '[brak odpowiedzi]'}`);
   }
 
-  // 🔹 Dodajemy dodatkowe pytania (po q7 itp.)
-  extraFields.forEach(({ label, key }) => {
-    const val = selected[key];
-    const text = typeof val === 'string' ? val.trim() : val?.toString?.() || '';
-    lines.push(`${label}\n${text || '[brak odpowiedzi]'}`);
-  });
+  // q6 → q8_plus
+  const plusKey = `q8_plus${suffix}`;
+  const plusVal = selected[plusKey];
+  lines.push(`${questions[5]}\n${(plusVal || '').trim() || '[brak odpowiedzi]'}`);
 
-  // 🔹 Notatka na końcu
-  lines.push(`\n${showGerman ? 'Notiz:' : 'Notatka:'}\n${note?.trim() || '[brak notatki]'}`);
+  // q7 → q8_minus
+  const minusKey = `q8_minus${suffix}`;
+  const minusVal = selected[minusKey];
+  lines.push(`${questions[6]}\n${(minusVal || '').trim() || '[brak odpowiedzi]'}`);
+
+  // q8 → q9
+  for (let i = 7; i <= 9; i++) {
+    const key = `q${i + 1}${suffix}`;
+    const value = selected[key];
+    const display = Array.isArray(value)
+      ? value.join(', ')
+      : typeof value === 'string'
+        ? value.trim()
+        : value?.toString?.() || '';
+
+    lines.push(`${questions[i]}\n${display || '[brak odpowiedzi]'}`);
+  }
+
+  // q7_why
+  const why = selected[`q7_why${suffix}`];
+  lines.push(`${showGerman ? 'Warum?' : 'Dlaczego?'}\n${(why || '').trim() || '[brak odpowiedzi]'}`);
+
+  // Notatka
+  lines.push(`${showGerman ? 'Notiz:' : 'Notatka:'}\n${note?.trim() || '[brak notatki]'}`);
 
   const fullText = lines.join('\n\n');
 
