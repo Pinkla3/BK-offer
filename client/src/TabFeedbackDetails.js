@@ -482,6 +482,7 @@ const handleSave = async () => {
             q10_de: answers[11],
             notes_de: note,
 
+            // synchronizacja do PL
             q1: sync(answers[0]),
             q3: Array.isArray(answers[2]) ? answers[2].join(', ') : sync(answers[2]),
             q5: sync(answers[4]),
@@ -503,6 +504,7 @@ const handleSave = async () => {
             q10: answers[11],
             notes: note,
 
+            // synchronizacja do DE
             q1_de: syncDe(answers[0]),
             q3_de: Array.isArray(answers[2]) ? answers[2].join(', ') : syncDe(answers[2]),
             q5_de: syncDe(answers[4]),
@@ -524,13 +526,49 @@ const handleSave = async () => {
       { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
     );
 
-    setSelected(res.data); // pełny update
+    const updated = res.data;
+    setSelected(updated);
+
+    // 🔁 Zaktualizuj tylko tę wersję językową, którą edytowano
+    if (showGerman) {
+      setEditedAnswersDe([
+        updated.q1_de || '',
+        updated.q2_de || '',
+        updated.q3_de?.split(', ') || [],
+        '', // q4_de nie istnieje
+        updated.q5_de || '',
+        updated.q6_de || '',
+        updated.q7_de || '',
+        updated.q7_why_de || '',
+        updated.q8_plus_de || '',
+        updated.q8_minus_de || '',
+        updated.q9_de || '',
+        updated.q10_de || ''
+      ]);
+      setEditedNoteDe(updated.notes_de || '');
+    } else {
+      setEditedAnswers([
+        updated.q1 || '',
+        updated.q2 || '',
+        updated.q3?.split(', ') || [],
+        updated.q4 || '',
+        updated.q5 || '',
+        updated.q6 || '',
+        updated.q7 || '',
+        updated.q7_why || '',
+        updated.q8_plus || '',
+        updated.q8_minus || '',
+        updated.q9 || '',
+        updated.q10 || ''
+      ]);
+      setEditedNote(updated.notes || '');
+    }
+
     setEditing(false);
     setIsTranslated(true);
 
     toast.success(showGerman ? 'Wersja niemiecka zapisana.' : 'Wersja polska zapisana.');
     window.dispatchEvent(new Event('feedbackUpdated'));
-
   } catch (err) {
     console.error('❌ Błąd zapisu:', err);
     toast.error('Nie udało się zapisać odpowiedzi.');
