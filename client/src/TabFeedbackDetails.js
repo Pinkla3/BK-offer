@@ -468,12 +468,12 @@ const handleSave = async () => {
     // 🔁 Tłumaczenie tylko przy zapisie PL
     let q2_de = '', q4_de = '', q7_why_de = '', q8_plus_de = '', q8_minus_de = '', notes_de = '';
     if (!showGerman) {
-      q2_de = await dynamicTranslate(answers[1] || '');
-      q4_de = await dynamicTranslate(answers[3] || '');
-      q7_why_de = await dynamicTranslate(answers[7] || '');
-      q8_plus_de = await dynamicTranslate(answers[8] || '');
-      q8_minus_de = await dynamicTranslate(answers[9] || '');
-      notes_de = await dynamicTranslate(note || '');
+      q2_de = await handleDynamicTranslate(answers[1] || '');
+      q4_de = await handleDynamicTranslate(answers[3] || '');
+      q7_why_de = await handleDynamicTranslate(answers[7] || '');
+      q8_plus_de = await handleDynamicTranslate(answers[8] || '');
+      q8_minus_de = await handleDynamicTranslate(answers[9] || '');
+      notes_de = await handleDynamicTranslate(note || '');
     }
 
     const payload = {
