@@ -444,7 +444,6 @@ const initEdit = () => {
   setIsPolishChangedSinceTranslation(false);
 };
 
-
 const handleSave = async () => {
   try {
     const answers = showGerman ? editedAnswersDe : editedAnswers;
@@ -469,6 +468,7 @@ const handleSave = async () => {
     const payload = {
       ...(showGerman
         ? {
+            // Wersja niemiecka
             q1_de: answers[0],
             q2_de: answers[1],
             q3_de: Array.isArray(answers[2]) ? answers[2].join(', ') : answers[2],
@@ -482,7 +482,7 @@ const handleSave = async () => {
             q10_de: answers[11],
             notes_de: note,
 
-            // synchronizacja do PL
+            // Synchronizacja do PL tylko wybranych
             q1: sync(answers[0]),
             q3: Array.isArray(answers[2]) ? answers[2].join(', ') : sync(answers[2]),
             q5: sync(answers[4]),
@@ -490,6 +490,7 @@ const handleSave = async () => {
             q7: sync(answers[6])
           }
         : {
+            // Wersja polska (pełny zapis)
             q1: answers[0],
             q2: answers[1],
             q3: Array.isArray(answers[2]) ? answers[2].join(', ') : answers[2],
@@ -504,7 +505,7 @@ const handleSave = async () => {
             q10: answers[11],
             notes: note,
 
-            // synchronizacja do DE
+            // Synchronizacja do DE tylko wybranych
             q1_de: syncDe(answers[0]),
             q3_de: Array.isArray(answers[2]) ? answers[2].join(', ') : syncDe(answers[2]),
             q5_de: syncDe(answers[4]),
@@ -527,12 +528,14 @@ const handleSave = async () => {
     );
 
     const updated = res.data;
-setSelected(prev => ({
-  ...prev,
-  ...res.data
-}));
 
-    // 🔁 Zaktualizuj tylko tę wersję językową, którą edytowano
+    // 🔐 Bezpieczne nadpisanie: tylko zmienione pola
+    setSelected(prev => ({
+      ...prev,
+      ...updated
+    }));
+
+    // 🔁 Zaktualizuj tylko odpowiednią wersję odpowiedzi
     if (showGerman) {
       setEditedAnswersDe([
         updated.q1_de || '',
@@ -569,7 +572,6 @@ setSelected(prev => ({
 
     setEditing(false);
     setIsTranslated(true);
-
     toast.success(showGerman ? 'Wersja niemiecka zapisana.' : 'Wersja polska zapisana.');
     window.dispatchEvent(new Event('feedbackUpdated'));
   } catch (err) {

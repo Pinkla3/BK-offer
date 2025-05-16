@@ -631,90 +631,65 @@ app.patch('/api/tabResponses/:id', authenticate, async (req, res) => {
   const updates = req.body;
 
   try {
-    const formattedDateTime = new Date().toLocaleString('pl-PL', {
+    // Pobierz bieżący rekord z bazy (potrzebny do zachowania brakujących pól)
+    const [[current]] = await pool.query('SELECT * FROM tab_responses WHERE id = ?', [id]);
+    if (!current) return res.status(404).json({ error: 'Nie znaleziono wpisu' });
+
+    // Historia edycji
+    const [[userRow]] = await pool.query('SELECT name FROM users WHERE id = ?', [req.user.id]);
+    const userName = userRow?.name || 'nieznany';
+    const timestamp = new Date().toLocaleString('pl-PL', {
       timeZone: 'Europe/Warsaw',
       hour12: false,
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit', second: '2-digit'
     });
+    const newHistory = `Edytowano przez ${userName} dnia ${timestamp}`;
 
-    const [[userRow]] = await pool.query('SELECT name FROM users WHERE id = ?', [req.user.id]);
-    const userName = userRow ? userRow.name : 'nieznany użytkownik';
-    const historyEntry = `Edytowano przez ${userName} dnia ${formattedDateTime}`;
-
-    const [rows] = await pool.query('SELECT edit_history FROM tab_responses WHERE id = ?', [id]);
-    if (rows.length === 0) {
-      return res.status(404).json({ error: 'Nie znaleziono wpisu' });
+    let historyArray = [];
+    try {
+      historyArray = JSON.parse(current.edit_history || '[]');
+      if (!Array.isArray(historyArray)) historyArray = [];
+    } catch {
+      historyArray = [];
     }
+    historyArray.push(newHistory);
 
-    let updatedHistory = [];
-    if (rows[0].edit_history) {
-      try {
-        updatedHistory = JSON.parse(rows[0].edit_history);
-        if (!Array.isArray(updatedHistory)) updatedHistory = [];
-      } catch {
-        updatedHistory = [];
-      }
-    }
-    updatedHistory.push(historyEntry);
-
-    const query = `
-      UPDATE tab_responses SET
-        caregiver_first_name = ?, caregiver_last_name = ?, caregiver_phone = ?,
-        patient_first_name = ?, patient_last_name = ?,
-        q1 = ?, q2 = ?, q3 = ?, q4 = ?, q5 = ?,
-        q6 = ?, q7 = ?, q7_why = ?, q8_plus = ?, q8_minus = ?, q9 = ?, q10 = ?, notes = ?,
-        q1_de = ?, q2_de = ?, q3_de = ?, q5_de = ?,
-        q6_de = ?, q7_de = ?, q7_why_de = ?, q8_plus_de = ?, q8_minus_de = ?, q9_de = ?, q10_de = ?, notes_de = ?,
-        edit_history = ?
-      WHERE id = ?
-    `;
-
-    const values = [
-      updates.caregiver_first_name || '',
-      updates.caregiver_last_name || '',
-      updates.caregiver_phone || '',
-      updates.patient_first_name || '',
-      updates.patient_last_name || '',
-
-      updates.q1 || '',
-      updates.q2 || '',
-      updates.q3 || '',
-      updates.q4 || '',
-      updates.q5 || '',
-      updates.q6 || '',
-      updates.q7 || '',
-      updates.q7_why || '',
-      updates.q8_plus || '',
-      updates.q8_minus || '',
-      updates.q9 || '',
-      updates.q10 || '',
-      updates.notes || '',
-
-      updates.q1_de || '',
-      updates.q2_de || '',
-      updates.q3_de || '',
-      updates.q5_de || '',
-      updates.q6_de || '',
-      updates.q7_de || '',
-      updates.q7_why_de || '',
-      updates.q8_plus_de || '',
-      updates.q8_minus_de || '',
-      updates.q9_de || '',
-      updates.q10_de || '',
-      updates.notes_de || '',
-
-      JSON.stringify(updatedHistory),
-      id
+    // 🔧 Dynamiczne budowanie zapytania SQL
+    const allowedFields = [
+      // PL
+      'q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'q7_why', 'q8_plus', 'q8_minus', 'q9', 'q10', 'notes',
+      // DE
+      'q1_de', 'q2_de', 'q3_de', 'q5_de', 'q6_de', 'q7_de', 'q7_why_de', 'q8_plus_de', 'q8_minus_de', 'q9_de', 'q10_de', 'notes_de',
+      // dane
+      'caregiver_first_name', 'caregiver_last_name', 'caregiver_phone',
+      'patient_first_name', 'patient_last_name'
     ];
 
-    await pool.query(query, values);
+    const fieldsToUpdate = [];
+    const values = [];
 
-    // Zwracamy cały wpis z user_name po aktualizacji
+    for (const key of allowedFields) {
+      if (key in updates) {
+        fieldsToUpdate.push(`${key} = ?`);
+        values.push(updates[key]);
+      }
+    }
+
+    // dodaj edit_history
+    fieldsToUpdate.push(`edit_history = ?`);
+    values.push(JSON.stringify(historyArray));
+
+    if (fieldsToUpdate.length === 0) {
+      return res.status(400).json({ error: 'Brak danych do aktualizacji' });
+    }
+
+    const sql = `UPDATE tab_responses SET ${fieldsToUpdate.join(', ')} WHERE id = ?`;
+    values.push(id);
+
+    await pool.query(sql, values);
+
+    // pełny SELECT po aktualizacji (z user_name)
     const [[updated]] = await pool.query(`
       SELECT tab_responses.*, users.name AS user_name
       FROM tab_responses
@@ -723,9 +698,10 @@ app.patch('/api/tabResponses/:id', authenticate, async (req, res) => {
     `, [id]);
 
     res.json(updated);
+
   } catch (err) {
-    console.error('❌ Błąd podczas PATCH /api/tabResponses/:id:', err);
-    res.status(500).json({ error: 'Wystąpił błąd serwera podczas aktualizacji feedbacku.' });
+    console.error('❌ Błąd podczas aktualizacji:', err);
+    res.status(500).json({ error: 'Wystąpił błąd serwera.' });
   }
 });
 
