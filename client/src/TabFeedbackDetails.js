@@ -466,7 +466,6 @@ const handleSave = async () => {
       'Nein': 'Nie'
     };
 
-    // Synchronizacja wybranych pól PL ⇄ DE
     const sync = (pl, de) => showGerman ? reverseTranslationMap[de] || '' : pl;
     const syncDe = (pl, de) => showGerman ? de : translationMapPlToDe[pl] || '';
 
@@ -486,8 +485,10 @@ const handleSave = async () => {
             q9_de: answers[10],
             q10_de: answers[11],
             notes_de: note,
+
+            // synchronizacja PL
             q1: sync(selected.q1, answers[0]),
-            q3: sync(selected.q3, answers[2]),
+            q3: Array.isArray(answers[2]) ? answers[2].join(', ') : sync(selected.q3, answers[2]),
             q5: sync(selected.q5, answers[4]),
             q6: sync(selected.q6, answers[5]),
             q7: sync(selected.q7, answers[6])
@@ -506,6 +507,8 @@ const handleSave = async () => {
             q9: answers[10],
             q10: answers[11],
             notes: note,
+
+            // synchronizacja DE
             q1_de: syncDe(answers[0], selected.q1_de),
             q3_de: syncDe(answers[2], selected.q3_de),
             q5_de: syncDe(answers[4], selected.q5_de),
@@ -531,7 +534,6 @@ const handleSave = async () => {
     const updated = res.data;
     setSelected(updated);
 
-    // 🔄 Uaktualnienie edytowanych odpowiedzi
     setEditedAnswers([
       updated.q1 || '',
       updated.q2 || '',
@@ -1308,7 +1310,7 @@ const handleToggleGerman = async () => {
 <QuestionGroup>
   <Label>
     {questions[5]}
-    {showGerman && (!selected.q6 || selected.q6.trim() === '' || selected.q6 === '0') && (
+    {showGerman && !editing && (!selected.q6_de || selected.q6_de.trim() === '' || selected.q6_de === '0') && (
       <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
         Brak odpowiedzi do tłumaczenia
       </span>
@@ -1321,20 +1323,21 @@ const handleToggleGerman = async () => {
         type="number"
         value={
           editing
-            ? editedAnswers[5] ?? ''
-            : showGerman && (!selected.q6 || selected.q6.trim() === '' || selected.q6 === '0')
-              ? '[brak tekstu do tłumaczenia]'
+            ? (showGerman ? editedAnswersDe[5] : editedAnswers[5]) ?? ''
+            : showGerman
+              ? selected.q6_de || '[brak tekstu do tłumaczenia]'
               : selected.q6 || ''
         }
-        placeholder="np. 50"
+        placeholder={showGerman ? 'z.B. 50' : 'np. 50'}
         readOnly={!editing}
         onChange={editing ? (e) => {
           const val = e.target.value;
-          setEditedAnswers(prev => {
-            const updated = [...prev];
-            updated[5] = val;
-            return updated;
-          });
+          const updatedPL = [...editedAnswers];
+          const updatedDE = [...editedAnswersDe];
+          updatedPL[5] = val;
+          updatedDE[5] = val;
+          setEditedAnswers(updatedPL);
+          setEditedAnswersDe(updatedDE);
         } : undefined}
         onWheel={(e) => e.target.blur()} // zapobiega zmianie przez scroll
         style={{
@@ -1345,11 +1348,11 @@ const handleToggleGerman = async () => {
           padding: '8px 36px 8px 12px',
           border: '1px solid',
           borderRadius: '10px',
-          backgroundColor: showGerman && (!selected.q6 || selected.q6.trim() === '' || selected.q6 === '0')
+          backgroundColor: showGerman && !editing && (!selected.q6_de || selected.q6_de.trim() === '' || selected.q6_de === '0')
             ? '#f8d7da' : (editing ? '#fff' : '#f9f9f9'),
-          borderColor: showGerman && (!selected.q6 || selected.q6.trim() === '' || selected.q6 === '0')
+          borderColor: showGerman && !editing && (!selected.q6_de || selected.q6_de.trim() === '' || selected.q6_de === '0')
             ? '#f5c6cb' : '#ccc',
-          color: showGerman && (!selected.q6 || selected.q6.trim() === '' || selected.q6 === '0')
+          color: showGerman && !editing && (!selected.q6_de || selected.q6_de.trim() === '' || selected.q6_de === '0')
             ? '#721c24' : '#000',
           appearance: 'textfield',
           MozAppearance: 'textfield'
@@ -1360,7 +1363,7 @@ const handleToggleGerman = async () => {
         right: '10px',
         top: '50%',
         transform: 'translateY(-50%)',
-        color: showGerman && (!selected.q6 || selected.q6.trim() === '' || selected.q6 === '0') ? '#721c24' : '#666',
+        color: showGerman && !editing && (!selected.q6_de || selected.q6_de.trim() === '' || selected.q6_de === '0') ? '#721c24' : '#666',
         fontSize: '18px'
       }}>
         €
