@@ -452,29 +452,28 @@ const handleSave = async () => {
       'bardzo dobrze': 'sehr gut',
       'dobrze': 'gut',
       'średnio': 'durchschnittlich',
-      'mam zastrzeżenia': 'Ich habe Bedenken'
+      'mam zastrzeżenia': 'Ich habe Bedenken',
+      'Tak': 'Ja',
+      'Nie': 'Nein'
     };
 
     const reverseTranslationMap = {
       'sehr gut': 'bardzo dobrze',
       'gut': 'dobrze',
       'durchschnittlich': 'średnio',
-      'Ich habe Bedenken': 'mam zastrzeżenia'
+      'Ich habe Bedenken': 'mam zastrzeżenia',
+      'Ja': 'Tak',
+      'Nein': 'Nie'
     };
 
-    // 🔁 synchronizacja q1 ⇄ q1_de
-    const q1 = showGerman
-      ? reverseTranslationMap[answers[0]] || ''
-      : answers[0];
-
-    const q1_de = showGerman
-      ? answers[0]
-      : translationMapPlToDe[answers[0]] || '';
+    // Synchronizacja wybranych pól PL ⇄ DE
+    const sync = (pl, de) => showGerman ? reverseTranslationMap[de] || '' : pl;
+    const syncDe = (pl, de) => showGerman ? de : translationMapPlToDe[pl] || '';
 
     const payload = {
       ...(showGerman
         ? {
-            q1_de: q1_de,
+            q1_de: answers[0],
             q2_de: answers[1],
             q3_de: answers[2],
             q4_de: answers[3],
@@ -487,10 +486,14 @@ const handleSave = async () => {
             q9_de: answers[10],
             q10_de: answers[11],
             notes_de: note,
-            q1: q1 // ⬅️ zawsze zapisujemy PL
+            q1: sync(selected.q1, answers[0]),
+            q3: sync(selected.q3, answers[2]),
+            q5: sync(selected.q5, answers[4]),
+            q6: sync(selected.q6, answers[5]),
+            q7: sync(selected.q7, answers[6])
           }
         : {
-            q1: q1,
+            q1: answers[0],
             q2: answers[1],
             q3: Array.isArray(answers[2]) ? answers[2].join(', ') : answers[2],
             q4: answers[3],
@@ -503,7 +506,11 @@ const handleSave = async () => {
             q9: answers[10],
             q10: answers[11],
             notes: note,
-            q1_de: q1_de // ⬅️ zawsze zapisujemy DE
+            q1_de: syncDe(answers[0], selected.q1_de),
+            q3_de: syncDe(answers[2], selected.q3_de),
+            q5_de: syncDe(answers[4], selected.q5_de),
+            q6_de: syncDe(answers[5], selected.q6_de),
+            q7_de: syncDe(answers[6], selected.q7_de)
           }),
 
       caregiver_first_name: editedCaregiverFirstName,
@@ -524,15 +531,11 @@ const handleSave = async () => {
     const updated = res.data;
     setSelected(updated);
 
-    // 🔁 Aktualizacja stanu po zapisie
+    // 🔄 Uaktualnienie edytowanych odpowiedzi
     setEditedAnswers([
       updated.q1 || '',
       updated.q2 || '',
-      Array.isArray(updated.q3)
-        ? updated.q3
-        : typeof updated.q3 === 'string'
-        ? updated.q3.split(', ')
-        : [],
+      typeof updated.q3 === 'string' ? updated.q3.split(', ') : updated.q3 || '',
       updated.q4 || '',
       updated.q5 || '',
       updated.q6 || '',
@@ -564,7 +567,6 @@ const handleSave = async () => {
 
     setEditing(false);
     setIsTranslated(true);
-
     toast.success(showGerman ? 'Wersja niemiecka zapisana.' : 'Wersja polska zapisana.');
     window.dispatchEvent(new Event('feedbackUpdated'));
   } catch (err) {
