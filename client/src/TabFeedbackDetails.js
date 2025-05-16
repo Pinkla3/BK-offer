@@ -480,16 +480,18 @@ const handleSave = async () => {
 
     const updated = res.data;
 
-    const updatedSelected = {
-      ...selected,
-      ...payload,
-      user_name: updated.user_name || selected.user_name,
-      edit_history: updated.edit_history
-    };
+    const getAnswersFrom = (source, isGerman = false) =>
+      Array.from({ length: 12 }, (_, i) => {
+        const key = `q${i + 1}${isGerman ? '_de' : ''}`;
+        return source[key] || '';
+      });
 
-    setSelected(updatedSelected);
-    setGermanAnswers(editedAnswersDe);
-    setTranslatedNote(editedNoteDe);
+    setEditedAnswers(getAnswersFrom(updated, false));
+    setEditedAnswersDe(getAnswersFrom(updated, true));
+    setEditedNote(updated.notes || '');
+    setEditedNoteDe(updated.notes_de || '');
+
+    setSelected(updated);
     setEditing(false);
     setIsTranslated(true);
 
