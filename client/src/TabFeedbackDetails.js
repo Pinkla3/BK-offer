@@ -465,10 +465,21 @@ const handleSave = async () => {
     const sync = (deValue) => reverseTranslationMap[deValue] || '';
     const syncDe = (plValue) => translationMapPlToDe[plValue] || '';
 
+    // 🔁 Tłumaczenie tylko przy zapisie PL
+    let q2_de = '', q4_de = '', q7_why_de = '', q8_plus_de = '', q8_minus_de = '', notes_de = '';
+    if (!showGerman) {
+      q2_de = await dynamicTranslate(answers[1] || '');
+      q4_de = await dynamicTranslate(answers[3] || '');
+      q7_why_de = await dynamicTranslate(answers[7] || '');
+      q8_plus_de = await dynamicTranslate(answers[8] || '');
+      q8_minus_de = await dynamicTranslate(answers[9] || '');
+      notes_de = await dynamicTranslate(note || '');
+    }
+
     const payload = {
       ...(showGerman
         ? {
-            // Wersja niemiecka
+            // Wersja niemiecka (z synchronizacją PL dla wybranych)
             q1_de: answers[0],
             q2_de: answers[1],
             q3_de: Array.isArray(answers[2]) ? answers[2].join(', ') : answers[2],
@@ -482,7 +493,6 @@ const handleSave = async () => {
             q10_de: answers[11],
             notes_de: note,
 
-            // Synchronizacja do PL tylko wybranych
             q1: sync(answers[0]),
             q3: Array.isArray(answers[2]) ? answers[2].join(', ') : sync(answers[2]),
             q5: sync(answers[4]),
@@ -490,7 +500,7 @@ const handleSave = async () => {
             q7: sync(answers[6])
           }
         : {
-            // Wersja polska (pełny zapis)
+            // Wersja polska (z tłumaczeniem pól tekstowych)
             q1: answers[0],
             q2: answers[1],
             q3: Array.isArray(answers[2]) ? answers[2].join(', ') : answers[2],
@@ -505,12 +515,19 @@ const handleSave = async () => {
             q10: answers[11],
             notes: note,
 
-            // Synchronizacja do DE tylko wybranych
             q1_de: syncDe(answers[0]),
             q3_de: Array.isArray(answers[2]) ? answers[2].join(', ') : syncDe(answers[2]),
             q5_de: syncDe(answers[4]),
             q6_de: answers[5],
-            q7_de: syncDe(answers[6])
+            q7_de: syncDe(answers[6]),
+
+            // 🔁 tylko przy zapisie PL
+            q2_de,
+            q4_de,
+            q7_why_de,
+            q8_plus_de,
+            q8_minus_de,
+            notes_de
           }),
 
       caregiver_first_name: editedCaregiverFirstName,
@@ -529,13 +546,12 @@ const handleSave = async () => {
 
     const updated = res.data;
 
-    // 🔐 Bezpieczne nadpisanie: tylko zmienione pola
+    // 🧠 Zachowaj wszystko, nie nadpisuj danych spoza PATCH-a
     setSelected(prev => ({
       ...prev,
       ...updated
     }));
 
-    // 🔁 Zaktualizuj tylko odpowiednią wersję odpowiedzi
     if (showGerman) {
       setEditedAnswersDe([
         updated.q1_de || '',
