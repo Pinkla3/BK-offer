@@ -625,6 +625,7 @@ const handleSave = async () => {
     toast.error('Nie udało się zapisać odpowiedzi.');
   }
 };
+
 const odmianaPytanie = (count) => {
   if (count === 1) return 'pytaniu';
   if ([2, 3, 4].includes(count)) return 'pytaniach';
