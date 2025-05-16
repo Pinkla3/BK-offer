@@ -511,6 +511,16 @@ const handleSave = async () => {
     const syncArray = (arr) => Array.isArray(arr) ? arr.map(val => reverseTranslationMap[val] || val) : [];
     const syncArrayDe = (arr) => Array.isArray(arr) ? arr.map(val => translationMapPlToDe[val] || val) : [];
 
+    // 🔁 Tłumaczenie pól tekstowych tylko przy zapisie PL
+    let q4_de = '', q7_why_de = '', q8_plus_de = '', q8_minus_de = '', notes_de = '';
+    if (!showGerman) {
+      q4_de = await handleDynamicTranslate(answers[3] || '');
+      q7_why_de = await handleDynamicTranslate(answers[7] || '');
+      q8_plus_de = await handleDynamicTranslate(answers[8] || '');
+      q8_minus_de = await handleDynamicTranslate(answers[9] || '');
+      notes_de = await handleDynamicTranslate(note || '');
+    }
+
     const payload = {
       ...(showGerman
         ? {
@@ -518,6 +528,7 @@ const handleSave = async () => {
             q1_de: answers[0],
             q2_de: Array.isArray(answers[1]) ? answers[1].join(', ') : answers[1],
             q3_de: Array.isArray(answers[2]) ? answers[2].join(', ') : answers[2],
+            q4_de: answers[3],
             q5_de: answers[4],
             q6_de: answers[5],
             q7_de: answers[6],
@@ -528,13 +539,12 @@ const handleSave = async () => {
             q10_de: answers[11],
             notes_de: note,
 
-            // 🔁 Synchronizacja tylko wybranych pól PL
+            // 🔁 Synchronizacja opcji DE → PL
             q1: sync(answers[0]),
             q3: Array.isArray(answers[2]) ? answers[2].join(', ') : sync(answers[2]),
             q5: sync(answers[4]),
             q6: answers[5],
             q7: sync(answers[6])
-            // ⛔ q2 NIE synchronizujemy z DE → PL
           }
         : {
             // Zapis wersji PL
@@ -552,13 +562,18 @@ const handleSave = async () => {
             q10: answers[11],
             notes: note,
 
-            // 🔁 Synchronizacja do DE
+            // 🔁 Synchronizacja opcji PL → DE
             q1_de: syncDe(answers[0]),
             q2_de: syncArrayDe(answers[1]).join(', '),
             q3_de: Array.isArray(answers[2]) ? answers[2].join(', ') : syncDe(answers[2]),
+            q4_de,
             q5_de: syncDe(answers[4]),
             q6_de: answers[5],
-            q7_de: syncDe(answers[6])
+            q7_de: syncDe(answers[6]),
+            q7_why_de,
+            q8_plus_de,
+            q8_minus_de,
+            notes_de
           }),
 
       caregiver_first_name: editedCaregiverFirstName,
@@ -587,7 +602,7 @@ const handleSave = async () => {
         updated.q1_de || '',
         updated.q2_de?.split(', ') || [],
         updated.q3_de?.split(', ') || [],
-         updated.q4_de || '',
+        updated.q4_de || '',
         updated.q5_de || '',
         updated.q6_de || '',
         updated.q7_de || '',
@@ -625,7 +640,6 @@ const handleSave = async () => {
     toast.error('Nie udało się zapisać odpowiedzi.');
   }
 };
-
 const odmianaPytanie = (count) => {
   if (count === 1) return 'pytaniu';
   if ([2, 3, 4].includes(count)) return 'pytaniach';
