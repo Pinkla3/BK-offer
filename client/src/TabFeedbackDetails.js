@@ -519,6 +519,7 @@ const hasChanges = () => {
 const handleSave = async () => {
   try {
 if (!hasChanges()) {
+  setEditing(false);
   toast.info('Brak zmian do zapisania.');
   return;
 }
