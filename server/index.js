@@ -627,48 +627,79 @@ app.post('/api/translate', authenticate, async (req, res) => {
 });
 
 app.patch('/api/tabResponses/:id', authenticate, async (req, res) => {
-  const id = req.params.id;
+  const { id } = req.params;
   const updates = req.body;
-  const userName = req.user.name || 'Nieznany użytkownik';
 
   try {
-    const [rows] = await pool.query('SELECT * FROM tab_responses WHERE id = ?', [id]);
-    if (rows.length === 0) return res.status(404).json({ error: 'Feedback nie istnieje' });
-
-    const current = rows[0];
-    const editHistory = JSON.parse(current.edit_history || '[]');
-    const now = new Date().toLocaleString('pl-PL', {
+    const formattedDateTime = new Date().toLocaleString('pl-PL', {
       timeZone: 'Europe/Warsaw',
-      hour12: false
+      hour12: false,
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
     });
-    editHistory.push(`Edytowano przez ${userName} dnia ${now}`);
 
-    // ⛔ odfiltruj puste wartości ('' / null / undefined)
-    const cleaned = Object.fromEntries(
-      Object.entries(updates).filter(([_, val]) =>
-        val !== '' && val !== null && val !== undefined
-      )
-    );
+    const [[userRow]] = await pool.query('SELECT name FROM users WHERE id = ?', [req.user.id]);
+    const userName = userRow ? userRow.name : 'nieznany użytkownik';
+    const historyEntry = `Edytowano przez ${userName} dnia ${formattedDateTime}`;
 
-    // dodaj edit_history
-    cleaned.edit_history = JSON.stringify(editHistory);
+    const [rows] = await pool.query('SELECT edit_history FROM tab_responses WHERE id = ?', [id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Nie znaleziono odpowiedzi' });
+    }
 
-    const fields = Object.keys(cleaned);
-    const values = Object.values(cleaned);
-    const setClause = fields.map(f => `${f} = ?`).join(', ');
+    let updatedHistory = [];
+    if (rows[0].edit_history) {
+      try {
+        updatedHistory = JSON.parse(rows[0].edit_history);
+        if (!Array.isArray(updatedHistory)) updatedHistory = [];
+      } catch {
+        updatedHistory = [];
+      }
+    }
 
-    await pool.query(
-      `UPDATE tab_responses SET ${setClause} WHERE id = ?`,
-      [...values, id]
-    );
+    updatedHistory.push(historyEntry);
 
-    const [updatedRows] = await pool.query('SELECT * FROM tab_responses WHERE id = ?', [id]);
-    res.json(updatedRows[0]);
-  } catch (error) {
-    console.error('❌ Błąd przy aktualizacji feedback:', error);
-    res.status(500).json({ error: 'Wystąpił błąd przy aktualizacji feedbacku.' });
+    await pool.query(`
+      UPDATE tab_responses SET
+        caregiver_first_name = ?, caregiver_last_name = ?, caregiver_phone = ?,
+        patient_first_name = ?, patient_last_name = ?,
+        q1 = ?, q2 = ?, q3 = ?, q4 = ?, q5 = ?,
+        q6 = ?, q7 = ?, q8 = ?, q9 = ?, q10 = ?,
+        notes = ?, q1_de = ?, q2_de = ?, q3_de = ?, q4_de = ?, q5_de = ?,
+        q6_de = ?, q7_de = ?, q8_de = ?, q9_de = ?, q10_de = ?,
+        notes_de = ?, edit_history = ?
+      WHERE id = ?
+    `, [
+      updates.caregiver_first_name, updates.caregiver_last_name, updates.caregiver_phone,
+      updates.patient_first_name, updates.patient_last_name,
+      updates.q1, updates.q2, updates.q3, updates.q4, updates.q5,
+      updates.q6, updates.q7, updates.q8, updates.q9, updates.q10,
+      updates.notes,
+      updates.q1_de, updates.q2_de, updates.q3_de, updates.q4_de, updates.q5_de,
+      updates.q6_de, updates.q7_de, updates.q8_de, updates.q9_de, updates.q10_de,
+      updates.notes_de,
+      JSON.stringify(updatedHistory),
+      id
+    ]);
+
+    const [[updated]] = await pool.query(`
+      SELECT tab_responses.*, users.name AS user_name
+      FROM tab_responses
+      JOIN users ON tab_responses.user_id = users.id
+      WHERE tab_responses.id = ?
+    `, [id]);
+
+    res.json(updated);
+  } catch (err) {
+    console.error('Błąd przy aktualizacji feedback:', err);
+    res.status(500).json({ error: 'Błąd serwera podczas zapisu feedback.' });
   }
 });
+
 app.delete('/api/tabResponses/:id', authenticate, async (req, res) => {
   const { id } = req.params;
   const userId = req.user.id;
