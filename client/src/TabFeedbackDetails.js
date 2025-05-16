@@ -482,7 +482,7 @@ const handleSave = async () => {
     };
 
     if (showGerman) {
-      // Pola tekstowe (_de only)
+      // Tekstowe pola _de
       assignIfFilled(answersDe[1], 'q2_de');
       assignIfFilled(answersDe[3], 'q4_de');
       assignIfFilled(answersDe[7], 'q7_why_de');
@@ -492,7 +492,7 @@ const handleSave = async () => {
       assignIfFilled(answersDe[11], 'q10_de');
       assignIfFilled(noteDe, 'notes_de');
 
-      // Synchronizowane: tylko jeśli PL puste
+      // q1, q5, q7 (tylko jeśli PL puste)
       if (answersDe[0]?.trim()) {
         payload.q1_de = answersDe[0];
         if (!selected.q1?.trim()) {
@@ -512,7 +512,7 @@ const handleSave = async () => {
         }
       }
 
-      // q3 – checkbox
+      // q3 (checkbox)
       const q3de = Array.isArray(answersDe[2]) ? answersDe[2].join(', ') : answersDe[2] || '';
       if (q3de) {
         payload.q3_de = q3de;
@@ -521,7 +521,7 @@ const handleSave = async () => {
         }
       }
 
-      // q6 – liczba
+      // q6 (liczba)
       const q6de = answersDe[5]?.toString().trim();
       if (q6de) {
         payload.q6_de = q6de;
@@ -531,7 +531,7 @@ const handleSave = async () => {
       }
 
     } else {
-      // Pola tekstowe (PL only)
+      // Tekstowe pola PL
       assignIfFilled(answers[1], 'q2');
       assignIfFilled(answers[3], 'q4');
       assignIfFilled(answers[7], 'q7_why');
@@ -541,7 +541,7 @@ const handleSave = async () => {
       assignIfFilled(answers[11], 'q10');
       assignIfFilled(note, 'notes');
 
-      // Synchronizowane: tylko jeśli DE puste
+      // q1, q5, q7
       if (answers[0]?.trim()) {
         payload.q1 = answers[0];
         if (!selected.q1_de?.trim()) {
@@ -561,7 +561,7 @@ const handleSave = async () => {
         }
       }
 
-      // q3 – checkbox
+      // q3
       const q3 = Array.isArray(answers[2]) ? answers[2].join(', ') : answers[2] || '';
       if (q3) {
         payload.q3 = q3;
@@ -570,7 +570,7 @@ const handleSave = async () => {
         }
       }
 
-      // q6 – liczba
+      // q6
       const q6 = answers[5]?.toString().trim();
       if (q6) {
         payload.q6 = q6;
@@ -580,7 +580,6 @@ const handleSave = async () => {
       }
     }
 
-    // PATCH do backendu
     const res = await axios.patch(
       `${API_BASE_URL}/api/tabResponses/${selected.id}`,
       payload,
@@ -589,7 +588,6 @@ const handleSave = async () => {
 
     const updated = res.data;
 
-    // Odśwież formularz
     const getAnswersFrom = (source, isGerman = false) =>
       Array.from({ length: 12 }, (_, i) => {
         const key = `q${i + 1}${isGerman ? '_de' : ''}`;
