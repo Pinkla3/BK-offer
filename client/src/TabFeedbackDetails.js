@@ -1127,6 +1127,7 @@ const handleToggleGerman = async () => {
   })()}
 </QuestionGroup>
 {/* Pytanie 2 */}
+{/* Pytanie 2 — q3 + q4 (checkboxy wielokrotnego wyboru z synchronizacją) */}
 <QuestionGroup>
   <Label>
     {questions[2]}
@@ -1137,107 +1138,112 @@ const handleToggleGerman = async () => {
     )}
   </Label>
 
-  <div
-    style={{
-      display: 'grid',
-      gridTemplateColumns: '250px 1fr',
-      columnGap: '30px',
-      rowGap: '12px',
-      marginTop: '10px',
-      maxWidth: '700px',
-      marginLeft: 'auto',
-      marginRight: 'auto'
-    }}
-  >
-    {checkboxOptionsQ2.map(option => {
-      const list = editing
-        ? Array.isArray(editedAnswers[2]) ? editedAnswers[2] : typeof editedAnswers[2] === 'string' ? editedAnswers[2].split(', ') : []
-        : typeof selected.q3 === 'string' ? selected.q3.split(', ') : Array.isArray(selected.q3) ? selected.q3 : [];
+  {/* ZMIENNA list dostępna dla checkboxów i inputa */}
+  {(() => {
+    const list = editing
+      ? Array.isArray(editedAnswers[2]) ? editedAnswers[2] : typeof editedAnswers[2] === 'string' ? editedAnswers[2].split(', ') : []
+      : typeof selected.q3 === 'string' ? selected.q3.split(', ') : Array.isArray(selected.q3) ? selected.q3 : [];
 
-      const isChecked = list.includes(option);
+    return (
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '250px 1fr',
+          columnGap: '30px',
+          rowGap: '12px',
+          marginTop: '10px',
+          maxWidth: '700px',
+          marginLeft: 'auto',
+          marginRight: 'auto'
+        }}
+      >
+        {checkboxOptionsQ2.map(option => {
+          const isChecked = list.includes(option);
 
-      return (
-        <label
-          key={option}
+          return (
+            <label
+              key={option}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                fontSize: '16px',
+                cursor: editing ? 'pointer' : 'default',
+                userSelect: 'none',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={isChecked}
+                disabled={!editing}
+                onChange={() => {
+                  if (!editing) return;
+
+                  const toggle = (arr, val) =>
+                    arr.includes(val)
+                      ? arr.filter(i => i !== val)
+                      : [...arr, val];
+
+                  setEditedAnswers(prev => {
+                    const prevList = Array.isArray(prev[2]) ? prev[2] : typeof prev[2] === 'string' ? prev[2].split(', ') : [];
+                    const updated = toggle(prevList, option);
+                    const newAnswers = [...prev];
+                    newAnswers[2] = updated;
+                    return newAnswers;
+                  });
+
+                  setEditedAnswersDe(prev => {
+                    const prevList = Array.isArray(prev[2]) ? prev[2] : typeof prev[2] === 'string' ? prev[2].split(', ') : [];
+                    const updated = toggle(prevList, option);
+                    const newAnswers = [...prev];
+                    newAnswers[2] = updated;
+                    return newAnswers;
+                  });
+                }}
+                style={{
+                  width: '20px',
+                  height: '20px',
+                  accentColor: '#007bff'
+                }}
+              />
+              <span>{t(option)}</span>
+            </label>
+          );
+        })}
+
+        {/* Input dla "inne trudności" */}
+        <Input
+          type="text"
+          placeholder={t('Proszę podać szczegóły')}
+          value={
+            editing
+              ? editedAnswers[3] || ''
+              : showGerman
+                ? selected.q4_de?.trim() || '[brak tekstu do tłumaczenia]'
+                : selected.q4 || ''
+          }
+          onChange={editing ? (e) => {
+            const val = e.target.value;
+            const updatedPL = [...editedAnswers];
+            updatedPL[3] = val;
+            setEditedAnswers(updatedPL);
+
+            const updatedDE = [...editedAnswersDe];
+            updatedDE[3] = val;
+            setEditedAnswersDe(updatedDE);
+          } : undefined}
+          readOnly={!editing}
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            fontSize: '16px',
-            cursor: editing ? 'pointer' : 'default',
-            userSelect: 'none',
-            whiteSpace: 'nowrap'
+            width: '100%',
+            maxWidth: '300px',
+            visibility: list.includes('inne trudności') ? 'visible' : 'hidden',
+            pointerEvents: list.includes('inne trudności') ? 'auto' : 'none'
           }}
-        >
-          <input
-            type="checkbox"
-            checked={isChecked}
-            disabled={!editing}
-            onChange={() => {
-              if (!editing) return;
-
-              const toggle = (list, item) =>
-                list.includes(item)
-                  ? list.filter(i => i !== item)
-                  : [...list, item];
-
-              setEditedAnswers(prev => {
-                const prevList = Array.isArray(prev[2]) ? prev[2] : typeof prev[2] === 'string' ? prev[2].split(', ') : [];
-                const updated = toggle(prevList, option);
-                const newAnswers = [...prev];
-                newAnswers[2] = updated;
-                return newAnswers;
-              });
-
-              setEditedAnswersDe(prev => {
-                const prevList = Array.isArray(prev[2]) ? prev[2] : typeof prev[2] === 'string' ? prev[2].split(', ') : [];
-                const updated = toggle(prevList, option);
-                const newAnswers = [...prev];
-                newAnswers[2] = updated;
-                return newAnswers;
-              });
-            }}
-            style={{
-              width: '20px',
-              height: '20px',
-              accentColor: '#007bff'
-            }}
-          />
-          <span>{t(option)}</span>
-        </label>
-      );
-    })}
-
-    {/* Input tekstowy dla "inne trudności" */}
-    <Input
-      type="text"
-      placeholder={t('Proszę podać szczegóły')}
-      value={
-        editing
-          ? editedAnswers[3] || ''
-          : showGerman
-            ? selected.q4_de?.trim() || '[brak tekstu do tłumaczenia]'
-            : selected.q4 || ''
-      }
-      onChange={editing ? (e) => {
-        const val = e.target.value;
-        const updatedPL = [...editedAnswers];
-        updatedPL[3] = val;
-        setEditedAnswers(updatedPL);
-
-        const updatedDE = [...editedAnswersDe];
-        updatedDE[3] = val;
-        setEditedAnswersDe(updatedDE);
-      } : undefined}
-      readOnly={!editing}
-      style={{
-        width: '100%',
-        maxWidth: '300px',
-        visibility: list.includes('inne trudności') ? 'visible' : 'hidden',
-        pointerEvents: list.includes('inne trudności') ? 'auto' : 'none'
-      }}
-    />
-  </div>
+        />
+      </div>
+    );
+  })()}
 </QuestionGroup>
 {/* Pytanie 3 */}
 <QuestionGroup>
