@@ -451,56 +451,37 @@ const handleSave = async () => {
       caregiver_phone: editedCaregiverPhone,
       patient_first_name: editedPatientFirstName,
       patient_last_name: editedPatientLastName,
-      no_history: showGerman
+      q1: editedAnswers[0],
+      q2: editedAnswers[1],
+      q3: Array.isArray(editedAnswers[2]) ? editedAnswers[2].join(', ') : editedAnswers[2],
+      q4: editedAnswers[3],
+      q5: editedAnswers[4],
+      q6: editedAnswers[5],
+      q7: editedAnswers[6],
+      q7_why: editedAnswers[7],
+      q8_plus: editedAnswers[8],
+      q8_minus: editedAnswers[9],
+      q9: editedAnswers[10],
+      q10: editedAnswers[11],
+      notes: editedNote,           // ✅ poprawka
+      notes_de: editedNoteDe       // ✅ jeśli chcesz też wersję DE
     };
-
-    const inputTextareaIndexes = [1, 3, 7, 8, 9, 10, 11]; // q2, q4, q7_why, q8_plus, q8_minus, q9, q10
-    const answers = showGerman ? editedAnswersDe : editedAnswers;
-    const note = showGerman ? editedNoteDe : editedNote;
-
-    inputTextareaIndexes.forEach((i) => {
-      const val = answers[i];
-      if (val?.toString().trim()) {
-        const key = `q${i + 1}${showGerman ? '_de' : ''}`;
-        payload[key] = val;
-      }
-    });
-
-    if (note?.toString().trim()) {
-      payload[showGerman ? 'notes_de' : 'notes'] = note;
-    }
 
     const res = await axios.patch(
       `${API_BASE_URL}/api/tabResponses/${selected.id}`,
       payload,
-      {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      }
+      { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
     );
 
-const updated = res.data;
-const merged = { ...selected, ...updated };
-
-const getAnswersFrom = (source, isGerman = false) =>
-  Array.from({ length: 12 }, (_, i) => {
-    const key = `q${i + 1}${isGerman ? '_de' : ''}`;
-    return source[key] || '';
-  });
-
-setEditedAnswers(getAnswersFrom(merged, false));
-setEditedAnswersDe(getAnswersFrom(merged, true));
-setEditedNote(merged.notes || '');
-setEditedNoteDe(merged.notes_de || '');
-
-    setSelected(updated);
+    setSelected(res.data);
     setEditing(false);
-    setIsTranslated(true);
-
-    toast.success('Dane zapisane pomyślnie!');
+    setIsTranslated(false);
+    setIsPolishChangedSinceTranslation(true);
+    toast.success('Wersja polska zapisana.');
     window.dispatchEvent(new Event('feedbackUpdated'));
   } catch (err) {
-    console.error('Błąd zapisu:', err);
-    toast.error('Wystąpił błąd podczas zapisywania. Spróbuj ponownie.');
+    console.error('Błąd zapisu wersji PL:', err);
+    toast.error('Nie udało się zapisać wersji polskiej.');
   }
 };
 
