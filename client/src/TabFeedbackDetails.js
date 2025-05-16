@@ -1262,33 +1262,36 @@ const handleToggleGerman = async () => {
 
         {/* Input dla "inne trudności" */}
         <Input
-          type="text"
-          placeholder={t('Proszę podać szczegóły')}
-          value={
-            editing
-              ? editedAnswers[3] || ''
-              : showGerman
-                ? selected.q4_de?.trim() || '[brak tekstu do tłumaczenia]'
-                : selected.q4 || ''
-          }
-          onChange={editing ? (e) => {
-            const val = e.target.value;
-            const updatedPL = [...editedAnswers];
-            updatedPL[3] = val;
-            setEditedAnswers(updatedPL);
+  type="text"
+  placeholder={t('Proszę podać szczegóły')}
+  value={
+    editing
+      ? (showGerman ? editedAnswersDe[3] : editedAnswers[3]) || ''
+      : showGerman
+        ? selected.q4_de?.trim() || '[brak tekstu do tłumaczenia]'
+        : selected.q4 || ''
+  }
+  onChange={editing ? (e) => {
+    const val = e.target.value;
+    if (showGerman) {
+      const updated = [...editedAnswersDe];
+      updated[3] = val;
+      setEditedAnswersDe(updated);
+    } else {
+      const updated = [...editedAnswers];
+      updated[3] = val;
+      setEditedAnswers(updated);
+    }
+  } : undefined}
+  readOnly={!editing}
+  style={{
+    width: '100%',
+    maxWidth: '300px',
+    visibility: list.includes('inne trudności') ? 'visible' : 'hidden',
+    pointerEvents: list.includes('inne trudności') ? 'auto' : 'none'
+  }}
+/>
 
-            const updatedDE = [...editedAnswersDe];
-            updatedDE[3] = val;
-            setEditedAnswersDe(updatedDE);
-          } : undefined}
-          readOnly={!editing}
-          style={{
-            width: '100%',
-            maxWidth: '300px',
-            visibility: list.includes('inne trudności') ? 'visible' : 'hidden',
-            pointerEvents: list.includes('inne trudności') ? 'auto' : 'none'
-          }}
-        />
       </div>
     );
   })()}
@@ -1521,29 +1524,29 @@ value={
       </span>
     )}
   </Label>
-  <TextArea
-value={
-  editing
-    ? editedAnswers[8] || ''
-    : showGerman
-      ? (editedAnswersDe[8] || selected.q8_plus_de || '[brak tłumaczenia]')
-      : selected.q8_plus || ''
-}
-    readOnly={!editing}
-    onChange={editing ? (e) => {
-      const updated = [...editedAnswers];
-      updated[8] = e.target.value;
-      setEditedAnswers(updated);
-    } : undefined}
-    rows={2}
-    placeholder={t('Np. dobra atmosfera, wsparcie rodziny...')}
-    style={{
-      marginBottom: '16px',
-      backgroundColor: showGerman && !editing && !((editedAnswersDe[8] || selected.q8_plus_de)?.trim()) ? '#f8d7da' : '#fff',
-      borderColor: showGerman && !editing && !((editedAnswersDe[8] || selected.q8_plus_de)?.trim()) ? '#f5c6cb' : '#ccc',
-      color: showGerman && !editing && !((editedAnswersDe[8] || selected.q8_plus_de)?.trim()) ? '#721c24' : '#000'
-    }}
-  />
+ <TextArea
+  value={
+    editing
+      ? (showGerman ? editedAnswersDe[8] : editedAnswers[8]) || ''
+      : showGerman
+        ? selected.q8_plus_de || '[brak tłumaczenia]'
+        : selected.q8_plus || ''
+  }
+  readOnly={!editing}
+  onChange={editing ? (e) => {
+    const updated = showGerman ? [...editedAnswersDe] : [...editedAnswers];
+    updated[8] = e.target.value;
+    showGerman ? setEditedAnswersDe(updated) : setEditedAnswers(updated);
+  } : undefined}
+  rows={2}
+  placeholder={t('Np. dobra atmosfera, wsparcie rodziny...')}
+  style={{
+    marginBottom: '16px',
+    backgroundColor: showGerman && !editing && !((editedAnswersDe[8] || selected.q8_plus_de)?.trim()) ? '#f8d7da' : '#fff',
+    borderColor: showGerman && !editing && !((editedAnswersDe[8] || selected.q8_plus_de)?.trim()) ? '#f5c6cb' : '#ccc',
+    color: showGerman && !editing && !((editedAnswersDe[8] || selected.q8_plus_de)?.trim()) ? '#721c24' : '#000'
+  }}
+/>
 
   {/* q8_minus */}
   <Label>
@@ -1554,28 +1557,28 @@ value={
       </span>
     )}
   </Label>
-  <TextArea
-value={
-  editing
-    ? editedAnswers[9] || ''
-    : showGerman
-      ? (editedAnswersDe[9] || selected.q8_minus_de || '[brak tłumaczenia]')
-      : selected.q8_minus || ''
-}
-    readOnly={!editing}
-    onChange={editing ? (e) => {
-      const updated = [...editedAnswers];
-      updated[9] = e.target.value;
-      setEditedAnswers(updated);
-    } : undefined}
-    rows={2}
-    placeholder={t('Np. brak czasu wolnego, trudna komunikacja...')}
-    style={{
-      backgroundColor: showGerman && !editing && !((editedAnswersDe[9] || selected.q8_minus_de)?.trim()) ? '#f8d7da' : '#fff',
-      borderColor: showGerman && !editing && !((editedAnswersDe[9] || selected.q8_minus_de)?.trim()) ? '#f5c6cb' : '#ccc',
-      color: showGerman && !editing && !((editedAnswersDe[9] || selected.q8_minus_de)?.trim()) ? '#721c24' : '#000'
-    }}
-  />
+<TextArea
+  value={
+    editing
+      ? (showGerman ? editedAnswersDe[9] : editedAnswers[9]) || ''
+      : showGerman
+        ? selected.q8_minus_de || '[brak tłumaczenia]'
+        : selected.q8_minus || ''
+  }
+  readOnly={!editing}
+  onChange={editing ? (e) => {
+    const updated = showGerman ? [...editedAnswersDe] : [...editedAnswers];
+    updated[9] = e.target.value;
+    showGerman ? setEditedAnswersDe(updated) : setEditedAnswers(updated);
+  } : undefined}
+  rows={2}
+  placeholder={t('Np. brak czasu wolnego, trudna komunikacja...')}
+  style={{
+    backgroundColor: showGerman && !editing && !((editedAnswersDe[9] || selected.q8_minus_de)?.trim()) ? '#f8d7da' : '#fff',
+    borderColor: showGerman && !editing && !((editedAnswersDe[9] || selected.q8_minus_de)?.trim()) ? '#f5c6cb' : '#ccc',
+    color: showGerman && !editing && !((editedAnswersDe[9] || selected.q8_minus_de)?.trim()) ? '#721c24' : '#000'
+  }}
+/>
 </QuestionGroup>
 
 {/* Notatka */}
