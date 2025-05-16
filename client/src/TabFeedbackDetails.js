@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { FaArrowLeft, FaEdit, FaSave, FaSpinner, FaSyncAlt } from 'react-icons/fa';
+import { FaArrowLeft, FaEdit, FaSave, FaSpinner, FaSyncAlt, FaCopy } from 'react-icons/fa';
 import Modal from 'react-modal';
 
 const API_BASE_URL = 'https://desk.berlin-opiekunki.pl';
@@ -988,6 +988,23 @@ const handleToggleGerman = async () => {
   'inne trudności'
 ];
 
+const handleCopyToClipboard = () => {
+  const questions = showGerman ? questionsDe : questionsPl;
+  const answers = showGerman ? editedAnswersDe : editedAnswers;
+  const note = showGerman ? editedNoteDe : editedNote;
+
+  const content = questions
+    .map((q, i) => q ? `${q}\n${Array.isArray(answers[i]) ? answers[i].join(', ') : answers[i] || '[brak odpowiedzi]'}` : null)
+    .filter(Boolean)
+    .join('\n\n');
+
+  const fullText = `${content}\n\n${showGerman ? noteLabelDe : noteLabelPl}\n${note || '[brak notatki]'}`;
+
+  navigator.clipboard.writeText(fullText)
+    .then(() => toast.success('Feedback skopiowany do schowka!'))
+    .catch(() => toast.error('Nie udało się skopiować.'));
+};
+
   return (
     <Wrapper>
      <TitleRow>
@@ -1077,7 +1094,13 @@ const handleToggleGerman = async () => {
   </FieldCard>
 </DetailSection>
 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-  <div style={{ width: '80px' }} /> {/* lewa przestrzeń */}
+  <SmallButton
+  onClick={handleCopyToClipboard}
+  style={{ width: '200px', justifyContent: 'center', alignSelf: 'center', marginBottom: '16px' }}
+>
+  <FaCopy />
+  Kopiuj feedback
+</SmallButton>
 
   <Title style={{ textAlign: 'center', flex: 1 }}>Feedback</Title>
 
