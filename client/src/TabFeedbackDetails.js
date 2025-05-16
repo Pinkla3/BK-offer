@@ -547,13 +547,6 @@ if (!hasChanges()) {
 
     // 🔁 Tłumaczenie pól tekstowych tylko przy zapisie PL
     let q4_de = '', q7_why_de = '', q8_plus_de = '', q8_minus_de = '', notes_de = '';
-    if (!showGerman) {
-      q4_de = await handleDynamicTranslate(answers[3] || '');
-      q7_why_de = await handleDynamicTranslate(answers[7] || '');
-      q8_plus_de = await handleDynamicTranslate(answers[8] || '');
-      q8_minus_de = await handleDynamicTranslate(answers[9] || '');
-      notes_de = await handleDynamicTranslate(note || '');
-    }
 
     const payload = {
       ...(showGerman
@@ -600,14 +593,10 @@ if (!hasChanges()) {
             q1_de: syncDe(answers[0]),
             q2_de: syncArrayDe(answers[1]).join(', '),
             q3_de: Array.isArray(answers[2]) ? answers[2].join(', ') : syncDe(answers[2]),
-            q4_de,
+
             q5_de: syncDe(answers[4]),
             q6_de: answers[5],
             q7_de: syncDe(answers[6]),
-            q7_why_de,
-            q8_plus_de,
-            q8_minus_de,
-            notes_de
           }),
 
       caregiver_first_name: editedCaregiverFirstName,
