@@ -488,7 +488,7 @@ const handleSave = async () => {
 
             // synchronizacja PL
             q1: sync(selected.q1, answers[0]),
-            q3: Array.isArray(answers[2]) ? answers[2].join(', ') : sync(selected.q3, answers[2]),
+            q3: Array.isArray(answers[2]) ? answers[2] : [answers[2]],
             q5: sync(selected.q5, answers[4]),
             q6: answers[5] ?? selected.q6,
             q7: sync(selected.q7, answers[6])
@@ -510,7 +510,7 @@ const handleSave = async () => {
 
             // synchronizacja DE
             q1_de: syncDe(answers[0], selected.q1_de),
-            q3_de: syncDe(answers[2], selected.q3_de),
+            q3_de: Array.isArray(answers[2]) ? answers[2] : [answers[2]],
             q5_de: syncDe(answers[4], selected.q5_de),
             q6_de: answers[5] ?? selected.q6_de,
             q7_de: syncDe(answers[6], selected.q7_de)
