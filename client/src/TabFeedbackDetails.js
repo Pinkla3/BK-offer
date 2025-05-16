@@ -1657,7 +1657,7 @@ value={
     }}
   />
 </QuestionGroup>
-<div style={{ marginTop: '32px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+<div style={{ marginTop: '32px', display: 'flex', flexDirection: 'column', alignItems: 'center', width:'50px' }}>
     {editing ? (
       <Button onClick={handleSave} disabled={translating}>
         {translating ? <SpinnerIcon size={16} /> : <FaSave />}
