@@ -506,7 +506,6 @@ const handleSave = async () => {
       Object.entries(translationMapPlToDe).map(([pl, de]) => [de, pl])
     );
 
-    // 🔁 synchronizacja opcji
     const sync = (deValue) => reverseTranslationMap[deValue] || '';
     const syncDe = (plValue) => translationMapPlToDe[plValue] || '';
     const syncArray = (arr) => Array.isArray(arr) ? arr.map(val => reverseTranslationMap[val] || val) : [];
@@ -515,7 +514,7 @@ const handleSave = async () => {
     const payload = {
       ...(showGerman
         ? {
-            // ✍️ zapis DE
+            // Zapis wersji DE
             q1_de: answers[0],
             q2_de: Array.isArray(answers[1]) ? answers[1].join(', ') : answers[1],
             q3_de: Array.isArray(answers[2]) ? answers[2].join(', ') : answers[2],
@@ -529,16 +528,16 @@ const handleSave = async () => {
             q10_de: answers[11],
             notes_de: note,
 
-            // 🔁 synchronizacja do PL
+            // 🔁 Synchronizacja tylko wybranych pól PL
             q1: sync(answers[0]),
-            q2: syncArray(answers[1]).join(', '),
             q3: Array.isArray(answers[2]) ? answers[2].join(', ') : sync(answers[2]),
             q5: sync(answers[4]),
             q6: answers[5],
             q7: sync(answers[6])
+            // ⛔ q2 NIE synchronizujemy z DE → PL
           }
         : {
-            // ✍️ zapis PL
+            // Zapis wersji PL
             q1: answers[0],
             q2: Array.isArray(answers[1]) ? answers[1].join(', ') : answers[1],
             q3: Array.isArray(answers[2]) ? answers[2].join(', ') : answers[2],
@@ -553,7 +552,7 @@ const handleSave = async () => {
             q10: answers[11],
             notes: note,
 
-            // 🔁 synchronizacja do DE
+            // 🔁 Synchronizacja do DE
             q1_de: syncDe(answers[0]),
             q2_de: syncArrayDe(answers[1]).join(', '),
             q3_de: Array.isArray(answers[2]) ? answers[2].join(', ') : syncDe(answers[2]),
@@ -626,35 +625,6 @@ const handleSave = async () => {
     toast.error('Nie udało się zapisać odpowiedzi.');
   }
 };
-
-
-const handleSaveNote = async () => {
-  try {
-    const payload = showGerman ? { notes_de: editedNoteDe } : { notes: editedNote };
-
-    const { data } = await axios.patch(
-      `${API_BASE_URL}/api/tabResponses/${selected.id}`,
-      payload,
-      { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
-    );
-
-    setSelected(prev => ({
-      ...prev,
-      ...payload,
-      user_name: data.user_name || prev.user_name,
-      edit_history: data.edit_history,
-    }));
-
-    if (showGerman) setTranslatedNote(editedNoteDe);
-    setEditing(false);
-    toast.success('Notatka została zapisana.');
-    window.dispatchEvent(new Event('feedbackUpdated'));
-  } catch (err) {
-    console.error('Błąd zapisu notatki:', err);
-    toast.error('Nie udało się zapisać notatki.');
-  }
-};
-
 const odmianaPytanie = (count) => {
   if (count === 1) return 'pytaniu';
   if ([2, 3, 4].includes(count)) return 'pytaniach';
