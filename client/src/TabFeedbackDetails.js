@@ -1379,6 +1379,7 @@ const handleToggleGerman = async () => {
       </span>
     )}
   </Label>
+
   <div
     style={{
       display: 'grid',
@@ -1421,12 +1422,24 @@ const handleToggleGerman = async () => {
     })}
   </div>
 
+  {/* 🔁 Animowane pole tekstowe (dla "Nie") */}
   {(() => {
-    const currentVal = editing ? editedAnswers[6] : selected.q7;
-    const shouldShow = currentVal === 'Nie';
+    const triggerValuesPL = ['Nie'];
+    const triggerValuesDE = ['Nein'];
+    const selectedVal = editing ? editedAnswers[6] || editedAnswersDe[6] : selected.q7 || selected.q7_de;
+    const shouldShow = triggerValuesPL.includes(selectedVal) || triggerValuesDE.includes(selectedVal);
 
-    return shouldShow && (
-      <>
+    return (
+      <div
+        style={{
+          marginTop: '16px',
+          overflow: 'hidden',
+          maxHeight: shouldShow ? '200px' : '0px',
+          opacity: shouldShow ? 1 : 0,
+          transition: 'all 0.4s ease',
+          width: '100%'
+        }}
+      >
         <Label>
           {questions[7]}
           {showGerman && !editing && !(selected.q7_why_de || '').trim() && (
@@ -1452,7 +1465,7 @@ const handleToggleGerman = async () => {
           placeholder={showGerman ? 'Warum nicht?' : 'Dlaczego nie?'}
           rows={3}
         />
-      </>
+      </div>
     );
   })()}
 </QuestionGroup>
