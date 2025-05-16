@@ -443,7 +443,7 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
     setEditedPatientFirstName(selected.patient_first_name || '');
     setEditedPatientLastName(selected.patient_last_name || '');
   };
- const handleSave = async () => {
+const handleSave = async () => {
   try {
     const payload = {
       caregiver_first_name: editedCaregiverFirstName,
@@ -462,93 +462,91 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
       'Nie': 'Nein'
     };
 
-    const reverseTranslationMap = {
-      'sehr gut': 'bardzo dobrze',
-      'gut': 'dobrze',
-      'durchschnittlich': 'średnio',
-      'Ich habe Bedenken': 'mam zastrzeżenia',
-      'Ja': 'Tak',
-      'Nein': 'Nie'
+    const reverseTranslationMap = Object.fromEntries(
+      Object.entries(translationMapPlToDe).map(([pl, de]) => [de, pl])
+    );
+
+    const safeJoin = (val) =>
+      Array.isArray(val) ? val.join(', ') : val?.toString().trim() || '';
+
+    const assign = (key, value) => {
+      if (value?.toString().trim()) {
+        payload[key] = value;
+      }
     };
 
-    const isArrayAnswer = (val) => Array.isArray(val) ? val.join(', ') : val;
-
+    // obsługa q1–q12
     for (let i = 0; i < 12; i++) {
-      const key = `q${i + 1}`;
-      const keyDe = `${key}_de`;
-      const val = editedAnswers[i];
-      const valDe = editedAnswersDe[i];
+      const qKey = `q${i + 1}`;
+      const qKeyDe = `${qKey}_de`;
+      const pl = editedAnswers[i];
+      const de = editedAnswersDe[i];
+      const plVal = safeJoin(pl);
+      const deVal = safeJoin(de);
 
       if (showGerman) {
-        // zapisujemy tylko tekstowe pola *_de
-        if ([1, 3, 7, 8, 9, 10, 11].includes(i) && valDe?.toString().trim()) {
-          payload[keyDe] = valDe;
+        // zapis tylko tekstowych _de
+        if ([2, 4, 8, 9, 10, 11].includes(i)) assign(qKeyDe, deVal);
+
+        // synchronizacja q1, q5, q7
+        if ([0, 4, 6].includes(i) && deVal && !selected[qKey]?.trim()) {
+          assign(qKeyDe, deVal);
+          assign(qKey, reverseTranslationMap[deVal] || '');
         }
 
-        // synchronizacja q1, q3, q5, q6, q7 → PL (jeśli puste)
-        if (i === 0 && valDe?.trim() && !selected[key]?.trim()) {
-          payload[keyDe] = valDe;
-          payload[key] = reverseTranslationMap[valDe];
+        // q3 (checkbox)
+        if (i === 2 && deVal && !selected[qKey]?.trim()) {
+          assign(qKeyDe, deVal);
+          assign(qKey, deVal);
         }
-        if (i === 2 && valDe && !selected[key]?.trim()) {
-          payload[keyDe] = isArrayAnswer(valDe);
-          payload[key] = isArrayAnswer(valDe);
+
+        // q6 (liczba)
+        if (i === 5 && deVal && !selected[qKey]?.trim()) {
+          assign(qKeyDe, deVal);
+          assign(qKey, deVal);
         }
-        if (i === 4 && valDe?.trim() && !selected[key]?.trim()) {
-          payload[keyDe] = valDe;
-          payload[key] = reverseTranslationMap[valDe];
-        }
-        if (i === 5 && valDe?.toString().trim() && !selected[key]?.toString().trim()) {
-          payload[keyDe] = valDe;
-          payload[key] = valDe;
-        }
-        if (i === 6 && valDe?.trim() && !selected[key]?.trim()) {
-          payload[keyDe] = valDe;
-          payload[key] = reverseTranslationMap[valDe];
-        }
+
       } else {
-        // zapisujemy tylko pola PL
-        if ([1, 3, 7, 8, 9, 10, 11].includes(i) && val?.toString().trim()) {
-          payload[key] = val;
+        // zapis tylko tekstowych PL
+        if ([2, 4, 8, 9, 10, 11].includes(i)) assign(qKey, plVal);
+
+        // synchronizacja q1, q5, q7
+        if ([0, 4, 6].includes(i) && plVal && !selected[qKeyDe]?.trim()) {
+          assign(qKey, plVal);
+          assign(qKeyDe, translationMapPlToDe[plVal] || '');
         }
 
-        // synchronizacja q1, q3, q5, q6, q7 → DE (jeśli puste)
-        if (i === 0 && val?.trim() && !selected[keyDe]?.trim()) {
-          payload[key] = val;
-          payload[keyDe] = translationMapPlToDe[val];
+        // q3 (checkbox)
+        if (i === 2 && plVal && !selected[qKeyDe]?.trim()) {
+          assign(qKey, plVal);
+          assign(qKeyDe, plVal);
         }
-        if (i === 2 && val && !selected[keyDe]?.trim()) {
-          payload[key] = isArrayAnswer(val);
-          payload[keyDe] = isArrayAnswer(val);
-        }
-        if (i === 4 && val?.trim() && !selected[keyDe]?.trim()) {
-          payload[key] = val;
-          payload[keyDe] = translationMapPlToDe[val];
-        }
-        if (i === 5 && val?.toString().trim() && !selected[keyDe]?.toString().trim()) {
-          payload[key] = val;
-          payload[keyDe] = val;
-        }
-        if (i === 6 && val?.trim() && !selected[keyDe]?.trim()) {
-          payload[key] = val;
-          payload[keyDe] = translationMapPlToDe[val];
+
+        // q6 (liczba)
+        if (i === 5 && plVal && !selected[qKeyDe]?.trim()) {
+          assign(qKey, plVal);
+          assign(qKeyDe, plVal);
         }
       }
     }
 
-    if (showGerman && editedNoteDe?.trim()) {
-      payload.notes_de = editedNoteDe;
-      if (!selected.notes?.trim()) {
-        payload.notes = editedNoteDe;
+    // notes
+    if (showGerman) {
+      if (editedNoteDe?.trim()) {
+        payload.notes_de = editedNoteDe;
+        if (!selected.notes?.trim()) {
+          payload.notes = editedNoteDe;
+        }
       }
-    } else if (!showGerman && editedNote?.trim()) {
-      payload.notes = editedNote;
-      if (!selected.notes_de?.trim()) {
-        payload.notes_de = editedNote;
+    } else {
+      if (editedNote?.trim()) {
+        payload.notes = editedNote;
+        if (!selected.notes_de?.trim()) {
+          payload.notes_de = editedNote;
+        }
       }
     }
 
-    // 🔁 Zapis do backendu
     const res = await axios.patch(
       `${API_BASE_URL}/api/tabResponses/${selected.id}`,
       payload,
