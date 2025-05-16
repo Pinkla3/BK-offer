@@ -1657,6 +1657,20 @@ value={
     }}
   />
 </QuestionGroup>
+
+<Button>
+    {editing ? (
+      <SmallButton onClick={handleSave} disabled={translating}>
+        {translating ? <SpinnerIcon size={16} /> : <FaSave />}
+        {translating ? 'Zapisywanie...' : 'Zapisz'}
+      </SmallButton>
+    ) : (
+      <SmallButton onClick={initEdit}>
+        <FaEdit /> Edytuj
+      </SmallButton>
+    )}
+  </Button>
+
 </TabSection>
 
 
