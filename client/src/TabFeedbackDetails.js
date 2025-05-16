@@ -1657,17 +1657,31 @@ value={
     }}
   />
 </QuestionGroup>
-<div style={{ marginTop: '32px', display: 'flex', flexDirection: 'column', alignItems: 'center', width:'50px' }}>
-    {editing ? (
-      <Button onClick={handleSave} disabled={translating}>
-        {translating ? <SpinnerIcon size={16} /> : <FaSave />}
-        {translating ? 'Zapisywanie...' : 'Zapisz'}
-      </Button>
-    ) : (
-      <Button onClick={initEdit}>
-        <FaEdit /> Edytuj
-      </Button>
-    )}
+<div
+  style={{
+    marginTop: '32px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center'
+  }}
+>
+  {editing ? (
+    <Button
+      onClick={handleSave}
+      disabled={translating}
+      style={{ width: '200px', justifyContent: 'center' }}
+    >
+      {translating ? <SpinnerIcon size={16} /> : <FaSave />}
+      {translating ? 'Zapisywanie...' : 'Zapisz'}
+    </Button>
+  ) : (
+    <Button
+      onClick={initEdit}
+      style={{ width: '200px', justifyContent: 'center' }}
+    >
+      <FaEdit /> Edytuj
+    </Button>
+  )}
 </div>
 </TabSection>
 
