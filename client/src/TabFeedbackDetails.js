@@ -508,31 +508,29 @@ const handleSave = async () => {
     payload.q6 = q6Value;
     payload.q6_de = q6Value;
 
-    // 4. Pola tekstowe (PL → DE)
-    const textFields = [
-      { key: 'q2', pl: answers[1] },
-      { key: 'q4', pl: answers[3] },
-      { key: 'q7_why', pl: answers[7] },
-      { key: 'q8_plus', pl: answers[8] },
-      { key: 'q8_minus', pl: answers[9] },
-      { key: 'q9', pl: answers[10] },
-      { key: 'q10', pl: answers[11] },
-      { key: 'notes', pl: note }
-    ];
+    // 4. Pola tekstowe — tylko aktywny język (bez tłumaczenia)
+    const assignIfFilled = (val, key) => {
+      if (val?.trim()) payload[key] = val;
+    };
 
-    for (const field of textFields) {
-      const { key, pl } = field;
-
-      if (!showGerman && pl?.trim()) {
-        payload[key] = pl;
-        const translated = await handleDynamicTranslate(pl); // PL → DE
-        payload[`${key}_de`] = translated;
-      }
-
-      // Jeśli showGerman === true → nie tłumaczymy DE → PL
-      if (showGerman && answersDe[textFields.indexOf(field)]?.trim()) {
-        payload[`${key}_de`] = answersDe[textFields.indexOf(field)];
-      }
+    if (!showGerman) {
+      assignIfFilled(answers[1], 'q2');
+      assignIfFilled(answers[3], 'q4');
+      assignIfFilled(answers[7], 'q7_why');
+      assignIfFilled(answers[8], 'q8_plus');
+      assignIfFilled(answers[9], 'q8_minus');
+      assignIfFilled(answers[10], 'q9');
+      assignIfFilled(answers[11], 'q10');
+      assignIfFilled(note, 'notes');
+    } else {
+      assignIfFilled(answersDe[1], 'q2_de');
+      assignIfFilled(answersDe[3], 'q4_de');
+      assignIfFilled(answersDe[7], 'q7_why_de');
+      assignIfFilled(answersDe[8], 'q8_plus_de');
+      assignIfFilled(answersDe[9], 'q8_minus_de');
+      assignIfFilled(answersDe[10], 'q9_de');
+      assignIfFilled(answersDe[11], 'q10_de');
+      assignIfFilled(noteDe, 'notes_de');
     }
 
     // 5. Zapis do backendu
