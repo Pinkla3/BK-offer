@@ -482,7 +482,7 @@ const handleSave = async () => {
     };
 
     if (showGerman) {
-      // Tekstowe pola _de
+      // Pola tekstowe (_de only)
       assignIfFilled(answersDe[1], 'q2_de');
       assignIfFilled(answersDe[3], 'q4_de');
       assignIfFilled(answersDe[7], 'q7_why_de');
@@ -492,36 +492,46 @@ const handleSave = async () => {
       assignIfFilled(answersDe[11], 'q10_de');
       assignIfFilled(noteDe, 'notes_de');
 
-      // Synchronizowane mapą: q1, q5, q7
+      // Synchronizowane: tylko jeśli PL puste
       if (answersDe[0]?.trim()) {
         payload.q1_de = answersDe[0];
-        payload.q1 = reverseTranslationMap[answersDe[0]] || selected.q1;
+        if (!selected.q1?.trim()) {
+          payload.q1 = reverseTranslationMap[answersDe[0]];
+        }
       }
       if (answersDe[4]?.trim()) {
         payload.q5_de = answersDe[4];
-        payload.q5 = reverseTranslationMap[answersDe[4]] || selected.q5;
+        if (!selected.q5?.trim()) {
+          payload.q5 = reverseTranslationMap[answersDe[4]];
+        }
       }
       if (answersDe[6]?.trim()) {
         payload.q7_de = answersDe[6];
-        payload.q7 = reverseTranslationMap[answersDe[6]] || selected.q7;
+        if (!selected.q7?.trim()) {
+          payload.q7 = reverseTranslationMap[answersDe[6]];
+        }
       }
 
-      // q3 (checkbox)
+      // q3 – checkbox
       const q3de = Array.isArray(answersDe[2]) ? answersDe[2].join(', ') : answersDe[2] || '';
       if (q3de) {
         payload.q3_de = q3de;
-        payload.q3 = q3de;
+        if (!selected.q3?.trim()) {
+          payload.q3 = q3de;
+        }
       }
 
-      // q6 (liczba)
+      // q6 – liczba
       const q6de = answersDe[5]?.toString().trim();
       if (q6de) {
         payload.q6_de = q6de;
-        payload.q6 = q6de;
+        if (!selected.q6?.toString().trim()) {
+          payload.q6 = q6de;
+        }
       }
 
     } else {
-      // Tekstowe pola PL
+      // Pola tekstowe (PL only)
       assignIfFilled(answers[1], 'q2');
       assignIfFilled(answers[3], 'q4');
       assignIfFilled(answers[7], 'q7_why');
@@ -531,32 +541,42 @@ const handleSave = async () => {
       assignIfFilled(answers[11], 'q10');
       assignIfFilled(note, 'notes');
 
-      // Synchronizowane mapą: q1, q5, q7
+      // Synchronizowane: tylko jeśli DE puste
       if (answers[0]?.trim()) {
         payload.q1 = answers[0];
-        payload.q1_de = translationMapPlToDe[answers[0]] || selected.q1_de;
+        if (!selected.q1_de?.trim()) {
+          payload.q1_de = translationMapPlToDe[answers[0]];
+        }
       }
       if (answers[4]?.trim()) {
         payload.q5 = answers[4];
-        payload.q5_de = translationMapPlToDe[answers[4]] || selected.q5_de;
+        if (!selected.q5_de?.trim()) {
+          payload.q5_de = translationMapPlToDe[answers[4]];
+        }
       }
       if (answers[6]?.trim()) {
         payload.q7 = answers[6];
-        payload.q7_de = translationMapPlToDe[answers[6]] || selected.q7_de;
+        if (!selected.q7_de?.trim()) {
+          payload.q7_de = translationMapPlToDe[answers[6]];
+        }
       }
 
-      // q3 (checkbox)
+      // q3 – checkbox
       const q3 = Array.isArray(answers[2]) ? answers[2].join(', ') : answers[2] || '';
       if (q3) {
         payload.q3 = q3;
-        payload.q3_de = q3;
+        if (!selected.q3_de?.trim()) {
+          payload.q3_de = q3;
+        }
       }
 
-      // q6 (liczba)
+      // q6 – liczba
       const q6 = answers[5]?.toString().trim();
       if (q6) {
         payload.q6 = q6;
-        payload.q6_de = q6;
+        if (!selected.q6_de?.toString().trim()) {
+          payload.q6_de = q6;
+        }
       }
     }
 
