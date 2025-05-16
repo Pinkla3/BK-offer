@@ -1093,21 +1093,39 @@ const handleCopyToClipboard = () => {
     </FieldItem>
   </FieldCard>
 </DetailSection>
-<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-  <SmallButton
-  onClick={handleCopyToClipboard}
-  style={{ width: '200px', justifyContent: 'center', alignSelf: 'center', marginBottom: '16px' }}
+<div
+  style={{
+    position: 'relative',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '24px',
+    padding: '0 16px'
+  }}
 >
-  <FaCopy />
-  Kopiuj feedback
-</SmallButton>
+  {/* Lewy przycisk */}
+  <SmallButton onClick={handleCopyToClipboard} style={{ width: '200px' }}>
+    <FaCopy />
+    Kopiuj feedback
+  </SmallButton>
 
-  <Title style={{ textAlign: 'center', flex: 1 }}>Feedback</Title>
+  {/* Tytuł na środku */}
+  <Title
+    style={{
+      position: 'absolute',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      margin: 0
+    }}
+  >
+    Feedback
+  </Title>
 
-  <SmallButtonRefresh onClick={() => fetchDetails(selected.id)}>
-    <FaSyncAlt style={{ transition: 'transform 0.3s ease' }} />
+  {/* Prawy przycisk */}
+  <SmallButton onClick={handleRefresh} style={{ width: '200px' }}>
+    <FaSync />
     Odśwież
-  </SmallButtonRefresh>
+  </SmallButton>
 </div>
 
         <TabSection>
