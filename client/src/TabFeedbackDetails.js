@@ -536,12 +536,7 @@ const handleSave = async () => {
     const updated = res.data;
 
     // 🔁 Zaktualizuj tylko zmienione dane lokalnie
-    const updatedSelected = {
-      ...selected,
-      ...payload,
-      user_name: updated.user_name || selected.user_name,
-      edit_history: updated.edit_history
-    };
+setSelected(updated);
 
     setSelected(updatedSelected);
     setGermanAnswers(answersDe);
