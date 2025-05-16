@@ -451,21 +451,19 @@ const handleSave = async () => {
       caregiver_phone: editedCaregiverPhone,
       patient_first_name: editedPatientFirstName,
       patient_last_name: editedPatientLastName,
-      q1: editedAnswers[0],
-      q2: editedAnswers[1],
-      q3: Array.isArray(editedAnswers[2]) ? editedAnswers[2].join(', ') : editedAnswers[2],
-      q4: editedAnswers[3],
-      q5: editedAnswers[4],
-      q6: editedAnswers[5],
-      q7: editedAnswers[6],
-      q7_why: editedAnswers[7],
-      q8_plus: editedAnswers[8],
-      q8_minus: editedAnswers[9],
-      q9: editedAnswers[10],
-      q10: editedAnswers[11],
-      notes: editedNote,           // ✅ poprawka
-      notes_de: editedNoteDe       // ✅ jeśli chcesz też wersję DE
     };
+
+    if (showGerman) {
+      editedAnswersDe.forEach((ans, i) => {
+        payload[`q${i + 1}_de`] = ans;
+      });
+      payload.notes_de = editedNoteDe;
+    } else {
+      editedAnswers.forEach((ans, i) => {
+        payload[`q${i + 1}`] = ans;
+      });
+      payload.notes = editedNote;
+    }
 
     const res = await axios.patch(
       `${API_BASE_URL}/api/tabResponses/${selected.id}`,
@@ -473,17 +471,32 @@ const handleSave = async () => {
       { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
     );
 
-    setSelected(res.data);
+    const updated = res.data;
+
+    const updatedSelected = {
+      ...selected,
+      ...payload,
+      user_name: updated.user_name || selected.user_name,
+      edit_history: updated.edit_history,
+    };
+
+    setSelected(updatedSelected);
+
+    if (showGerman) {
+      setGermanAnswers(editedAnswersDe);
+      setTranslatedNote(editedNoteDe);
+    }
+
     setEditing(false);
-    setIsTranslated(false);
-    setIsPolishChangedSinceTranslation(true);
-    toast.success('Wersja polska zapisana.');
+    setIsTranslated(true);
+    toast.success('Dane zapisane pomyślnie!');
     window.dispatchEvent(new Event('feedbackUpdated'));
   } catch (err) {
-    console.error('Błąd zapisu wersji PL:', err);
-    toast.error('Nie udało się zapisać wersji polskiej.');
+    console.error('Błąd zapisu:', err);
+    toast.error('Wystąpił błąd podczas zapisywania. Spróbuj ponownie.');
   }
 };
+
 
 const odmianaPytanie = (count) => {
   if (count === 1) return 'pytaniu';
