@@ -506,15 +506,18 @@ const handleSave = async () => {
       Object.entries(translationMapPlToDe).map(([pl, de]) => [de, pl])
     );
 
+    // 🔁 synchronizacja opcji
     const sync = (deValue) => reverseTranslationMap[deValue] || '';
     const syncDe = (plValue) => translationMapPlToDe[plValue] || '';
+    const syncArray = (arr) => Array.isArray(arr) ? arr.map(val => reverseTranslationMap[val] || val) : [];
+    const syncArrayDe = (arr) => Array.isArray(arr) ? arr.map(val => translationMapPlToDe[val] || val) : [];
 
     const payload = {
       ...(showGerman
         ? {
-            // ✍️ Zapis wersji DE (z synchronizacją tylko wybranych pól PL)
+            // ✍️ zapis DE
             q1_de: answers[0],
-            q2_de: answers[1],
+            q2_de: Array.isArray(answers[1]) ? answers[1].join(', ') : answers[1],
             q3_de: Array.isArray(answers[2]) ? answers[2].join(', ') : answers[2],
             q5_de: answers[4],
             q6_de: answers[5],
@@ -526,17 +529,18 @@ const handleSave = async () => {
             q10_de: answers[11],
             notes_de: note,
 
-            // 🔁 Synchronizacja opcji z DE → PL
+            // 🔁 synchronizacja do PL
             q1: sync(answers[0]),
+            q2: syncArray(answers[1]).join(', '),
             q3: Array.isArray(answers[2]) ? answers[2].join(', ') : sync(answers[2]),
             q5: sync(answers[4]),
             q6: answers[5],
             q7: sync(answers[6])
           }
         : {
-            // ✍️ Zapis wersji PL (bez tłumaczenia dynamicznego)
+            // ✍️ zapis PL
             q1: answers[0],
-            q2: answers[1],
+            q2: Array.isArray(answers[1]) ? answers[1].join(', ') : answers[1],
             q3: Array.isArray(answers[2]) ? answers[2].join(', ') : answers[2],
             q4: answers[3],
             q5: answers[4],
@@ -549,8 +553,9 @@ const handleSave = async () => {
             q10: answers[11],
             notes: note,
 
-            // 🔁 Synchronizacja opcji z PL → DE
+            // 🔁 synchronizacja do DE
             q1_de: syncDe(answers[0]),
+            q2_de: syncArrayDe(answers[1]).join(', '),
             q3_de: Array.isArray(answers[2]) ? answers[2].join(', ') : syncDe(answers[2]),
             q5_de: syncDe(answers[4]),
             q6_de: answers[5],
@@ -573,7 +578,6 @@ const handleSave = async () => {
 
     const updated = res.data;
 
-    // 🧠 Nadpisz tylko zaktualizowane dane
     setSelected(prev => ({
       ...prev,
       ...updated
@@ -582,7 +586,7 @@ const handleSave = async () => {
     if (showGerman) {
       setEditedAnswersDe([
         updated.q1_de || '',
-        updated.q2_de || '',
+        updated.q2_de?.split(', ') || [],
         updated.q3_de?.split(', ') || [],
         '', // q4_de nie istnieje
         updated.q5_de || '',
@@ -598,7 +602,7 @@ const handleSave = async () => {
     } else {
       setEditedAnswers([
         updated.q1 || '',
-        updated.q2 || '',
+        updated.q2?.split(', ') || [],
         updated.q3?.split(', ') || [],
         updated.q4 || '',
         updated.q5 || '',
