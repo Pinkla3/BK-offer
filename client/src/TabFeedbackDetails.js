@@ -1122,10 +1122,10 @@ const handleCopyToClipboard = () => {
   </Title>
 
   {/* Prawy przycisk */}
-  <SmallButton onClick={handleRefresh} style={{ width: '200px' }}>
-    <FaSync />
+  <SmallButtonRefresh onClick={() => fetchDetails(selected.id)}>
+    <FaSyncAlt style={{ transition: 'transform 0.3s ease' }} />
     Odśwież
-  </SmallButton>
+  </SmallButtonRefresh>
 </div>
 
         <TabSection>
