@@ -477,38 +477,60 @@ const handleSave = async () => {
       no_history: showGerman
     };
 
-    // 1. q1, q5, q7 – synchronizacja przez mapę
-    const mapSync = (pl, de) => ({
-      pl: de ? reverseTranslationMap[de] || pl : pl,
-      de: pl ? translationMapPlToDe[pl] || de : de
-    });
+    // === q1, q5, q7 - tylko kierunek zależny od showGerman
+    if (showGerman) {
+      if (answersDe[0]?.trim()) {
+        payload.q1_de = answersDe[0];
+        payload.q1 = reverseTranslationMap[answersDe[0]] || selected.q1;
+      }
+      if (answersDe[4]?.trim()) {
+        payload.q5_de = answersDe[4];
+        payload.q5 = reverseTranslationMap[answersDe[4]] || selected.q5;
+      }
+      if (answersDe[6]?.trim()) {
+        payload.q7_de = answersDe[6];
+        payload.q7 = reverseTranslationMap[answersDe[6]] || selected.q7;
+      }
+    } else {
+      if (answers[0]?.trim()) {
+        payload.q1 = answers[0];
+        payload.q1_de = translationMapPlToDe[answers[0]] || selected.q1_de;
+      }
+      if (answers[4]?.trim()) {
+        payload.q5 = answers[4];
+        payload.q5_de = translationMapPlToDe[answers[4]] || selected.q5_de;
+      }
+      if (answers[6]?.trim()) {
+        payload.q7 = answers[6];
+        payload.q7_de = translationMapPlToDe[answers[6]] || selected.q7_de;
+      }
+    }
 
-    const syncQ1 = mapSync(answers[0], answersDe[0]);
-    const syncQ5 = mapSync(answers[4], answersDe[4]);
-    const syncQ7 = mapSync(answers[6], answersDe[6]);
+    // === q3 – checkbox (tablica jako string) synchronizowana
+    const q3pl = Array.isArray(answers[2]) ? answers[2].join(', ') : answers[2] || '';
+    const q3de = Array.isArray(answersDe[2]) ? answersDe[2].join(', ') : answersDe[2] || '';
+    if (showGerman) {
+      if (q3de) {
+        payload.q3_de = q3de;
+        payload.q3 = q3pl || q3de;
+      }
+    } else {
+      if (q3pl) {
+        payload.q3 = q3pl;
+        payload.q3_de = q3de || q3pl;
+      }
+    }
 
-    payload.q1 = syncQ1.pl;
-    payload.q1_de = syncQ1.de;
-    payload.q5 = syncQ5.pl;
-    payload.q5_de = syncQ5.de;
-    payload.q7 = syncQ7.pl;
-    payload.q7_de = syncQ7.de;
+    // === q6 – wspólna wartość
+    const q6 = answers[5]?.toString().trim();
+    const q6de = answersDe[5]?.toString().trim();
+    const q6Final = q6 || q6de || '';
+    if (q6Final) {
+      payload.q6 = q6Final;
+      payload.q6_de = q6Final;
+    }
 
-    // 2. q3 – checkbox (array → string), synchronizowane
-    const formatQ3 = (val) => Array.isArray(val) ? val.join(', ') : (val || '');
-    const syncQ3 = {
-      pl: formatQ3(answers[2]),
-      de: formatQ3(answersDe[2])
-    };
-    payload.q3 = syncQ3.pl || syncQ3.de;
-    payload.q3_de = syncQ3.de || syncQ3.pl;
-
-    // 3. q6 – wspólna wartość PL i DE
-    const q6Value = answers[5]?.toString().trim() || answersDe[5]?.toString().trim() || '';
-    payload.q6 = q6Value;
-    payload.q6_de = q6Value;
-
-    // 4. Pola tekstowe — tylko aktywny język (bez tłumaczenia)
+    // === Pozostałe pola – tylko w aktywnym języku
     const assignIfFilled = (val, key) => {
       if (val?.trim()) payload[key] = val;
     };
@@ -533,7 +555,7 @@ const handleSave = async () => {
       assignIfFilled(noteDe, 'notes_de');
     }
 
-    // 5. Zapis do backendu
+    // === PATCH do backendu
     const res = await axios.patch(
       `${API_BASE_URL}/api/tabResponses/${selected.id}`,
       payload,
@@ -542,7 +564,7 @@ const handleSave = async () => {
 
     const updated = res.data;
 
-    // 6. Aktualizacja stanu formularza
+    // === Odświeżenie stanu formularza
     const getAnswersFrom = (source, isGerman = false) =>
       Array.from({ length: 12 }, (_, i) => {
         const key = `q${i + 1}${isGerman ? '_de' : ''}`;
@@ -567,6 +589,7 @@ const handleSave = async () => {
     toast.error('Wystąpił błąd podczas zapisywania. Spróbuj ponownie.');
   }
 };
+
 
 const odmianaPytanie = (count) => {
   if (count === 1) return 'pytaniu';
