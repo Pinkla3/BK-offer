@@ -1658,18 +1658,16 @@ value={
   />
 </QuestionGroup>
 
-<Button style={{ width: '100px', height: '20px', display:'flex', justifyContent:'center' }}>
     {editing ? (
-      <SmallButton onClick={handleSave} disabled={translating}>
+      <Button onClick={handleSave} disabled={translating}>
         {translating ? <SpinnerIcon size={16} /> : <FaSave />}
         {translating ? 'Zapisywanie...' : 'Zapisz'}
-      </SmallButton>
+      </Button>
     ) : (
-      <SmallButton onClick={initEdit}>
+      <Button onClick={initEdit}>
         <FaEdit /> Edytuj
-      </SmallButton>
+      </Button>
     )}
-  </Button>
 
 </TabSection>
 
