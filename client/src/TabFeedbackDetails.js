@@ -989,17 +989,27 @@ const handleToggleGerman = async () => {
 ];
 
 const handleCopyToClipboard = () => {
+  if (!selected) {
+    toast.error('Brak danych do skopiowania.');
+    return;
+  }
+
   const questions = showGerman ? questionsDe : questionsPl;
-  const answers = showGerman ? editedAnswersDe : editedAnswers;
-  const note = showGerman ? editedNoteDe : editedNote;
+  const suffix = showGerman ? '_de' : '';
+  const noteKey = `notes${suffix}`;
+  const note = selected[noteKey];
 
   const content = questions.map((question, index) => {
-    const answer = answers[index];
-    const displayAnswer = Array.isArray(answer)
-      ? answer.join(', ')
-      : answer?.toString().trim() || '[brak odpowiedzi]';
+    const key = `q${index + 1}${suffix}`;
+    const value = selected[key];
 
-    return `${question}\n${displayAnswer}`;
+    const displayValue = Array.isArray(value)
+      ? value.join(', ')
+      : typeof value === 'string'
+        ? value.trim()
+        : value?.toString?.() || '';
+
+    return `${question}\n${displayValue || '[brak odpowiedzi]'}`;
   }).join('\n\n');
 
   const fullText = `${content}\n\n${showGerman ? 'Notiz:' : 'Notatka:'}\n${note?.trim() || '[brak notatki]'}`;
