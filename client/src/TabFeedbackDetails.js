@@ -993,12 +993,16 @@ const handleCopyToClipboard = () => {
   const answers = showGerman ? editedAnswersDe : editedAnswers;
   const note = showGerman ? editedNoteDe : editedNote;
 
-  const content = questions
-    .map((q, i) => q ? `${q}\n${Array.isArray(answers[i]) ? answers[i].join(', ') : answers[i] || '[brak odpowiedzi]'}` : null)
-    .filter(Boolean)
-    .join('\n\n');
+  const content = questions.map((question, index) => {
+    const answer = answers[index];
+    const displayAnswer = Array.isArray(answer)
+      ? answer.join(', ')
+      : answer?.toString().trim() || '[brak odpowiedzi]';
 
-  const fullText = `${content}\n\n${showGerman ? noteLabelDe : noteLabelPl}\n${note || '[brak notatki]'}`;
+    return `${question}\n${displayAnswer}`;
+  }).join('\n\n');
+
+  const fullText = `${content}\n\n${showGerman ? 'Notiz:' : 'Notatka:'}\n${note?.trim() || '[brak notatki]'}`;
 
   navigator.clipboard.writeText(fullText)
     .then(() => toast.success('Feedback skopiowany do schowka!'))
