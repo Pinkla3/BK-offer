@@ -361,7 +361,7 @@ useEffect(() => {
   const fillOrTranslateDE = async () => {
     const de = [
       selected.q1_de || '',
-      selected.q2_de || (await handleDynamicTranslate(selected.q2 || '')),
+      selected.q2_de || '',
       selected.q3_de
         ? selected.q3_de.split(', ')
         : Array.isArray(selected.q3)
