@@ -527,7 +527,10 @@ const handleSave = async () => {
     );
 
     const updated = res.data;
-    setSelected(updated);
+setSelected(prev => ({
+  ...prev,
+  ...res.data
+}));
 
     // 🔁 Zaktualizuj tylko tę wersję językową, którą edytowano
     if (showGerman) {
