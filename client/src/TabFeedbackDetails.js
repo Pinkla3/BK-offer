@@ -457,6 +457,16 @@ const handleSave = async () => {
       'Nie': 'Nein'
     };
 
+    const safeText = (edited, original) =>
+  typeof edited === 'string' && edited.trim() !== '' ? edited : original;
+
+const safeJoin = (val, fallback) =>
+  Array.isArray(val) && val.length
+    ? val.join(', ')
+    : typeof val === 'string' && val.trim()
+    ? val
+    : fallback;
+
     const reverseTranslationMap = {
       'sehr gut': 'bardzo dobrze',
       'gut': 'dobrze',
@@ -469,63 +479,77 @@ const handleSave = async () => {
     const sync = (pl, de) => showGerman ? reverseTranslationMap[de] || pl : pl;
     const syncDe = (pl, de) => showGerman ? de : translationMapPlToDe[pl] || de;
 
-    const payload = {
-      ...(showGerman
-  ? {
-      q1_de: answers[0],
-      q2_de: answers[1],
-      q3_de: Array.isArray(answers[2]) ? answers[2].join(', ') : answers[2],
-      q4_de: answers[3],
-      q5_de: answers[4],
-      q6_de: answers[5],
-      q7_de: answers[6],
-      q7_why_de: answers[7],
-      q8_plus_de: answers[8],
-      q8_minus_de: answers[9],
-      q9_de: answers[10],
-      q10_de: answers[11],
-      notes_de: note,
+  const payload = {
+  ...(showGerman
+    ? {
+        // === Wersja niemiecka ===
+        q1_de: answers[0],
+        q2_de: answers[1],
+        q3_de: safeJoin(answers[2], selected.q3_de),
+        q4_de: safeText(answers[3], selected.q4_de),
+        q5_de: answers[4],
+        q6_de: safeText(answers[5]?.toString(), selected.q6_de),
+        q7_de: answers[6],
+        q7_why_de: safeText(answers[7], selected.q7_why_de),
+        q8_plus_de: safeText(answers[8], selected.q8_plus_de),
+        q8_minus_de: safeText(answers[9], selected.q8_minus_de),
+        q9_de: safeText(answers[10], selected.q9_de),
+        q10_de: safeText(answers[11], selected.q10_de),
+        notes_de: safeText(note, selected.notes_de),
 
-      // synchronizacja PL — tylko jeśli dane z DE nie są puste
-      q1: answers[0] ? sync(selected.q1, answers[0]) : selected.q1,
-      q3: answers[2] && answers[2].length
-        ? (Array.isArray(answers[2]) ? answers[2].join(', ') : answers[2])
-        : selected.q3,
-      q5: answers[4] ? sync(selected.q5, answers[4]) : selected.q5,
-      q6: answers[5] !== '' ? answers[5] : selected.q6,
-      q7: answers[6] ? sync(selected.q7, answers[6]) : selected.q7,
-    }
-        : {
-            q1: answers[0],
-            q2: answers[1],
-            q3: Array.isArray(answers[2]) ? answers[2].join(', ') : answers[2],
-            q4: answers[3],
-            q5: answers[4],
-            q6: answers[5],
-            q7: answers[6],
-            q7_why: answers[7],
-            q8_plus: answers[8],
-            q8_minus: answers[9],
-            q9: answers[10],
-            q10: answers[11],
-            notes: note,
+        // === Synchronizacja do wersji polskiej (jeśli DE niepuste) ===
+        q1: answers[0]?.trim() ? sync(selected.q1, answers[0]) : selected.q1,
+        q3: safeJoin(answers[2], selected.q3),
+        q4: safeText(answers[3], selected.q4),
+        q5: answers[4]?.trim() ? sync(selected.q5, answers[4]) : selected.q5,
+        q6: answers[5]?.toString().trim() ? answers[5] : selected.q6,
+        q7: answers[6]?.trim() ? sync(selected.q7, answers[6]) : selected.q7,
+        q7_why: safeText(answers[7], selected.q7_why),
+        q8_plus: safeText(answers[8], selected.q8_plus),
+        q8_minus: safeText(answers[9], selected.q8_minus),
+        q9: safeText(answers[10], selected.q9),
+        q10: safeText(answers[11], selected.q10),
+        notes: safeText(note, selected.notes),
+      }
+    : {
+        // === Wersja polska ===
+        q1: answers[0],
+        q2: answers[1],
+        q3: safeJoin(answers[2], selected.q3),
+        q4: safeText(answers[3], selected.q4),
+        q5: answers[4],
+        q6: safeText(answers[5]?.toString(), selected.q6),
+        q7: answers[6],
+        q7_why: safeText(answers[7], selected.q7_why),
+        q8_plus: safeText(answers[8], selected.q8_plus),
+        q8_minus: safeText(answers[9], selected.q8_minus),
+        q9: safeText(answers[10], selected.q9),
+        q10: safeText(answers[11], selected.q10),
+        notes: safeText(note, selected.notes),
 
-            // synchronizacja DE
-            q1_de: syncDe(answers[0], selected.q1_de),
-            q3_de: syncDe(answers[2], selected.q3_de),
-            q5_de: syncDe(answers[4], selected.q5_de),
-            q6_de: answers[5] ?? selected.q6_de,
-            q7_de: syncDe(answers[6], selected.q7_de)
-          }),
+        // === Synchronizacja do wersji niemieckiej (jeśli PL niepuste) ===
+        q1_de: answers[0]?.trim() ? syncDe(answers[0], selected.q1_de) : selected.q1_de,
+        q3_de: safeJoin(answers[2], selected.q3_de),
+        q4_de: safeText(answers[3], selected.q4_de),
+        q5_de: answers[4]?.trim() ? syncDe(answers[4], selected.q5_de) : selected.q5_de,
+        q6_de: answers[5]?.toString().trim() ? answers[5] : selected.q6_de,
+        q7_de: answers[6]?.trim() ? syncDe(answers[6], selected.q7_de) : selected.q7_de,
+        q7_why_de: safeText(answers[7], selected.q7_why_de),
+        q8_plus_de: safeText(answers[8], selected.q8_plus_de),
+        q8_minus_de: safeText(answers[9], selected.q8_minus_de),
+        q9_de: safeText(answers[10], selected.q9_de),
+        q10_de: safeText(answers[11], selected.q10_de),
+        notes_de: safeText(note, selected.notes_de),
+      }),
 
-      caregiver_first_name: editedCaregiverFirstName,
-      caregiver_last_name: editedCaregiverLastName,
-      caregiver_phone: editedCaregiverPhone,
-      patient_first_name: editedPatientFirstName,
-      patient_last_name: editedPatientLastName,
+  caregiver_first_name: editedCaregiverFirstName,
+  caregiver_last_name: editedCaregiverLastName,
+  caregiver_phone: editedCaregiverPhone,
+  patient_first_name: editedPatientFirstName,
+  patient_last_name: editedPatientLastName,
 
-      no_history: showGerman
-    };
+  no_history: showGerman
+};
 
     const res = await axios.patch(
       `${API_BASE_URL}/api/tabResponses/${selected.id}`,
