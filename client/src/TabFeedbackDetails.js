@@ -1128,14 +1128,15 @@ const handleToggleGerman = async () => {
 </QuestionGroup>
 {/* Pytanie 2 */}
 <QuestionGroup>
- <Label>
-  {questions[2]}
-  {showGerman && (!selected.q3 || selected.q3.trim() === '') && (
-    <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
-      Brak odpowiedzi do tłumaczenia
-    </span>
-  )}
-</Label>
+  <Label>
+    {questions[2]}
+    {showGerman && !editing && !(selected.q3_de || '').trim() && (
+      <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
+        Brak odpowiedzi do tłumaczenia
+      </span>
+    )}
+  </Label>
+
   <div
     style={{
       display: 'grid',
@@ -1149,7 +1150,12 @@ const handleToggleGerman = async () => {
     }}
   >
     {checkboxOptionsQ2.slice(0, 4).map(option => {
-     const isChecked = (editing ? editedAnswers[2] : (selected.q3 ? selected.q3.split(', ') : [])).includes(option);
+      const translated = t(option);
+      const isChecked = (editing
+        ? (showGerman ? editedAnswersDe[2] : editedAnswers[2]) || []
+        : (showGerman ? selected.q3_de : selected.q3)?.split(', ') || []
+      ).includes(option);
+
       return (
         <label
           key={option}
@@ -1169,28 +1175,35 @@ const handleToggleGerman = async () => {
             disabled={!editing}
             onChange={() => {
               if (!editing) return;
+
+              const listPL = editedAnswers[2] || [];
+              const updatedPL = listPL.includes(option)
+                ? listPL.filter(i => i !== option)
+                : [...listPL, option];
+
+              const listDE = editedAnswersDe[2] || [];
+              const updatedDE = updatedPL; // zakładamy brak tłumaczeń checkboxów
+
               setEditedAnswers(prev => {
-                const list = prev[2] || [];
-                const updated = list.includes(option)
-                  ? list.filter(i => i !== option)
-                  : [...list, option];
-                const newAnswers = [...prev];
-                newAnswers[2] = updated;
-                return newAnswers;
+                const next = [...prev];
+                next[2] = updatedPL;
+                return next;
+              });
+
+              setEditedAnswersDe(prev => {
+                const next = [...prev];
+                next[2] = updatedDE;
+                return next;
               });
             }}
-            style={{
-              width: '20px',
-              height: '20px',
-              accentColor: '#007bff'
-            }}
+            style={{ width: '20px', height: '20px', accentColor: '#007bff' }}
           />
-          <span>{t(option)}</span>
+          <span>{translated}</span>
         </label>
       );
     })}
 
-    {/* Checkbox "inne trudności" */}
+    {/* "inne trudności" */}
     <label
       style={{
         display: 'flex',
@@ -1204,53 +1217,72 @@ const handleToggleGerman = async () => {
     >
       <input
         type="checkbox"
-        checked={(editing ? editedAnswers[2] : selected.q3 || []).includes('inne trudności')}
+        checked={
+          (editing
+            ? (showGerman ? editedAnswersDe[2] : editedAnswers[2])
+            : (showGerman ? selected.q3_de : selected.q3)?.split(', ') || []
+          ).includes('inne trudności')
+        }
         disabled={!editing}
         onChange={() => {
           if (!editing) return;
+
+          const listPL = editedAnswers[2] || [];
+          const updatedPL = listPL.includes('inne trudności')
+            ? listPL.filter(i => i !== 'inne trudności')
+            : [...listPL, 'inne trudności'];
+
           setEditedAnswers(prev => {
-            const list = prev[2] || [];
-            const updated = list.includes('inne trudności')
-              ? list.filter(i => i !== 'inne trudności')
-              : [...list, 'inne trudności'];
-            const newAnswers = [...prev];
-            newAnswers[2] = updated;
-            return newAnswers;
+            const next = [...prev];
+            next[2] = updatedPL;
+            return next;
+          });
+
+          setEditedAnswersDe(prev => {
+            const next = [...prev];
+            next[2] = updatedPL; // synchronizacja 1:1
+            return next;
           });
         }}
-        style={{
-          width: '20px',
-          height: '20px',
-          accentColor: '#007bff'
-        }}
+        style={{ width: '20px', height: '20px', accentColor: '#007bff' }}
       />
       <span>{t('inne trudności')}</span>
     </label>
 
-    {/* Input tekstowy */}
-<Input
-  type="text"
-  placeholder={t('Proszę podać szczegóły')}
-  value={
-    editing
-      ? editedAnswers[3] || ''
-      : showGerman
-        ? selected.q4_de?.trim() || '[brak tekstu do tłumaczenia]'
-        : selected.q4 || ''
-  }
-  onChange={editing ? (e) => {
-    const updated = [...editedAnswers];
-    updated[3] = e.target.value;
-    setEditedAnswers(updated);
-  } : undefined}
-  readOnly={!editing}
-  style={{
-    width: '100%',
-    maxWidth: '300px',
-    visibility: (editing ? editedAnswers[2] : selected.q3?.split(', ') || []).includes('inne trudności') ? 'visible' : 'hidden',
-    pointerEvents: (editing ? editedAnswers[2] : selected.q3?.split(', ') || []).includes('inne trudności') ? 'auto' : 'none'
-  }}
-/>
+    {/* Input q4 */}
+    <Input
+      type="text"
+      placeholder={showGerman ? 'Bitte geben Sie Details an' : t('Proszę podać szczegóły')}
+      value={
+        editing
+          ? (showGerman ? editedAnswersDe[3] : editedAnswers[3]) || ''
+          : showGerman
+            ? selected.q4_de?.trim() || '[brak tekstu do tłumaczenia]'
+            : selected.q4 || ''
+      }
+      onChange={editing ? (e) => {
+        const updated = [...(showGerman ? editedAnswersDe : editedAnswers)];
+        updated[3] = e.target.value;
+        showGerman
+          ? setEditedAnswersDe(updated)
+          : setEditedAnswers(updated);
+      } : undefined}
+      readOnly={!editing}
+      style={{
+        width: '100%',
+        maxWidth: '300px',
+        visibility: (
+          editing
+            ? (showGerman ? editedAnswersDe[2] : editedAnswers[2]) || []
+            : (showGerman ? selected.q3_de : selected.q3)?.split(', ') || []
+        ).includes('inne trudności') ? 'visible' : 'hidden',
+        pointerEvents: (
+          editing
+            ? (showGerman ? editedAnswersDe[2] : editedAnswers[2]) || []
+            : (showGerman ? selected.q3_de : selected.q3)?.split(', ') || []
+        ).includes('inne trudności') ? 'auto' : 'none'
+      }}
+    />
   </div>
 </QuestionGroup>
 {/* Pytanie 3 */}
