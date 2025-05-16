@@ -478,18 +478,19 @@ const handleSave = async () => {
       }
     );
 
-    const updated = res.data;
+const updated = res.data;
+const merged = { ...selected, ...updated };
 
-    const getAnswersFrom = (source, isGerman = false) =>
-      Array.from({ length: 12 }, (_, i) => {
-        const key = `q${i + 1}${isGerman ? '_de' : ''}`;
-        return source[key] || '';
-      });
+const getAnswersFrom = (source, isGerman = false) =>
+  Array.from({ length: 12 }, (_, i) => {
+    const key = `q${i + 1}${isGerman ? '_de' : ''}`;
+    return source[key] || '';
+  });
 
-    setEditedAnswers(getAnswersFrom(updated, false));
-    setEditedAnswersDe(getAnswersFrom(updated, true));
-    setEditedNote(updated.notes || '');
-    setEditedNoteDe(updated.notes_de || '');
+setEditedAnswers(getAnswersFrom(merged, false));
+setEditedAnswersDe(getAnswersFrom(merged, true));
+setEditedNote(merged.notes || '');
+setEditedNoteDe(merged.notes_de || '');
 
     setSelected(updated);
     setEditing(false);
@@ -502,8 +503,6 @@ const handleSave = async () => {
     toast.error('Wystąpił błąd podczas zapisywania. Spróbuj ponownie.');
   }
 };
-
-
 
 const odmianaPytanie = (count) => {
   if (count === 1) return 'pytaniu';
