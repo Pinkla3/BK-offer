@@ -550,7 +550,17 @@ const safeJoin = (val, fallback) =>
 
   no_history: showGerman
 };
-
+// Po utworzeniu payload:
+Object.keys(payload).forEach((key) => {
+  if (
+    payload[key] === '' ||
+    payload[key] === null ||
+    payload[key] === undefined ||
+    (Array.isArray(payload[key]) && payload[key].length === 0)
+  ) {
+    delete payload[key]; // Usuń puste wartości
+  }
+});
     const res = await axios.patch(
       `${API_BASE_URL}/api/tabResponses/${selected.id}`,
       payload,
