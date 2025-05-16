@@ -369,25 +369,20 @@ useEffect(() => {
         : typeof selected.q3 === 'string'
         ? selected.q3.split(', ')
         : [],
-      selected.q4_de || (await handleDynamicTranslate(selected.q4 || '')),
+      selected.q4_de ||'',
       selected.q5_de || '',
       selected.q6_de || '',
       selected.q7_de || '',
-      selected.q7_why_de || (await handleDynamicTranslate(selected.q7_why || '')),
-      selected.q8_plus_de || (await handleDynamicTranslate(selected.q8_plus || '')),
-      selected.q8_minus_de || (await handleDynamicTranslate(selected.q8_minus || '')),
+      selected.q7_why_de || '',
+      selected.q8_plus_de || '',
+      selected.q8_minus_de || '',
       selected.q9_de || '',
       selected.q10_de || ''
     ];
 
     setEditedAnswersDe(de);
 
-    if (!selected.notes_de && selected.notes) {
-      const translatedNote = await handleDynamicTranslate(selected.notes);
-      setEditedNoteDe(translatedNote);
-    } else {
-      setEditedNoteDe(selected.notes_de || '');
-    }
+setEditedNoteDe(selected.notes_de || '');
   };
 
   if (showGerman) {
