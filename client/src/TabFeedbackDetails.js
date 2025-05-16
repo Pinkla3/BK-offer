@@ -445,8 +445,10 @@ const t = (text) => showGerman ? (translationMapPlToDe[text] || text) : text;
   };
 const handleSave = async () => {
   try {
-    const answers = showGerman ? editedAnswersDe : editedAnswers;
-    const note = showGerman ? editedNoteDe : editedNote;
+    const answers = editedAnswers;
+    const answersDe = editedAnswersDe;
+    const note = editedNote;
+    const noteDe = editedNoteDe;
 
     const translationMapPlToDe = {
       'bardzo dobrze': 'sehr gut',
@@ -466,76 +468,65 @@ const handleSave = async () => {
       'Nein': 'Nie'
     };
 
-    const payload = {};
+    const payload = {
+      caregiver_first_name: editedCaregiverFirstName,
+      caregiver_last_name: editedCaregiverLastName,
+      caregiver_phone: editedCaregiverPhone,
+      patient_first_name: editedPatientFirstName,
+      patient_last_name: editedPatientLastName,
+      no_history: showGerman
+    };
 
+    // ✳️ Zamknięte pytania
     if (showGerman) {
-      // === Niemiecka wersja ===
       if (answers[0]?.trim()) payload.q1_de = answers[0];
-      if (answers[1]?.trim()) payload.q2_de = answers[1];
-      if (Array.isArray(answers[2]) && answers[2].length) payload.q3_de = answers[2].join(', ');
-      if (answers[3]?.trim()) payload.q4_de = answers[3];
       if (answers[4]?.trim()) payload.q5_de = answers[4];
-      if (answers[5]?.toString().trim()) payload.q6_de = answers[5];
       if (answers[6]?.trim()) payload.q7_de = answers[6];
-      if (answers[7]?.trim()) payload.q7_why_de = answers[7];
-      if (answers[8]?.trim()) payload.q8_plus_de = answers[8];
-      if (answers[9]?.trim()) payload.q8_minus_de = answers[9];
-      if (answers[10]?.trim()) payload.q9_de = answers[10];
-      if (answers[11]?.trim()) payload.q10_de = answers[11];
-      if (note?.trim()) payload.notes_de = note;
-
-      // Synchronizacja PL
-      if (answers[0]?.trim()) payload.q1 = reverseTranslationMap[answers[0]] || selected.q1;
-      if (Array.isArray(answers[2]) && answers[2].length) payload.q3 = answers[2].join(', ');
-      if (answers[3]?.trim()) payload.q4 = answers[3];
-      if (answers[4]?.trim()) payload.q5 = reverseTranslationMap[answers[4]] || selected.q5;
-      if (answers[5]?.toString().trim()) payload.q6 = answers[5];
-      if (answers[6]?.trim()) payload.q7 = reverseTranslationMap[answers[6]] || selected.q7;
-      if (answers[7]?.trim()) payload.q7_why = answers[7];
-      if (answers[8]?.trim()) payload.q8_plus = answers[8];
-      if (answers[9]?.trim()) payload.q8_minus = answers[9];
-      if (answers[10]?.trim()) payload.q9 = answers[10];
-      if (answers[11]?.trim()) payload.q10 = answers[11];
-      if (note?.trim()) payload.notes = note;
     } else {
-      // === Polska wersja ===
       if (answers[0]?.trim()) payload.q1 = answers[0];
-      if (answers[1]?.trim()) payload.q2 = answers[1];
-      if (Array.isArray(answers[2]) && answers[2].length) payload.q3 = answers[2].join(', ');
-      if (answers[3]?.trim()) payload.q4 = answers[3];
       if (answers[4]?.trim()) payload.q5 = answers[4];
-      if (answers[5]?.toString().trim()) payload.q6 = answers[5];
       if (answers[6]?.trim()) payload.q7 = answers[6];
-      if (answers[7]?.trim()) payload.q7_why = answers[7];
-      if (answers[8]?.trim()) payload.q8_plus = answers[8];
-      if (answers[9]?.trim()) payload.q8_minus = answers[9];
-      if (answers[10]?.trim()) payload.q9 = answers[10];
-      if (answers[11]?.trim()) payload.q10 = answers[11];
-      if (note?.trim()) payload.notes = note;
-
-      // Synchronizacja DE
-      if (answers[0]?.trim()) payload.q1_de = translationMapPlToDe[answers[0]] || selected.q1_de;
-      if (Array.isArray(answers[2]) && answers[2].length) payload.q3_de = answers[2].join(', ');
-      if (answers[3]?.trim()) payload.q4_de = answers[3];
-      if (answers[4]?.trim()) payload.q5_de = translationMapPlToDe[answers[4]] || selected.q5_de;
-      if (answers[5]?.toString().trim()) payload.q6_de = answers[5];
-      if (answers[6]?.trim()) payload.q7_de = translationMapPlToDe[answers[6]] || selected.q7_de;
-      if (answers[7]?.trim()) payload.q7_why_de = answers[7];
-      if (answers[8]?.trim()) payload.q8_plus_de = answers[8];
-      if (answers[9]?.trim()) payload.q8_minus_de = answers[9];
-      if (answers[10]?.trim()) payload.q9_de = answers[10];
-      if (answers[11]?.trim()) payload.q10_de = answers[11];
-      if (note?.trim()) payload.notes_de = note;
     }
 
-    // Dane opiekunki i pacjenta
-    payload.caregiver_first_name = editedCaregiverFirstName;
-    payload.caregiver_last_name = editedCaregiverLastName;
-    payload.caregiver_phone = editedCaregiverPhone;
-    payload.patient_first_name = editedPatientFirstName;
-    payload.patient_last_name = editedPatientLastName;
-    payload.no_history = showGerman;
+    // ✳️ Tłumaczenia zamkniętych opcji
+    if (showGerman) {
+      if (answers[0]?.trim()) payload.q1 = reverseTranslationMap[answers[0]] || selected.q1;
+      if (answers[4]?.trim()) payload.q5 = reverseTranslationMap[answers[4]] || selected.q5;
+      if (answers[6]?.trim()) payload.q7 = reverseTranslationMap[answers[6]] || selected.q7;
+    } else {
+      if (answers[0]?.trim()) payload.q1_de = translationMapPlToDe[answers[0]] || selected.q1_de;
+      if (answers[4]?.trim()) payload.q5_de = translationMapPlToDe[answers[4]] || selected.q5_de;
+      if (answers[6]?.trim()) payload.q7_de = translationMapPlToDe[answers[6]] || selected.q7_de;
+    }
 
+    // ✳️ Checkboxy (q3)
+    if (Array.isArray(answers[2]) && answers[2].length) {
+      if (showGerman) payload.q3_de = answers[2].join(', ');
+      else payload.q3 = answers[2].join(', ');
+    }
+
+    // ✳️ Pola tekstowe (q4, q7_why, q8_plus, q8_minus, q9, q10)
+    const textFieldIndexes = [3, 7, 8, 9, 10, 11];
+    textFieldIndexes.forEach((i) => {
+      const key = `q${i + 1}`;
+      const val = answers[i];
+      const valDe = answersDe[i];
+
+      if (showGerman && valDe?.trim()) {
+        payload[`${key}_de`] = valDe;
+      } else if (!showGerman && val?.trim()) {
+        payload[key] = val;
+      }
+    });
+
+    // ✳️ Notatki
+    if (showGerman && noteDe?.trim()) {
+      payload.notes_de = noteDe;
+    } else if (!showGerman && note?.trim()) {
+      payload.notes = note;
+    }
+
+    // 🛰️ Wyślij tylko to, co naprawdę trzeba
     const res = await axios.patch(
       `${API_BASE_URL}/api/tabResponses/${selected.id}`,
       payload,
@@ -543,48 +534,26 @@ const handleSave = async () => {
     );
 
     const updated = res.data;
-    setSelected(updated);
 
-    setEditedAnswers([
-      updated.q1 || '',
-      updated.q2 || '',
-      typeof updated.q3 === 'string' ? updated.q3.split(', ') : updated.q3 || '',
-      updated.q4 || '',
-      updated.q5 || '',
-      updated.q6 || '',
-      updated.q7 || '',
-      updated.q7_why || '',
-      updated.q8_plus || '',
-      updated.q8_minus || '',
-      updated.q9 || '',
-      updated.q10 || ''
-    ]);
+    // 🔁 Zaktualizuj tylko zmienione dane lokalnie
+    const updatedSelected = {
+      ...selected,
+      ...payload,
+      user_name: updated.user_name || selected.user_name,
+      edit_history: updated.edit_history
+    };
 
-    setEditedAnswersDe([
-      updated.q1_de || '',
-      updated.q2_de || '',
-      updated.q3_de || '',
-      updated.q4_de || '',
-      updated.q5_de || '',
-      updated.q6_de || '',
-      updated.q7_de || '',
-      updated.q7_why_de || '',
-      updated.q8_plus_de || '',
-      updated.q8_minus_de || '',
-      updated.q9_de || '',
-      updated.q10_de || ''
-    ]);
-
-    setEditedNote(updated.notes || '');
-    setEditedNoteDe(updated.notes_de || '');
-
+    setSelected(updatedSelected);
+    setGermanAnswers(answersDe);
+    setTranslatedNote(noteDe);
     setEditing(false);
     setIsTranslated(true);
-    toast.success(showGerman ? 'Wersja niemiecka zapisana.' : 'Wersja polska zapisana.');
+
+    toast.success('Dane zapisane pomyślnie!');
     window.dispatchEvent(new Event('feedbackUpdated'));
   } catch (err) {
     console.error('❌ Błąd zapisu:', err);
-    toast.error('Nie udało się zapisać odpowiedzi.');
+    toast.error('Wystąpił błąd podczas zapisywania. Spróbuj ponownie.');
   }
 };
 
