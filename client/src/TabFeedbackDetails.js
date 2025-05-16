@@ -1666,21 +1666,21 @@ value={
   }}
 >
   {editing ? (
-    <Button
+    <SmallButton
       onClick={handleSave}
       disabled={translating}
       style={{ width: '200px', justifyContent: 'center' }}
     >
       {translating ? <SpinnerIcon size={16} /> : <FaSave />}
       {translating ? 'Zapisywanie...' : 'Zapisz'}
-    </Button>
+    </SmallButton>
   ) : (
-    <Button
+    <SmallButton
       onClick={initEdit}
       style={{ width: '200px', justifyContent: 'center' }}
     >
       <FaEdit /> Edytuj
-    </Button>
+    </SmallButton>
   )}
 </div>
 </TabSection>
