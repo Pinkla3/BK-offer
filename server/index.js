@@ -660,7 +660,7 @@ app.patch('/api/tabResponses/:id', authenticate, async (req, res) => {
       // PL
       'q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'q7_why', 'q8_plus', 'q8_minus', 'q9', 'q10', 'notes',
       // DE
-      'q1_de', 'q2_de', 'q3_de', 'q5_de', 'q6_de', 'q7_de', 'q7_why_de', 'q8_plus_de', 'q8_minus_de', 'q9_de', 'q10_de', 'notes_de',
+      'q1_de', 'q2_de', 'q3_de', 'q4_de', 'q5_de', 'q6_de', 'q7_de', 'q7_why_de', 'q8_plus_de', 'q8_minus_de', 'q9_de', 'q10_de', 'notes_de',
       // dane
       'caregiver_first_name', 'caregiver_last_name', 'caregiver_phone',
       'patient_first_name', 'patient_last_name'
