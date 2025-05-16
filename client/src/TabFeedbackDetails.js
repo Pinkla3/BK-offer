@@ -995,57 +995,51 @@ const handleCopyToClipboard = () => {
   }
 
   const suffix = showGerman ? '_de' : '';
-  const noteKey = `notes${suffix}`;
-  const note = selected[noteKey];
-
-  const questions = showGerman ? questionsDe : questionsPl;
+  const get = (key) => selected[`${key}${suffix}`]?.toString().trim() || '';
+  const notEmpty = (val) => val && val.trim() !== '';
 
   const lines = [];
 
-  // q1–q5 (standardowo)
-  for (let i = 0; i < 5; i++) {
-    const key = `q${i + 1}${suffix}`;
-    const value = selected[key];
-    const display = Array.isArray(value)
-      ? value.join(', ')
-      : typeof value === 'string'
-        ? value.trim()
-        : value?.toString?.() || '';
-
-    lines.push(`${questions[i]}\n${display || '[brak odpowiedzi]'}`);
+  // Pytanie 1
+  lines.push(`${showGerman ? questionsDe[0] : questionsPl[0]}`);
+  lines.push(get('q1') || '[brak odpowiedzi]');
+  if (notEmpty(get('q2'))) {
+    lines.push(get('q2'));
   }
 
-  // q6 → q8_plus
-  const plusKey = `q8_plus${suffix}`;
-  const plusVal = selected[plusKey];
-  lines.push(`${questions[5]}\n${(plusVal || '').trim() || '[brak odpowiedzi]'}`);
-
-  // q7 → q8_minus
-  const minusKey = `q8_minus${suffix}`;
-  const minusVal = selected[minusKey];
-  lines.push(`${questions[6]}\n${(minusVal || '').trim() || '[brak odpowiedzi]'}`);
-
-  // q8 → q9
-  for (let i = 7; i <= 9; i++) {
-    const key = `q${i + 1}${suffix}`;
-    const value = selected[key];
-    const display = Array.isArray(value)
-      ? value.join(', ')
-      : typeof value === 'string'
-        ? value.trim()
-        : value?.toString?.() || '';
-
-    lines.push(`${questions[i]}\n${display || '[brak odpowiedzi]'}`);
+  // Pytanie 2
+  lines.push(`\n${showGerman ? questionsDe[1] : questionsPl[1]}`);
+  lines.push(get('q3') || '[brak odpowiedzi]');
+  if (notEmpty(get('q4'))) {
+    lines.push(get('q4'));
   }
 
-  // q7_why
-  const why = selected[`q7_why${suffix}`];
-  lines.push(`${showGerman ? 'Warum?' : 'Dlaczego?'}\n${(why || '').trim() || '[brak odpowiedzi]'}`);
+  // Pytanie 3
+  lines.push(`\n${showGerman ? questionsDe[2] : questionsPl[2]}`);
+  lines.push(get('q5') || '[brak odpowiedzi]');
+
+  // Pytanie 4
+  lines.push(`\n${showGerman ? questionsDe[3] : questionsPl[3]}`);
+  lines.push(get('q6') || '[brak odpowiedzi]');
+
+  // Pytanie 5
+  lines.push(`\n${showGerman ? questionsDe[4] : questionsPl[4]}`);
+  lines.push(get('q7') || '[brak odpowiedzi]');
+  if (notEmpty(get('q7_why'))) {
+    lines.push(get('q7_why'));
+  }
+
+  // Pytanie 6
+  lines.push(`\n${showGerman ? questionsDe[5] : questionsPl[5]}`);
+  lines.push(get('q8_plus') || '[brak odpowiedzi]');
+  lines.push(get('q8_minus') || '[brak odpowiedzi]');
 
   // Notatka
-  lines.push(`${showGerman ? 'Notiz:' : 'Notatka:'}\n${note?.trim() || '[brak notatki]'}`);
+  const note = get('notes');
+  lines.push(`\n${showGerman ? 'Notiz:' : 'Notatka:'}`);
+  lines.push(note || '[brak notatki]');
 
-  const fullText = lines.join('\n\n');
+  const fullText = lines.join('\n');
 
   navigator.clipboard.writeText(fullText)
     .then(() => toast.success('Feedback skopiowany do schowka!'))
