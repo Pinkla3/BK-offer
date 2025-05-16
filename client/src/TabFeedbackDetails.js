@@ -1659,7 +1659,7 @@ value={
 </QuestionGroup>
 <div
   style={{
-    marginTop: '-32px',
+    marginTop: '-25px',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center'
