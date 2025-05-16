@@ -466,8 +466,8 @@ const handleSave = async () => {
       'Nein': 'Nie'
     };
 
-    const sync = (pl, de) => showGerman ? reverseTranslationMap[de] || '' : pl;
-    const syncDe = (pl, de) => showGerman ? de : translationMapPlToDe[pl] || '';
+    const sync = (pl, de) => showGerman ? reverseTranslationMap[de] || pl : pl;
+    const syncDe = (pl, de) => showGerman ? de : translationMapPlToDe[pl] || de;
 
     const payload = {
       ...(showGerman
@@ -490,7 +490,7 @@ const handleSave = async () => {
             q1: sync(selected.q1, answers[0]),
             q3: Array.isArray(answers[2]) ? answers[2].join(', ') : sync(selected.q3, answers[2]),
             q5: sync(selected.q5, answers[4]),
-            q6: sync(selected.q6, answers[5]),
+            q6: answers[5] ?? selected.q6,
             q7: sync(selected.q7, answers[6])
           }
         : {
@@ -512,7 +512,7 @@ const handleSave = async () => {
             q1_de: syncDe(answers[0], selected.q1_de),
             q3_de: syncDe(answers[2], selected.q3_de),
             q5_de: syncDe(answers[4], selected.q5_de),
-            q6_de: syncDe(answers[5], selected.q6_de),
+            q6_de: answers[5] ?? selected.q6_de,
             q7_de: syncDe(answers[6], selected.q7_de)
           }),
 
@@ -1321,13 +1321,13 @@ const handleToggleGerman = async () => {
     <div style={{ position: 'relative', maxWidth: '300px', width: '100%' }}>
       <input
         type="number"
-        value={
-          editing
-            ? (showGerman ? editedAnswersDe[5] : editedAnswers[5]) ?? ''
-            : showGerman
-              ? (selected.q6_de && selected.q6_de !== '0' ? selected.q6_de : '[brak tekstu do tłumaczenia]')
-              : (selected.q6 && selected.q6 !== '0' ? selected.q6 : '[brak odpowiedzi]')
-        }
+value={
+  editing
+    ? (showGerman ? editedAnswersDe[5] : editedAnswers[5]) ?? ''
+    : showGerman
+      ? (selected.q6_de && selected.q6_de !== '0' ? selected.q6_de : 'brak odpowiedzi do tłumaczenia')
+      : (selected.q6 && selected.q6 !== '0' ? selected.q6 : '')
+}
         placeholder={showGerman ? 'z. B. 50' : 'np. 50'}
         readOnly={!editing}
         onChange={editing ? (e) => {
