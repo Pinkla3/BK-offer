@@ -469,7 +469,6 @@ const handleSave = async () => {
     const payload = {};
 
     if (showGerman) {
-      // === Niemiecka wersja ===
       if (answers[0]?.trim()) payload.q1_de = answers[0];
       if (answers[1]?.trim()) payload.q2_de = answers[1];
       if (Array.isArray(answers[2]) && answers[2].length) payload.q3_de = answers[2].join(', ');
@@ -484,7 +483,6 @@ const handleSave = async () => {
       if (answers[11]?.trim()) payload.q10_de = answers[11];
       if (note?.trim()) payload.notes_de = note;
 
-      // Synchronizacja PL
       if (answers[0]?.trim()) payload.q1 = reverseTranslationMap[answers[0]] || selected.q1;
       if (Array.isArray(answers[2]) && answers[2].length) payload.q3 = answers[2].join(', ');
       if (answers[3]?.trim()) payload.q4 = answers[3];
@@ -498,7 +496,6 @@ const handleSave = async () => {
       if (answers[11]?.trim()) payload.q10 = answers[11];
       if (note?.trim()) payload.notes = note;
     } else {
-      // === Polska wersja ===
       if (answers[0]?.trim()) payload.q1 = answers[0];
       if (answers[1]?.trim()) payload.q2 = answers[1];
       if (Array.isArray(answers[2]) && answers[2].length) payload.q3 = answers[2].join(', ');
@@ -513,7 +510,6 @@ const handleSave = async () => {
       if (answers[11]?.trim()) payload.q10 = answers[11];
       if (note?.trim()) payload.notes = note;
 
-      // Synchronizacja DE
       if (answers[0]?.trim()) payload.q1_de = translationMapPlToDe[answers[0]] || selected.q1_de;
       if (Array.isArray(answers[2]) && answers[2].length) payload.q3_de = answers[2].join(', ');
       if (answers[3]?.trim()) payload.q4_de = answers[3];
@@ -536,14 +532,30 @@ const handleSave = async () => {
     payload.patient_last_name = editedPatientLastName;
     payload.no_history = showGerman;
 
+    // 🔍 Porównanie z poprzednim stanem
+    const getChangedFields = (original, updated) =>
+      Object.fromEntries(
+        Object.entries(updated).filter(([key, value]) => {
+          const prev = original[key];
+          const normPrev = Array.isArray(prev) ? prev.join(', ') : prev;
+          const normNew = Array.isArray(value) ? value.join(', ') : value;
+          return normNew !== normPrev;
+        })
+      );
+
+    const changedPayload = getChangedFields(selected, payload);
+
+    // 🔁 Wyślij tylko zmienione pola
     const res = await axios.patch(
       `${API_BASE_URL}/api/tabResponses/${selected.id}`,
-      payload,
+      changedPayload,
       { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
     );
 
     const updated = res.data;
-    setSelected(updated);
+
+    // 🔄 Zaktualizuj tylko zmienione pola lokalnie
+    setSelected(prev => ({ ...prev, ...getChangedFields(prev, updated) }));
 
     setEditedAnswers([
       updated.q1 || '',
