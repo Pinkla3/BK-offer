@@ -488,8 +488,41 @@ const initEdit = () => {
   setIsPolishChangedSinceTranslation(false);
 };
 
+const hasChanges = () => {
+  const currentAnswers = showGerman ? editedAnswersDe : editedAnswers;
+  const original = selected;
+
+  const fields = [
+    'q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'q7_why', 'q8_plus', 'q8_minus', 'q9', 'q10'
+  ];
+
+  const noteChanged = (showGerman ? editedNoteDe : editedNote) !== (showGerman ? original.notes_de : original.notes);
+
+  const changed = fields.some((q, i) => {
+    const key = showGerman ? `${q}_de` : q;
+    const edited = currentAnswers[i];
+    const originalVal = Array.isArray(original[key])
+      ? original[key]
+      : typeof original[key] === 'string' && original[key].includes(', ')
+        ? original[key].split(', ')
+        : original[key];
+
+    if (Array.isArray(edited) && Array.isArray(originalVal)) {
+      return edited.join(', ') !== originalVal.join(', ');
+    }
+    return edited !== originalVal;
+  });
+
+  return changed || noteChanged;
+};
+
 const handleSave = async () => {
   try {
+if (!hasChanges()) {
+  toast.info('Brak zmian do zapisania.');
+  return;
+}
+
     const answers = showGerman ? editedAnswersDe : editedAnswers;
     const note = showGerman ? editedNoteDe : editedNote;
 
