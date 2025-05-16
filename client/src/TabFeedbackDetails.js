@@ -1253,7 +1253,7 @@ const handleToggleGerman = async () => {
 <QuestionGroup>
   <Label>
     {questions[4]}
-    {showGerman && (!selected.q5 || selected.q5.trim() === '') && (
+    {showGerman && !editing && !(selected.q5_de || '').trim() && (
       <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
         Brak odpowiedzi do tłumaczenia
       </span>
@@ -1273,28 +1273,34 @@ const handleToggleGerman = async () => {
     }}
   >
     {['Tak', 'Nie'].map(val => {
-      const translated = t(val);
-      const isActive = (editing ? editedAnswers[4] : selected.q5) === val;
+      const translationMap = { Tak: 'Ja', Nie: 'Nein' };
+      const plVal = val;
+      const deVal = translationMap[val];
+      const current = editing ? editedAnswers[4] : selected.q5;
+      const isActive = current === plVal;
+
       return (
         <OptionButton
           key={val}
           type="button"
           active={isActive}
           editing={editing}
-          onClick={() => editing && setEditedAnswers(prev => {
-            const updated = [...prev];
-            updated[4] = val;
-            return updated;
-          })}
-          warning={isMissingTranslation(translated) && isActive}
+          onClick={() => {
+            if (!editing) return;
+            const updatedPL = [...editedAnswers];
+            const updatedDE = [...editedAnswersDe];
+            updatedPL[4] = plVal;
+            updatedDE[4] = deVal;
+            setEditedAnswers(updatedPL);
+            setEditedAnswersDe(updatedDE);
+          }}
         >
-          {translated}
+          {showGerman ? deVal : plVal}
         </OptionButton>
       );
     })}
   </div>
 </QuestionGroup>
-
 
 {/* Pytanie 4 */}
 <QuestionGroup>
@@ -1365,13 +1371,12 @@ const handleToggleGerman = async () => {
 <QuestionGroup>
   <Label>
     {questions[6]}
-    {showGerman && (!selected.q7 || selected.q7.trim() === '') && (
+    {showGerman && !editing && !(selected.q7_de || '').trim() && (
       <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
         Brak odpowiedzi do tłumaczenia
       </span>
     )}
   </Label>
-
   <div
     style={{
       display: 'grid',
@@ -1386,55 +1391,68 @@ const handleToggleGerman = async () => {
     }}
   >
     {['Tak', 'Nie'].map(val => {
-      const isActive = (editing ? editedAnswers[6] : selected.q7) === val;
+      const translationMap = { Tak: 'Ja', Nie: 'Nein' };
+      const plVal = val;
+      const deVal = translationMap[val];
+      const current = editing ? editedAnswers[6] : selected.q7;
+      const isActive = current === plVal;
+
       return (
         <OptionButton
           key={val}
           type="button"
           active={isActive}
           editing={editing}
-          onClick={() => editing && setEditedAnswers(prev => {
-            const updated = [...prev];
-            updated[6] = val;
-            return updated;
-          })}
+          onClick={() => {
+            if (!editing) return;
+            const updatedPL = [...editedAnswers];
+            const updatedDE = [...editedAnswersDe];
+            updatedPL[6] = plVal;
+            updatedDE[6] = deVal;
+            setEditedAnswers(updatedPL);
+            setEditedAnswersDe(updatedDE);
+          }}
         >
-          {t(val)}
+          {showGerman ? deVal : plVal}
         </OptionButton>
       );
     })}
   </div>
 
-  {/* Pole tekstowe tylko jeśli zaznaczone "Nie" */}
-  {(editing ? editedAnswers[6] : selected.q7) === 'Nie' && (
-    <>
-      <Label>
-        {questions[7]}
-        {showGerman && (!selected.q7_why || selected.q7_why.trim() === '') && (
-          <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
-            Brak odpowiedzi do tłumaczenia
-          </span>
-        )}
-      </Label>
-     <TextArea
-  value={
-    editing
-      ? editedAnswers[7] || ''
-      : showGerman
-        ? selected.q7_why_de?.trim() || '[brak tekstu do tłumaczenia]'
-        : selected.q7_why || ''
-  }
-  onChange={editing ? (e) => {
-    const updated = [...editedAnswers];
-    updated[7] = e.target.value;
-    setEditedAnswers(updated);
-  } : undefined}
-  readOnly={!editing}
-  placeholder={t('Dlaczego nie?')}
-  rows={3}
-/>
-    </>
-  )}
+  {(() => {
+    const currentVal = editing ? editedAnswers[6] : selected.q7;
+    const shouldShow = currentVal === 'Nie';
+
+    return shouldShow && (
+      <>
+        <Label>
+          {questions[7]}
+          {showGerman && !editing && !(selected.q7_why_de || '').trim() && (
+            <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
+              Brak odpowiedzi do tłumaczenia
+            </span>
+          )}
+        </Label>
+        <TextArea
+          value={
+            editing
+              ? (showGerman ? editedAnswersDe[7] : editedAnswers[7]) || ''
+              : showGerman
+                ? selected.q7_why_de || '[brak tekstu do tłumaczenia]'
+                : selected.q7_why || ''
+          }
+          onChange={editing ? (e) => {
+            const updated = showGerman ? [...editedAnswersDe] : [...editedAnswers];
+            updated[7] = e.target.value;
+            showGerman ? setEditedAnswersDe(updated) : setEditedAnswers(updated);
+          } : undefined}
+          readOnly={!editing}
+          placeholder={showGerman ? 'Warum nicht?' : 'Dlaczego nie?'}
+          rows={3}
+        />
+      </>
+    );
+  })()}
 </QuestionGroup>
 
 {/* Pytanie 6 */}
