@@ -1128,14 +1128,15 @@ const handleToggleGerman = async () => {
 </QuestionGroup>
 {/* Pytanie 2 */}
 <QuestionGroup>
- <Label>
-  {questions[2]}
-  {showGerman && (!selected.q3 || selected.q3.trim() === '') && (
-    <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
-      Brak odpowiedzi do tłumaczenia
-    </span>
-  )}
-</Label>
+  <Label>
+    {questions[2]}
+    {showGerman && (!selected.q3 || selected.q3.trim() === '') && (
+      <span style={{ color: 'red', fontSize: '13px', marginLeft: '8px' }}>
+        Brak odpowiedzi do tłumaczenia
+      </span>
+    )}
+  </Label>
+
   <div
     style={{
       display: 'grid',
@@ -1149,7 +1150,11 @@ const handleToggleGerman = async () => {
     }}
   >
     {checkboxOptionsQ2.map(option => {
-     const isChecked = (editing ? editedAnswers[2] : (selected.q3 ? selected.q3.split(', ') : [])).includes(option);
+      const list = editing
+        ? Array.isArray(editedAnswers[2]) ? editedAnswers[2] : typeof editedAnswers[2] === 'string' ? editedAnswers[2].split(', ') : []
+        : typeof selected.q3 === 'string' ? selected.q3.split(', ') : Array.isArray(selected.q3) ? selected.q3 : [];
+
+      const isChecked = list.includes(option);
 
       return (
         <label
@@ -1177,16 +1182,16 @@ const handleToggleGerman = async () => {
                   : [...list, item];
 
               setEditedAnswers(prev => {
-                const list = prev[2] || [];
-                const updated = toggle(list, option);
+                const prevList = Array.isArray(prev[2]) ? prev[2] : typeof prev[2] === 'string' ? prev[2].split(', ') : [];
+                const updated = toggle(prevList, option);
                 const newAnswers = [...prev];
                 newAnswers[2] = updated;
                 return newAnswers;
               });
 
               setEditedAnswersDe(prev => {
-                const list = prev[2] || [];
-                const updated = toggle(list, option);
+                const prevList = Array.isArray(prev[2]) ? prev[2] : typeof prev[2] === 'string' ? prev[2].split(', ') : [];
+                const updated = toggle(prevList, option);
                 const newAnswers = [...prev];
                 newAnswers[2] = updated;
                 return newAnswers;
@@ -1228,8 +1233,8 @@ const handleToggleGerman = async () => {
       style={{
         width: '100%',
         maxWidth: '300px',
-        visibility: (editing ? editedAnswers[2] : selected.q3?.split(', ') || []).includes('inne trudności') ? 'visible' : 'hidden',
-        pointerEvents: (editing ? editedAnswers[2] : selected.q3?.split(', ') || []).includes('inne trudności') ? 'auto' : 'none'
+        visibility: list.includes('inne trudności') ? 'visible' : 'hidden',
+        pointerEvents: list.includes('inne trudności') ? 'auto' : 'none'
       }}
     />
   </div>
