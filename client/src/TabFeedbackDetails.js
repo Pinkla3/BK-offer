@@ -537,7 +537,7 @@ const handleSave = async () => {
     setEditedAnswers([
       updated.q1 || '',
       updated.q2 || '',
-      typeof updated.q3 === 'string' ? updated.q3.split(', ') : updated.q3 || '',
+       Array.isArray(updated.q3) ? updated.q3 : typeof updated.q3 === 'string' ? updated.q3.split(', ') : [],
       updated.q4 || '',
       updated.q5 || '',
       updated.q6 || '',
@@ -552,7 +552,7 @@ const handleSave = async () => {
     setEditedAnswersDe([
       updated.q1_de || '',
       updated.q2_de || '',
-      updated.q3_de || '',
+     Array.isArray(updated.q3_de) ? updated.q3_de : typeof updated.q3_de === 'string' ? updated.q3_de.split(', ') : [],
       updated.q4_de || '',
       updated.q5_de || '',
       updated.q6_de || '',
