@@ -1658,7 +1658,7 @@ value={
   />
 </QuestionGroup>
 
-<Button style={{ width: '100px' }}>
+<Button style={{ width: '100px', height: '20px', justifyContent:'center' }}>
     {editing ? (
       <SmallButton onClick={handleSave} disabled={translating}>
         {translating ? <SpinnerIcon size={16} /> : <FaSave />}
