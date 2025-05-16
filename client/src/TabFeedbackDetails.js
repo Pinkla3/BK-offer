@@ -466,8 +466,8 @@ const handleSave = async () => {
       'Nein': 'Nie'
     };
 
-    const sync = (pl, de) => showGerman ? reverseTranslationMap[de] || pl : pl;
-    const syncDe = (pl, de) => showGerman ? de : translationMapPlToDe[pl] || de;
+    const sync = (pl, de) => showGerman ? reverseTranslationMap[de] || '' : pl;
+    const syncDe = (pl, de) => showGerman ? de : translationMapPlToDe[pl] || '';
 
     const payload = {
       ...(showGerman
@@ -475,7 +475,7 @@ const handleSave = async () => {
             q1_de: answers[0],
             q2_de: answers[1],
             q3_de: answers[2],
-            q4_de: answers[3],
+            q4_de: answers[3], // osobne pole dla DE
             q5_de: answers[4],
             q6_de: answers[5],
             q7_de: answers[6],
@@ -486,18 +486,17 @@ const handleSave = async () => {
             q10_de: answers[11],
             notes_de: note,
 
-            // synchronizacja PL
             q1: sync(selected.q1, answers[0]),
             q3: Array.isArray(answers[2]) ? answers[2].join(', ') : sync(selected.q3, answers[2]),
             q5: sync(selected.q5, answers[4]),
-            q6: answers[5] ?? selected.q6,
+            q6: sync(selected.q6, answers[5]),
             q7: sync(selected.q7, answers[6])
           }
         : {
             q1: answers[0],
             q2: answers[1],
             q3: Array.isArray(answers[2]) ? answers[2].join(', ') : answers[2],
-            q4: answers[3],
+            q4: answers[3], // osobne pole dla PL
             q5: answers[4],
             q6: answers[5],
             q7: answers[6],
@@ -508,11 +507,10 @@ const handleSave = async () => {
             q10: answers[11],
             notes: note,
 
-            // synchronizacja DE
             q1_de: syncDe(answers[0], selected.q1_de),
             q3_de: syncDe(answers[2], selected.q3_de),
             q5_de: syncDe(answers[4], selected.q5_de),
-            q6_de: answers[5] ?? selected.q6_de,
+            q6_de: syncDe(answers[5], selected.q6_de),
             q7_de: syncDe(answers[6], selected.q7_de)
           }),
 
@@ -538,7 +536,7 @@ const handleSave = async () => {
       updated.q1 || '',
       updated.q2 || '',
       typeof updated.q3 === 'string' ? updated.q3.split(', ') : updated.q3 || '',
-      updated.q4 || '',
+      updated.q4 || '', // PL
       updated.q5 || '',
       updated.q6 || '',
       updated.q7 || '',
@@ -553,7 +551,7 @@ const handleSave = async () => {
       updated.q1_de || '',
       updated.q2_de || '',
       updated.q3_de || '',
-      updated.q4_de || '',
+      updated.q4_de || '', // DE
       updated.q5_de || '',
       updated.q6_de || '',
       updated.q7_de || '',
