@@ -335,30 +335,70 @@ const TabFeedbackDetails = ({ selected, setSelected, onBack }) => {
   const [showHistoryModal, setShowHistoryModal] = useState(false);
 
 useEffect(() => {
-  if (editing && selected) {
-    setEditedAnswers([
-      selected.q1 || '',
-      selected.q2 || '',
-      Array.isArray(selected.q3)
+  if (!editing || !selected) return;
+
+  // 1. Wypełnij dane PL
+  setEditedAnswers([
+    selected.q1 || '',
+    selected.q2 || '',
+    Array.isArray(selected.q3)
+      ? selected.q3
+      : typeof selected.q3 === 'string'
+      ? selected.q3.split(', ')
+      : [],
+    selected.q4 || '',
+    selected.q5 || '',
+    selected.q6 || '',
+    selected.q7 || '',
+    selected.q7_why || '',
+    selected.q8_plus || '',
+    selected.q8_minus || '',
+    selected.q9 || '',
+    selected.q10 || ''
+  ]);
+
+  // 2. Wypełnij DE — jeśli są, albo przetłumacz z PL
+  const fillOrTranslateDE = async () => {
+    const de = [
+      selected.q1_de || '',
+      selected.q2_de || (await handleDynamicTranslate(selected.q2 || '')),
+      selected.q3_de
+        ? selected.q3_de.split(', ')
+        : Array.isArray(selected.q3)
         ? selected.q3
         : typeof selected.q3 === 'string'
         ? selected.q3.split(', ')
         : [],
-      selected.q4 || '',
-      selected.q5 || '',
-      selected.q6 || '',
-      selected.q7 || '',
-      selected.q7_why || '',
-      selected.q8_plus || '',
-      selected.q8_minus || '',
-      selected.q9 || '',
-      selected.q10 || ''
-    ]);
+      selected.q4_de || (await handleDynamicTranslate(selected.q4 || '')),
+      selected.q5_de || '',
+      selected.q6_de || '',
+      selected.q7_de || '',
+      selected.q7_why_de || (await handleDynamicTranslate(selected.q7_why || '')),
+      selected.q8_plus_de || (await handleDynamicTranslate(selected.q8_plus || '')),
+      selected.q8_minus_de || (await handleDynamicTranslate(selected.q8_minus || '')),
+      selected.q9_de || '',
+      selected.q10_de || ''
+    ];
 
+    setEditedAnswersDe(de);
+
+    if (!selected.notes_de && selected.notes) {
+      const translatedNote = await handleDynamicTranslate(selected.notes);
+      setEditedNoteDe(translatedNote);
+    } else {
+      setEditedNoteDe(selected.notes_de || '');
+    }
+  };
+
+  if (showGerman) {
+    fillOrTranslateDE();
+  } else {
     setEditedAnswersDe([
       selected.q1_de || '',
       selected.q2_de || '',
-      selected.q3_de || '',
+      selected.q3_de
+        ? selected.q3_de.split(', ')
+        : [],
       selected.q4_de || '',
       selected.q5_de || '',
       selected.q6_de || '',
@@ -369,8 +409,12 @@ useEffect(() => {
       selected.q9_de || '',
       selected.q10_de || ''
     ]);
+    setEditedNoteDe(selected.notes_de || '');
   }
-}, [editing, selected]);
+
+  setEditedNote(selected.notes || '');
+
+}, [editing, selected, showGerman]);
 
 const translationMapPlToDe = {
   'bardzo dobrze': 'sehr gut',
