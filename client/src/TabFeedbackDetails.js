@@ -1000,44 +1000,40 @@ const handleCopyToClipboard = () => {
 
   const lines = [];
 
-  // Pytanie 1
-  lines.push(`${showGerman ? questionsDe[0] : questionsPl[0]}`);
+  // 1. Jak ogólnie czuje się Pani/Pan z klientem?
+  lines.push(`1. Jak ogólnie czuje się Pani/Pan z klientem?`);
   lines.push(get('q1') || '[brak odpowiedzi]');
-  if (notEmpty(get('q2'))) {
-    lines.push(get('q2'));
-  }
+  if (notEmpty(get('q2'))) lines.push(get('q2'));
 
-  // Pytanie 2
-  lines.push(`\n${showGerman ? questionsDe[1] : questionsPl[1]}`);
+  // 2. Czy istnieją trudności w opiece nad pacjentem/pacjentką?
+  lines.push(`\n2. Czy istnieją trudności w opiece nad pacjentem/pacjentką?`);
   lines.push(get('q3') || '[brak odpowiedzi]');
-  if (notEmpty(get('q4'))) {
-    lines.push(get('q4'));
-  }
+  if (notEmpty(get('q4'))) lines.push(get('q4'));
 
-  // Pytanie 3
-  lines.push(`\n${showGerman ? questionsDe[2] : questionsPl[2]}`);
+  // 3. Czy ma pani/pan czas wolny?
+  lines.push(`\n3. Czy ma pani/pan czas wolny?`);
   lines.push(get('q5') || '[brak odpowiedzi]');
 
-  // Pytanie 4
-  lines.push(`\n${showGerman ? questionsDe[3] : questionsPl[3]}`);
+  // 4. Ile wynosi budżet na tydzień? (w Euro)
+  lines.push(`\n4. Ile wynosi budżet na tydzień? (w Euro)`);
   lines.push(get('q6') || '[brak odpowiedzi]');
 
-  // Pytanie 5
-  lines.push(`\n${showGerman ? questionsDe[4] : questionsPl[4]}`);
+  // 5. Czy chciałby/chciałaby pan/pani wrócić do rodziny?
+  lines.push(`\n5. Czy chciałby/chciałaby pan/pani wrócić do rodziny?`);
   lines.push(get('q7') || '[brak odpowiedzi]');
-  if (notEmpty(get('q7_why'))) {
-    lines.push(get('q7_why'));
-  }
+  if (notEmpty(get('q7_why'))) lines.push(get('q7_why'));
 
-  // Pytanie 6
-  lines.push(`\n${showGerman ? questionsDe[5] : questionsPl[5]}`);
+  // 6. Napisz 2 plusy:
+  lines.push(`\n6. Napisz 2 plusy:`);
   lines.push(get('q8_plus') || '[brak odpowiedzi]');
+
+  // 7. ...i 2 minusy zlecenia (jeśli są):
+  lines.push(`\n ...i 2 minusy zlecenia (jeśli są):`);
   lines.push(get('q8_minus') || '[brak odpowiedzi]');
 
   // Notatka
-  const note = get('notes');
-  lines.push(`\n${showGerman ? 'Notiz:' : 'Notatka:'}`);
-  lines.push(note || '[brak notatki]');
+  lines.push(`\n Notatka:`);
+  lines.push(get('notes') || '[brak notatki]');
 
   const fullText = lines.join('\n');
 
