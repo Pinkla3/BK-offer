@@ -626,7 +626,7 @@ app.post('/api/translate', authenticate, async (req, res) => {
   }
 });
 
-app.patch('/api/tabResponses/:id', authenticateToken, async (req, res) => {
+app.patch('/api/tabResponses/:id', authenticate, async (req, res) => {
   const id = req.params.id;
   const updates = req.body;
   const userName = req.user.name || 'Nieznany użytkownik';
