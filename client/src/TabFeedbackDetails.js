@@ -989,57 +989,35 @@ const handleToggleGerman = async () => {
 ];
 
 const handleCopyToClipboard = () => {
-  if (!selected) {
-    toast.error('Brak danych do skopiowania.');
-    return;
-  }
+  const questions = showGerman ? questionsDe : questionsPl;
+  const answers = showGerman ? editedAnswersDe : editedAnswers;
+  const note = showGerman ? editedNoteDe : editedNote;
+  const lang = showGerman ? ' (DE)' : ' (PL)';
 
-  const suffix = showGerman ? '_de' : '';
-  const get = (key) => selected[`${key}${suffix}`]?.toString().trim() || '';
-  const notEmpty = (val) => val && val.trim() !== '';
+  const formatAnswer = (qIndex) => {
+    const question = questions[qIndex]?.trim();
+    const answer = answers[qIndex] ?? '';
+    if (!question || question === '') return '';
+    return `${question}\n${Array.isArray(answer) ? answer.join(', ') : answer}\n`;
+  };
 
-  const lines = [];
+  const content = [
+    `Imię i nazwisko opiekunki${lang}: ${editedCaregiverFirstName} ${editedCaregiverLastName}`,
+    `Telefon opiekunki: ${editedCaregiverPhone}`,
+    `Imię i nazwisko pacjenta: ${editedPatientFirstName} ${editedPatientLastName}`,
+    '',
+    ...questions.map((_, i) => formatAnswer(i)).filter(Boolean),
+    `${showGerman ? noteLabelDe : noteLabelPl}`,
+    note || '[brak notatki]'
+  ].join('\n');
 
-  // 1. Jak ogólnie czuje się Pani/Pan z klientem?
-  lines.push(`1. Jak ogólnie czuje się Pani/Pan z klientem?`);
-  lines.push(get('q1') || '[brak odpowiedzi]');
-  if (notEmpty(get('q2'))) lines.push(get('q2'));
-
-  // 2. Czy istnieją trudności w opiece nad pacjentem/pacjentką?
-  lines.push(`\n2. Czy istnieją trudności w opiece nad pacjentem/pacjentką?`);
-  lines.push(get('q3') || '[brak odpowiedzi]');
-  if (notEmpty(get('q4'))) lines.push(get('q4'));
-
-  // 3. Czy ma pani/pan czas wolny?
-  lines.push(`\n3. Czy ma pani/pan czas wolny?`);
-  lines.push(get('q5') || '[brak odpowiedzi]');
-
-  // 4. Ile wynosi budżet na tydzień? (w Euro)
-  lines.push(`\n4. Ile wynosi budżet na tydzień? (w Euro)`);
-  lines.push(get('q6') || '[brak odpowiedzi]');
-
-  // 5. Czy chciałby/chciałaby pan/pani wrócić do rodziny?
-  lines.push(`\n5. Czy chciałby/chciałaby pan/pani wrócić do rodziny?`);
-  lines.push(get('q7') || '[brak odpowiedzi]');
-  if (notEmpty(get('q7_why'))) lines.push(get('q7_why'));
-
-  // 6. Napisz 2 plusy:
-  lines.push(`\n6. Napisz 2 plusy:`);
-  lines.push(get('q8_plus') || '[brak odpowiedzi]');
-
-  // 7. ...i 2 minusy zlecenia (jeśli są):
-  lines.push(`\n ...i 2 minusy zlecenia (jeśli są):`);
-  lines.push(get('q8_minus') || '[brak odpowiedzi]');
-
-  // Notatka
-  lines.push(`\n Notatka:`);
-  lines.push(get('notes') || '[brak notatki]');
-
-  const fullText = lines.join('\n');
-
-  navigator.clipboard.writeText(fullText)
-    .then(() => toast.success('Feedback skopiowany do schowka!'))
-    .catch(() => toast.error('Nie udało się skopiować.'));
+  navigator.clipboard.writeText(content)
+    .then(() => {
+      toast.success('Feedback został skopiowany do schowka.');
+    })
+    .catch(() => {
+      toast.error('Nie udało się skopiować feedbacku.');
+    });
 };
 
   return (
