@@ -1175,7 +1175,7 @@ const handleCopyToClipboard = () => {
   {/* Lewy przycisk */}
   <SmallButton onClick={handleCopyToClipboard} style={{ width: '200px' }}>
     <FaCopy />
-    Kopiuj feedback
+    Skopiuj
   </SmallButton>
 
   {/* Tytuł na środku */}
