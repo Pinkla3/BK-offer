@@ -85,6 +85,16 @@ const TabFeedbackView = ({ resetSelected }) => {
     return () => window.removeEventListener('feedbackUpdated', handleUpdate);
   }, []);
 
+  useEffect(() => {
+  const handleExternalBack = () => {
+    setSelected(null);
+    setStep(1);
+  };
+
+  window.addEventListener('feedbackBack', handleExternalBack);
+  return () => window.removeEventListener('feedbackBack', handleExternalBack);
+}, []);
+
   return (
     <div>
       {step === 1 ? (
