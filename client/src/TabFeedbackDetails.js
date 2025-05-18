@@ -1070,10 +1070,6 @@ const handleCopyToClipboard = () => {
     `${questions[8]}\n${get('q8_plus')}`,
     `${questions[9]}\n${get('q8_minus')}`,
 
-    // Pytanie 7 i 8
-    `${questions[10]}\n${get('q9')}`,
-    `${questions[11]}\n${get('q10')}`,
-
     (showGerman ? noteLabelDe : noteLabelPl),
     note || '[brak notatki]'
   ].join('\n');
