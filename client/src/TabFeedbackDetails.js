@@ -1000,7 +1000,7 @@ const handleCopyToClipboard = () => {
   const note = get('notes');
   const lang = showGerman ? ' (DE)' : ' (PL)';
 
-  // specjalne mapowanie checkboxów q3
+  // checkboxowe odpowiedzi
   const checkboxOptionsQ2 = [
     'występują nocki',
     'jest ciężki transfer',
@@ -1019,32 +1019,60 @@ const handleCopyToClipboard = () => {
 
   const t = (val) => showGerman ? (translationMapPlToDe[val] || val) : val;
 
-  const q3Array = Array.isArray(selected[showGerman ? 'q3_de' : 'q3'])
-    ? selected[showGerman ? 'q3_de' : 'q3']
-    : (selected[showGerman ? 'q3_de' : 'q3'] || '').split(', ').map(s => s.trim()).filter(Boolean);
-
+  // Pytanie 2 (q3) jako lista checkboxów
+  const q3Raw = selected[showGerman ? 'q3_de' : 'q3'] || '';
+  const q3Array = Array.isArray(q3Raw)
+    ? q3Raw
+    : q3Raw.split(', ').map(s => s.trim()).filter(Boolean);
   const q3Text = q3Array.map(t).join(', ');
   const q4Text = get('q4');
 
+  // q2 tylko jeśli q1 = 'średnio' lub 'mam zastrzeżenia' lub DE odpowiedniki
+  const triggerQ2 = showGerman
+    ? ['durchschnittlich', 'Ich habe Bedenken']
+    : ['średnio', 'mam zastrzeżenia'];
+
+  const q1 = get('q1');
+  const q2 = get('q2');
+
+  const includeQ2 = triggerQ2.includes(q1);
+
+  // q7_why tylko jeśli q7 === 'Nie' lub 'Nein'
+  const triggerQ7 = showGerman ? 'Nein' : 'Nie';
+  const q7 = get('q7');
+  const q7_why = get('q7_why');
+
+  const includeQ7Why = q7 === triggerQ7;
+
+  // Składanie treści
   const content = [
     `Imię i nazwisko opiekunki${lang}: ${selected?.caregiver_first_name || ''} ${selected?.caregiver_last_name || ''}`,
     `Telefon opiekunki: ${selected?.caregiver_phone || ''}`,
     `Imię i nazwisko pacjenta: ${selected?.patient_first_name || ''} ${selected?.patient_last_name || ''}`,
     '',
 
-    // Pytanie 1
-    `${questions[0]}\n${get('q1')}\n`,
+    // Pytanie 1 (+ q2 jeśli trzeba)
+    `${questions[0]}\n${q1}${includeQ2 ? `\n${q2}` : ''}\n`,
 
-    // Pytanie 2 – checkboxy + opcjonalne q4
+    // Pytanie 2 (checkboxy + q4)
     `${questions[2]}\n${q3Text}${q3Array.includes('inne trudności') || q3Array.includes('andere Schwierigkeiten') ? `\n${q4Text}` : ''}\n`,
 
-    // Pozostałe pytania (3–10)
-    ...[4, 5, 6, 7, 8, 9, 10, 11].map(i => {
-      const q = questions[i];
-      const a = answers[i];
-      if (!q || q.trim() === '') return null;
-      return `${q}\n${Array.isArray(a) ? a.join(', ') : a}\n`;
-    }).filter(Boolean),
+    // Pytanie 3
+    `${questions[4]}\n${get('q5')}\n`,
+
+    // Pytanie 4
+    `${questions[5]}\n${get('q6')}\n`,
+
+    // Pytanie 5 (+ q7_why jeśli trzeba)
+    `${questions[6]}\n${q7}${includeQ7Why ? `\n${q7_why}` : ''}\n`,
+
+    // Pytanie 6
+    `${questions[8]}\n${get('q8_plus')}`,
+    `${questions[9]}\n${get('q8_minus')}`,
+
+    // Pytanie 7 i 8
+    `${questions[10]}\n${get('q9')}`,
+    `${questions[11]}\n${get('q10')}`,
 
     (showGerman ? noteLabelDe : noteLabelPl),
     note || '[brak notatki]'
@@ -1054,7 +1082,6 @@ const handleCopyToClipboard = () => {
     .then(() => toast.success('Feedback został skopiowany do schowka.'))
     .catch(() => toast.error('Nie udało się skopiować feedbacku.'));
 };
-
   return (
     <Wrapper>
      <TitleRow>
