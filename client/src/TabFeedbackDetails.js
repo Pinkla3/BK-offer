@@ -989,7 +989,7 @@ const handleToggleGerman = async () => {
 const handleCopyToClipboard = () => {
   const questions = showGerman ? questionsDe : questionsPl;
   const get = (key) => selected?.[showGerman ? `${key}_de` : key] || '';
-  
+
   const fieldKeys = [
     'q1', 'q2', 'q3', 'q4', 'q5', 'q6',
     'q7', 'q7_why', 'q8_plus', 'q8_minus',
@@ -1000,17 +1000,53 @@ const handleCopyToClipboard = () => {
   const note = get('notes');
   const lang = showGerman ? ' (DE)' : ' (PL)';
 
+  // specjalne mapowanie checkboxów q3
+  const checkboxOptionsQ2 = [
+    'występują nocki',
+    'jest ciężki transfer',
+    'osoba jest trudna',
+    'brak',
+    'inne trudności'
+  ];
+
+  const translationMapPlToDe = {
+    'występują nocki': 'es gibt Nachtdienste',
+    'jest ciężki transfer': 'es gibt schwierige Transfers',
+    'osoba jest trudna': 'die Person ist schwierig',
+    'brak': 'keine',
+    'inne trudności': 'andere Schwierigkeiten'
+  };
+
+  const t = (val) => showGerman ? (translationMapPlToDe[val] || val) : val;
+
+  const q3Array = Array.isArray(selected[showGerman ? 'q3_de' : 'q3'])
+    ? selected[showGerman ? 'q3_de' : 'q3']
+    : (selected[showGerman ? 'q3_de' : 'q3'] || '').split(', ').map(s => s.trim()).filter(Boolean);
+
+  const q3Text = q3Array.map(t).join(', ');
+  const q4Text = get('q4');
+
   const content = [
     `Imię i nazwisko opiekunki${lang}: ${selected?.caregiver_first_name || ''} ${selected?.caregiver_last_name || ''}`,
     `Telefon opiekunki: ${selected?.caregiver_phone || ''}`,
     `Imię i nazwisko pacjenta: ${selected?.patient_first_name || ''} ${selected?.patient_last_name || ''}`,
     '',
-    ...questions.map((q, i) => {
-      if (!q?.trim()) return null;
-      const answer = answers[i];
-      return `${q}\n${Array.isArray(answer) ? answer.join(', ') : answer}\n`;
+
+    // Pytanie 1
+    `${questions[0]}\n${get('q1')}\n`,
+
+    // Pytanie 2 – checkboxy + opcjonalne q4
+    `${questions[2]}\n${q3Text}${q3Array.includes('inne trudności') || q3Array.includes('andere Schwierigkeiten') ? `\n${q4Text}` : ''}\n`,
+
+    // Pozostałe pytania (3–10)
+    ...[4, 5, 6, 7, 8, 9, 10, 11].map(i => {
+      const q = questions[i];
+      const a = answers[i];
+      if (!q || q.trim() === '') return null;
+      return `${q}\n${Array.isArray(a) ? a.join(', ') : a}\n`;
     }).filter(Boolean),
-    showGerman ? noteLabelDe : noteLabelPl,
+
+    (showGerman ? noteLabelDe : noteLabelPl),
     note || '[brak notatki]'
   ].join('\n');
 
