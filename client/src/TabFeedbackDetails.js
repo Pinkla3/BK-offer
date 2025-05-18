@@ -851,8 +851,6 @@ if (hasMissingNote) {
   }
 };
 
-const isMissingTranslation = (val) => val?.trim() === '[brak tekstu do tłumaczenia]';
-
 const getTextAreaStyle = (val) => {
   return val?.trim() === '[brak tekstu do tłumaczenia]'
     ? { backgroundColor: '#f8d7da', borderColor: '#f5c6cb', color: '#721c24' }
@@ -990,34 +988,35 @@ const handleToggleGerman = async () => {
 
 const handleCopyToClipboard = () => {
   const questions = showGerman ? questionsDe : questionsPl;
-  const answers = showGerman ? editedAnswersDe : editedAnswers;
-  const note = showGerman ? editedNoteDe : editedNote;
+  const get = (key) => selected?.[showGerman ? `${key}_de` : key] || '';
+  
+  const fieldKeys = [
+    'q1', 'q2', 'q3', 'q4', 'q5', 'q6',
+    'q7', 'q7_why', 'q8_plus', 'q8_minus',
+    'q9', 'q10'
+  ];
+
+  const answers = fieldKeys.map(get);
+  const note = get('notes');
   const lang = showGerman ? ' (DE)' : ' (PL)';
 
-  const formatAnswer = (qIndex) => {
-    const question = questions[qIndex]?.trim();
-    const answer = answers[qIndex] ?? '';
-    if (!question || question === '') return '';
-    return `${question}\n${Array.isArray(answer) ? answer.join(', ') : answer}\n`;
-  };
-
   const content = [
-    `Imię i nazwisko opiekunki${lang}: ${editedCaregiverFirstName} ${editedCaregiverLastName}`,
-    `Telefon opiekunki: ${editedCaregiverPhone}`,
-    `Imię i nazwisko pacjenta: ${editedPatientFirstName} ${editedPatientLastName}`,
+    `Imię i nazwisko opiekunki${lang}: ${selected?.caregiver_first_name || ''} ${selected?.caregiver_last_name || ''}`,
+    `Telefon opiekunki: ${selected?.caregiver_phone || ''}`,
+    `Imię i nazwisko pacjenta: ${selected?.patient_first_name || ''} ${selected?.patient_last_name || ''}`,
     '',
-    ...questions.map((_, i) => formatAnswer(i)).filter(Boolean),
-    `${showGerman ? noteLabelDe : noteLabelPl}`,
+    ...questions.map((q, i) => {
+      if (!q?.trim()) return null;
+      const answer = answers[i];
+      return `${q}\n${Array.isArray(answer) ? answer.join(', ') : answer}\n`;
+    }).filter(Boolean),
+    showGerman ? noteLabelDe : noteLabelPl,
     note || '[brak notatki]'
   ].join('\n');
 
   navigator.clipboard.writeText(content)
-    .then(() => {
-      toast.success('Feedback został skopiowany do schowka.');
-    })
-    .catch(() => {
-      toast.error('Nie udało się skopiować feedbacku.');
-    });
+    .then(() => toast.success('Feedback został skopiowany do schowka.'))
+    .catch(() => toast.error('Nie udało się skopiować feedbacku.'));
 };
 
   return (
