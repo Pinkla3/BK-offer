@@ -508,7 +508,14 @@ const hasChanges = () => {
     return edited !== originalVal;
   });
 
-  return changed || noteChanged;
+  const personalChanged =
+    editedCaregiverFirstName !== (original.caregiver_first_name || '') ||
+    editedCaregiverLastName !== (original.caregiver_last_name || '') ||
+    editedCaregiverPhone !== (original.caregiver_phone || '') ||
+    editedPatientFirstName !== (original.patient_first_name || '') ||
+    editedPatientLastName !== (original.patient_last_name || '');
+
+  return changed || noteChanged || personalChanged;
 };
 
 const handleSave = async () => {
