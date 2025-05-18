@@ -1046,10 +1046,6 @@ const handleCopyToClipboard = () => {
 
   // Składanie treści
   const content = [
-    `Imię i nazwisko opiekunki${lang}: ${selected?.caregiver_first_name || ''} ${selected?.caregiver_last_name || ''}`,
-    `Telefon opiekunki: ${selected?.caregiver_phone || ''}`,
-    `Imię i nazwisko pacjenta: ${selected?.patient_first_name || ''} ${selected?.patient_last_name || ''}`,
-    '',
 
     // Pytanie 1 (+ q2 jeśli trzeba)
     `${questions[0]}\n${q1}${includeQ2 ? `\n${q2}` : ''}\n`,
