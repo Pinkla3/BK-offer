@@ -90,7 +90,7 @@ app.post('/api/login', async (req, res) => {
     
     // Debug: wyświetlenie JWT_SECRET (usuń w produkcji)
     
-    const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '8h' });
+    const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '60s' });
     res.json({ message: 'Zalogowano', token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
   } catch (err) {
     res.status(500).json({ error: 'Błąd logowania' });
