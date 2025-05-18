@@ -1284,22 +1284,23 @@ const handleCopyToClipboard = () => {
           width: '100%'
         }}
       >
-        <TextArea
-          name="q2"
-          value={
-            editing
-              ? (showGerman ? editedAnswersDe[1] : editedAnswers[1]) || ''
-              : showGerman
-                ? selected.q2_de || '[brak tłumaczenia]'
-                : selected.q2 || ''
-          }
-          onChange={editing ? (e) => {
-            const updated = showGerman ? [...editedAnswersDe] : [...editedAnswers];
-            updated[1] = e.target.value;
-            showGerman ? setEditedAnswersDe(updated) : setEditedAnswers(updated);
-          } : undefined}
-          placeholder={showGerman ? 'Warum?' : 'Dlaczego?'}
-          rows={3}
+<TextArea
+  name="q2"
+  value={
+    editing
+      ? (showGerman ? editedAnswersDe[1] : editedAnswers[1]) || ''
+      : showGerman
+        ? selected.q2_de || '[brak tłumaczenia]'
+        : selected.q2 || ''
+  }
+  onChange={(e) => {
+    if (!editing) return;
+    const updated = showGerman ? [...editedAnswersDe] : [...editedAnswers];
+    updated[1] = e.target.value;
+    showGerman ? setEditedAnswersDe(updated) : setEditedAnswers(updated);
+  }}
+  placeholder={showGerman ? 'Warum?' : 'Dlaczego?'}
+  rows={3}
           style={{
             width: '100%',
             border: '1px solid #ccc',
@@ -1633,23 +1634,24 @@ value={
             </span>
           )}
         </Label>
-        <TextArea
-          value={
-            editing
-              ? (showGerman ? editedAnswersDe[7] : editedAnswers[7]) || ''
-              : showGerman
-                ? selected.q7_why_de || '[brak tekstu do tłumaczenia]'
-                : selected.q7_why || ''
-          }
-          onChange={editing ? (e) => {
-            const updated = showGerman ? [...editedAnswersDe] : [...editedAnswers];
-            updated[7] = e.target.value;
-            showGerman ? setEditedAnswersDe(updated) : setEditedAnswers(updated);
-          } : undefined}
-          readOnly={!editing}
-          placeholder={showGerman ? 'Warum nicht?' : 'Dlaczego nie?'}
-          rows={3}
-        />
+<TextArea
+  value={
+    editing
+      ? (showGerman ? editedAnswersDe[7] : editedAnswers[7]) || ''
+      : showGerman
+        ? selected.q7_why_de || '[brak tekstu do tłumaczenia]'
+        : selected.q7_why || ''
+  }
+  onChange={(e) => {
+    if (!editing) return;
+    const updated = showGerman ? [...editedAnswersDe] : [...editedAnswers];
+    updated[7] = e.target.value;
+    showGerman ? setEditedAnswersDe(updated) : setEditedAnswers(updated);
+  }}
+  readOnly={!editing}
+  placeholder={showGerman ? 'Warum nicht?' : 'Dlaczego nie?'}
+  rows={3}
+/>
       </div>
     );
   })()}
@@ -1675,11 +1677,12 @@ value={
         : selected.q8_plus || ''
   }
   readOnly={!editing}
-  onChange={editing ? (e) => {
+  onChange={(e) => {
+    if (!editing) return;
     const updated = showGerman ? [...editedAnswersDe] : [...editedAnswers];
     updated[8] = e.target.value;
     showGerman ? setEditedAnswersDe(updated) : setEditedAnswers(updated);
-  } : undefined}
+  }}
   rows={2}
   placeholder={t('Np. dobra atmosfera, wsparcie rodziny...')}
   style={{
@@ -1689,6 +1692,7 @@ value={
     color: showGerman && !editing && !((editedAnswersDe[8] || selected.q8_plus_de)?.trim()) ? '#721c24' : '#000'
   }}
 />
+
 
   {/* q8_minus */}
   <Label>
@@ -1708,11 +1712,12 @@ value={
         : selected.q8_minus || ''
   }
   readOnly={!editing}
-  onChange={editing ? (e) => {
+  onChange={(e) => {
+    if (!editing) return;
     const updated = showGerman ? [...editedAnswersDe] : [...editedAnswers];
     updated[9] = e.target.value;
     showGerman ? setEditedAnswersDe(updated) : setEditedAnswers(updated);
-  } : undefined}
+  }}
   rows={2}
   placeholder={t('Np. brak czasu wolnego, trudna komunikacja...')}
   style={{
@@ -1735,37 +1740,38 @@ value={
   </Label>
 
   <TextArea
-    value={
-      editing
-        ? (showGerman ? editedNoteDe : editedNote)
-        : (showGerman
-            ? (editedNoteDe || selected.notes_de || '[brak tłumaczenia]')
-            : (editedNote || selected.notes || '')
-          )
+  value={
+    editing
+      ? (showGerman ? editedNoteDe : editedNote)
+      : (showGerman
+          ? (editedNoteDe || selected.notes_de || '[brak tłumaczenia]')
+          : (editedNote || selected.notes || '')
+        )
+  }
+  readOnly={!editing}
+  onChange={(e) => {
+    if (!editing) return;
+    if (showGerman) {
+      setEditedNoteDe(e.target.value);
+    } else {
+      setEditedNote(e.target.value);
     }
-    readOnly={!editing}
-    onChange={editing ? (e) => {
-      if (showGerman) {
-        setEditedNoteDe(e.target.value);
-      } else {
-        setEditedNote(e.target.value);
-      }
-    } : undefined}
-    rows={4}
-    placeholder={t('Dodatkowe uwagi...')}
-    style={{
-      ...getTextAreaStyle(
-        showGerman
-          ? (editing ? editedNote : selected.notes)
-          : (editing ? editedNote : selected.notes)
-      ),
-      ...(showGerman && (!selected.notes_de || selected.notes_de.trim() === '') && {
-        backgroundColor: '#f8d7da',
-        borderColor: '#f5c6cb',
-        color: '#721c24'
-      })
-    }}
-  />
+  }}
+  rows={4}
+  placeholder={t('Dodatkowe uwagi...')}
+  style={{
+    ...getTextAreaStyle(
+      showGerman
+        ? (editing ? editedNote : selected.notes)
+        : (editing ? editedNote : selected.notes)
+    ),
+    ...(showGerman && (!selected.notes_de || selected.notes_de.trim() === '') && {
+      backgroundColor: '#f8d7da',
+      borderColor: '#f5c6cb',
+      color: '#721c24'
+    })
+  }}
+/>
 </QuestionGroup>
 <div
   style={{
